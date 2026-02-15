@@ -14,7 +14,7 @@ This repository holds the **specification**, **examples**, and **standardization
 - **Vendor-neutral:** Describe agents without binding to a specific provider or runtime.
 - **Machine-readable:** Enable tooling for validation, code generation, and orchestration.
 - **Human-friendly:** Support YAML and JSON for authoring and review.
-- **Extensible:** Allow custom extensions (e.g., `x-*` fields) for domain-specific needs.
+- **Extensible:** Allow custom extensions (`x_*` fields) and domain-specific profiles.
 - **Standards-ready:** Structure the spec for submission to multiple standards organizations.
 
 ## Specification
@@ -49,6 +49,7 @@ We aim to align with existing DSL standards (OpenAPI, AsyncAPI) and to submit AD
 | Path | Purpose |
 |------|---------|
 | [versions/](versions/) | Versioned specification (e.g., `0.1.0-draft/spec.md`). |
+| [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial). |
 | [standardization/](standardization/) | Roadmap and per-standards-body notes. |
 | [proposals/](proposals/) | Spec and process proposals. |
 | [examples/](examples/) | Example ADL YAML/JSON documents. |

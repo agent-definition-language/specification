@@ -1,0 +1,156 @@
+{
+  "$schema": "https://adl-spec.org/0.1/schema.json",
+  "adl": "0.1.0",
+  "name": "Compliance Review Agent",
+  "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
+  "version": "1.0.0",
+  "profiles": ["urn:adl:profile:governance:1.0"],
+  "provider": {
+    "name": "Acme Compliance",
+    "url": "https://compliance.acme.example",
+    "contact": "compliance@acme.example"
+  },
+  "model": {
+    "capabilities": ["function_calling"]
+  },
+  "tools": [
+    {
+      "name": "review_document",
+      "description": "Review a document against compliance controls",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "document_id": { "type": "string" },
+          "framework": { "type": "string" }
+        },
+        "required": ["document_id", "framework"]
+      },
+      "read_only": true
+    },
+    {
+      "name": "generate_report",
+      "description": "Generate a compliance report",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "review_id": { "type": "string" },
+          "format": { "type": "string", "enum": ["pdf", "json", "html"] }
+        },
+        "required": ["review_id"]
+      }
+    }
+  ],
+  "permissions": {
+    "network": {
+      "allowed_hosts": ["docs.acme.example", "api.acme.example"],
+      "allowed_protocols": ["https"],
+      "deny_private": true
+    },
+    "filesystem": {
+      "allowed_paths": [
+        { "path": "/data/documents/**", "access": "read" },
+        { "path": "/data/reports/**", "access": "read_write" }
+      ]
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "scopes": ["compliance:read", "compliance:write"]
+    },
+    "encryption": {
+      "in_transit": {
+        "required": true,
+        "min_version": "1.2"
+      }
+    }
+  },
+  "compliance_framework": {
+    "primary_framework": "SOC2_TYPE_II",
+    "control_mappings": [
+      {
+        "framework": "SOC2",
+        "control_id": "CC6.1",
+        "status": "implemented"
+      },
+      {
+        "framework": "SOC2",
+        "control_id": "CC6.6",
+        "status": "implemented"
+      },
+      {
+        "framework": "SOC2",
+        "control_id": "CC7.2",
+        "status": "implemented"
+      }
+    ],
+    "audit_dates": {
+      "last_audit": "2025-11-15T00:00:00Z",
+      "next_audit": "2026-11-15T00:00:00Z"
+    }
+  },
+  "ai_governance": {
+    "risk_classification": {
+      "level": "medium",
+      "assessed_by": "AI Ethics Committee",
+      "assessed_at": "2025-10-01T00:00:00Z",
+      "rationale": "Agent processes sensitive compliance data but does not make autonomous decisions"
+    },
+    "safety_reviews": {
+      "required": true,
+      "frequency": "quarterly",
+      "last_review": "2025-12-01T00:00:00Z",
+      "review_board": "AI Safety Board"
+    },
+    "human_oversight": {
+      "level": "on_exception",
+      "role": "Compliance Officer"
+    }
+  },
+  "governance": {
+    "operational_status": {
+      "status": "active",
+      "effective_date": "2025-12-01T00:00:00Z"
+    },
+    "ownership": {
+      "owner": "Compliance Team",
+      "delegate": "Security Team",
+      "contact": "compliance@acme.example"
+    },
+    "approval_workflow": {
+      "required": true,
+      "approvers": ["compliance-lead", "security-lead"],
+      "approval_type": "all"
+    },
+    "audit_trail": {
+      "enabled": true,
+      "retention_days": 730,
+      "destination": "s3://acme-audit-logs/compliance-agent/"
+    }
+  },
+  "registry_metadata": {
+    "urn": "urn:acme:agents:compliance-review:1.0.0",
+    "taxonomy": {
+      "domain": "compliance",
+      "subdomain": "document-review",
+      "capability": "soc2-review"
+    },
+    "discovery_tags": ["compliance", "soc2", "audit", "document-review"],
+    "federation": {
+      "registries": [
+        "https://registry.acme.example",
+        "https://enterprise-agents.example"
+      ],
+      "primary": "https://registry.acme.example"
+    }
+  },
+  "metadata": {
+    "authors": [
+      { "name": "Compliance Team", "email": "compliance@acme.example" }
+    ],
+    "license": "Proprietary",
+    "documentation": "https://docs.acme.example/agents/compliance-review",
+    "tags": ["compliance", "soc2", "enterprise"]
+  }
+}

@@ -467,37 +467,16 @@ See the [examples/](../../examples/) directory:
 
 ---
 
-## Appendix C. Governance Profile
+## Appendix C. Profiles
 
-**Identifier:** `urn:adl:profile:governance:1.0`
+ADL profiles are maintained in the [profiles/](../../profiles/) directory. Each profile is versioned independently and declares compatibility with ADL versions.
 
-When this profile is declared, the following additional members and requirements apply.
+### Available Profiles
 
-### C.1 Additional Members
+| Profile | Identifier | Status |
+|---------|------------|--------|
+| [Governance](../../profiles/governance/) | `urn:adl:profile:governance:1.0` | Draft |
+| [Healthcare](../../profiles/healthcare/) | `urn:adl:profile:healthcare:1.0` | Placeholder |
+| [Financial](../../profiles/financial/) | `urn:adl:profile:financial:1.0` | Placeholder |
 
-**compliance_framework** — REQUIRED when using this profile. Object containing:
-
-| Member            | Type   | Description |
-|-------------------|--------|-------------|
-| primary_framework | string | Primary compliance framework |
-| control_mappings  | array  | Control implementation details |
-| audit_dates       | object | Last and next audit dates (e.g. `last_audit`, `next_audit` ISO 8601) |
-
-`primary_framework` **MUST** be one of: `NIST_800_53`, `SOC2_TYPE_II`, `ISO_27001`, `ISO_42001`, `GDPR`, `HIPAA`, `PCI_DSS`, `EU_AI_ACT`.
-
-**ai_governance** — OPTIONAL. Object containing: `risk_classification` (object), `safety_reviews` (object), `human_oversight` (object).
-
-**governance** — OPTIONAL. Object containing: `operational_status` (object), `ownership` (object), `approval_workflow` (object), `audit_trail` (object).
-
-**registry_metadata** — OPTIONAL. Object containing: `urn` (string), `taxonomy` (object), `discovery_tags` (array), `federation` (object).
-
-### C.2 Compliance Mapping
-
-| ADL / Profile Section        | Framework Controls |
-|------------------------------|--------------------|
-| permissions.network          | NIST AC-4, SC-7; SOC2 CC6.6 |
-| permissions.filesystem      | NIST AC-3, AC-6; SOC2 CC6.1 |
-| security.authentication     | NIST IA-2, IA-5; SOC2 CC6.1 |
-| security.encryption          | NIST SC-8, SC-13; SOC2 CC6.1 |
-| ai_governance                | ISO 42001 6.1, 9.1; EU AI Act Art. 9 |
-| governance.audit_trail       | NIST AU-2, AU-6; SOC2 CC7.2 |
+See [profiles/README.md](../../profiles/README.md) for the full profile index and contribution guidelines.
