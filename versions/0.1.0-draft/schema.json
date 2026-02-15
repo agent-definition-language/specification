@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/0.1/schema.json",
+  "title": "ADL Document",
+  "description": "Agent Definition Language v0.1.0",
+  "type": "object",
+  "required": ["adl", "name", "description", "version"],
+  "properties": {
+    "adl": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "ADL specification version (semantic versioning)"
+    },
+    "$schema": {
+      "type": "string",
+      "format": "uri",
+      "description": "URI to this JSON Schema"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable name for the agent"
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable description of the agent's purpose and capabilities"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Agent version (semantic versioning)"
+    }
+  },
+  "additionalProperties": true
+}
