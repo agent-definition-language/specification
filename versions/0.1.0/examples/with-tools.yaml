@@ -1,0 +1,49 @@
+adl: "0.1.0"
+name: Calculator
+description: A calculator agent that performs math operations.
+version: "0.1.0"
+
+model:
+  capabilities:
+    - function_calling
+
+tools:
+  - name: add
+    description: Add two numbers
+    parameters:
+      type: object
+      properties:
+        a:
+          type: number
+        b:
+          type: number
+      required:
+        - a
+        - b
+    returns:
+      type: number
+    read_only: true
+    idempotent: true
+
+  - name: multiply
+    description: Multiply two numbers
+    parameters:
+      type: object
+      properties:
+        a:
+          type: number
+        b:
+          type: number
+      required:
+        - a
+        - b
+    returns:
+      type: number
+    read_only: true
+    idempotent: true
+
+metadata:
+  license: MIT
+  tags:
+    - calculator
+    - math
