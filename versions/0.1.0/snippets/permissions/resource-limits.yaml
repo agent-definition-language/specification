@@ -1,0 +1,3 @@
+resource_limits:
+  max_memory_mb: 2048
+  max_duration_sec: 300

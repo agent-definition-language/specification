@@ -1,0 +1,4 @@
+adl: "0.1.0"
+name: Hello Agent
+description: A simple greeting agent.
+version: "1.0.0"

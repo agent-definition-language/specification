@@ -1,0 +1,7 @@
+network:
+  allowed_hosts:
+    - api.semanticscholar.org
+    - arxiv.org
+  allowed_protocols:
+    - https
+  deny_private: true

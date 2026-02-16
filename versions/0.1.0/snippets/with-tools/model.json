@@ -1,0 +1,7 @@
+{
+  "model": {
+    "capabilities": [
+      "function_calling"
+    ]
+  }
+}
