@@ -1,6 +1,6 @@
 {
   "$schema": "https://adl-spec.org/0.1/schema.json",
-  "adl": "0.1.0",
+  "adl_spec": "0.1.0",
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
   "version": "1.0.0",

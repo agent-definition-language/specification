@@ -30,7 +30,7 @@ Example ADL documents are in [examples/](examples/). Minimal valid document (0.1
 
 ```json
 {
-  "adl": "0.1.0",
+  "adl_spec": "0.1.0",
   "name": "My Agent",
   "description": "An agent defined with ADL.",
   "version": "1.0.0"

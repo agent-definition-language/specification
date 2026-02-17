@@ -1,8 +1,7 @@
 # Agent Definition Language (ADL) Specification
 
 **Version:** 0.1.0-draft  
-**Status:** Draft (internal draft of ADL)  
-**Format:** JSON (snake_case member names)
+**Status:** Draft (internal draft of ADL)
 
 ## 1. Introduction
 
@@ -16,6 +15,7 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 - **Interoperability:** Agents can interact with tools, resources, and other agents using a common description format.
 - **Deployment:** Runtime environments can provision and configure agents based on declared requirements.
 - **Security:** Permission boundaries and security requirements are explicitly declared and enforceable.
+- **Lifecycle:** Agents can be versioned, tracked through operational states, and managed across their entire lifecycle from draft to retirement.
 
 ### 1.2 Goals
 
@@ -30,12 +30,12 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 
 ADL builds upon and interoperates with:
 
-- **JSON [RFC8259]** — ADL documents are valid JSON.
-- **JSON Schema** — ADL documents are validated against JSON Schema; tool parameters use JSON Schema for types.
-- **A2A Protocol** — ADL documents can generate A2A Agent Cards.
-- **Model Context Protocol (MCP)** — ADL documents can generate MCP server configurations; tools, resources, and prompts align with MCP primitives.
-- **OpenAPI** — ADL can reference OpenAPI specifications for HTTP-based tools.
-- **W3C DIDs / Verifiable Credentials** — ADL supports DIDs for cryptographic identity and VCs for attestations.
+- **<a href="https://www.rfc-editor.org/rfc/rfc8259" target="_blank">JSON [RFC8259]</a>** — ADL documents are valid JSON.
+- **<a href="https://json-schema.org/draft/2020-12/json-schema-core" target="_blank">JSON Schema</a>** — ADL documents are validated against JSON Schema; tool parameters use JSON Schema for types.
+- **<a href="https://a2a-protocol.org/latest/specification/" target="_blank">A2A Protocol</a>** — ADL documents can generate A2A Agent Cards.
+- **<a href="https://modelcontextprotocol.io/specification" target="_blank">Model Context Protocol (MCP)</a>** — ADL documents can generate MCP server configurations; tools, resources, and prompts align with MCP primitives.
+- **<a href="https://spec.openapis.org/oas/latest.html" target="_blank">OpenAPI</a>** — ADL can reference OpenAPI specifications for HTTP-based tools.
+- **<a href="https://www.w3.org/TR/did-core/" target="_blank">W3C DIDs</a> / <a href="https://www.w3.org/TR/vc-data-model-2.0/" target="_blank">Verifiable Credentials</a>** — ADL supports DIDs for cryptographic identity and VCs for attestations.
 
 ---
 
@@ -78,14 +78,14 @@ An ADL document **MUST** be a single JSON object.
 
 **Required members:**
 
-- `adl` (Section 5.1)
+- `adl_spec` (Section 5.1)
 - `name` (Section 5.3)
 - `description` (Section 5.4)
 - `version` (Section 5.5)
 
 **Optional members:**
 
-- `$schema`, `id`, `provider`, `cryptographic_identity`, `model`, `system_prompt`, `tools`, `resources`, `prompts`, `permissions`, `security`, `runtime`, `metadata`, `profiles`
+- `$schema`, `id`, `provider`, `cryptographic_identity`, `lifecycle`, `model`, `system_prompt`, `tools`, `resources`, `prompts`, `permissions`, `security`, `runtime`, `metadata`, `profiles`
 
 An ADL document **MUST NOT** contain members not defined by this specification, a declared profile, or the extension mechanism.
 
@@ -96,45 +96,117 @@ An ADL document **MUST NOT** contain members not defined by this specification, 
 
 Implementations **MUST** preserve extension members when processing but **MAY** ignore their contents. Implementations **MUST NOT** reject documents containing unknown `x_`-prefixed members.
 
+Extension members (prefixed with `x_`) **MAY** appear in any object within an ADL document, including nested objects such as `lifecycle`, `provider`, `model`, `permissions`, and `security`. Extension member names **MUST** match the pattern `x_` followed by a namespace identifier using only lowercase letters, digits, and underscores (e.g., `x_acme_internal_id`).
+
+### 4.4 Pattern Matching
+
+Several ADL members use patterns to specify allowed or denied values. ADL defines a minimal pattern syntax based on a subset of glob matching rules. The following constructs are supported:
+
+1. **Literal match.** A string with no wildcard characters matches only itself. Matching is case-sensitive unless the underlying system is case-insensitive (e.g., Windows filesystem paths).
+
+2. **Single-segment wildcard (`*`).** The `*` character matches zero or more characters within a single segment. The segment boundary depends on context:
+   - **Host patterns** (Section 9.2): segments are separated by `.` (dot). `*` does not match dots. `*.example.com` matches `api.example.com` but does not match `deep.sub.example.com`.
+   - **Environment variable patterns** (Section 9.4): `*` matches any characters in the variable name. `APP_*` matches `APP_PORT` and `APP_HOST`.
+   - **Command patterns** (Section 9.5): `*` matches any characters in the command name.
+
+3. **Multi-segment wildcard (`**`).** The `**` sequence matches zero or more path segments including separators. Valid only in filesystem path patterns (Section 9.3). `/data/**` matches `/data/`, `/data/foo`, and `/data/foo/bar/baz`. `**` **MUST NOT** appear in host patterns, environment variable patterns, or command patterns.
+
+4. **Restrictions.** Patterns **MUST** contain wildcards only in the positions described above. Mid-string wildcards (e.g., `foo*bar`) are **NOT RECOMMENDED**; implementations **MAY** reject them. A bare `*` as an entire pattern (matching everything) is valid but **NOT RECOMMENDED** for security-sensitive domains (`allowed_hosts`, `allowed_variables`). Implementations **SHOULD** warn when a bare `*` wildcard is used in permission patterns.
+
+Implementations **MUST** apply patterns using the rules defined in this section. Implementations **MUST NOT** interpret patterns as regular expressions.
+
 ---
 
 ## 5. Core Members
 
-### 5.1 adl
+### 5.1 ADL Specification
 
 Specifies the ADL specification version the document conforms to.
 
 - **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH).
-- Implementations **MUST** reject documents with an unsupported `adl` version.
+- Implementations **MUST** reject documents with an unsupported `adl_spec` version.
 - Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
 
-Example: `"adl": "0.1.0"`
+Example: `"adl_spec": "0.1.0"`
 
 ### 5.2 $schema
 
 Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.1: `https://adl-spec.org/0.1/schema.json`.
 
-### 5.3 name
+### 5.3 Name
 
 Human-readable name for the agent. **REQUIRED.** Value **MUST** be a non-empty string. For machine identifiers, use `id` (Section 6.1).
 
-### 5.4 description
+### 5.4 Description
 
 Human-readable description of the agent's purpose and capabilities. **REQUIRED.** Value **MUST** be a non-empty string. **SHOULD** be sufficient for users to understand what the agent does without examining tool definitions.
 
-### 5.5 version
+### 5.5 Version
 
 Agent's version. **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). Agent version changes **SHOULD** follow SemVer (MAJOR: breaking; MINOR: new capabilities; PATCH: fixes, docs).
+
+### 5.6 Lifecycle
+
+Operational lifecycle status of the agent. **OPTIONAL.** When present, value **MUST** be an object containing at minimum a `status` member.
+
+| Member          | Type   | Required | Description                                      |
+|-----------------|--------|----------|--------------------------------------------------|
+| status          | string | REQUIRED | Lifecycle state of the agent                     |
+| effective_date  | string | OPTIONAL | ISO 8601 timestamp when current status took effect |
+| sunset_date     | string | OPTIONAL | ISO 8601 timestamp for planned or actual retirement |
+| successor       | string | OPTIONAL | URI or URN of the replacement agent              |
+
+#### status
+
+**REQUIRED** when `lifecycle` is present. Value **MUST** be one of:
+
+| Status       | Meaning                                                   |
+|--------------|-----------------------------------------------------------|
+| `draft`      | Under development; not ready for production use           |
+| `active`     | Operational and available for use                         |
+| `deprecated` | Superseded; discouraged for new use; may be removed       |
+| `retired`    | End-of-life; no longer operational                        |
+
+When `lifecycle` is omitted, no lifecycle assertion is made. Implementations **MUST NOT** assume a default status.
+
+Runtimes **SHOULD** check `lifecycle.status` before provisioning agents. Runtimes **SHOULD NOT** provision agents with status `draft` in production environments. Runtimes **SHOULD** warn users when provisioning agents with status `deprecated`. Runtimes **MUST NOT** provision or execute agents with status `retired`.
+
+> **Note:** "Provision" and "execute" refer to instantiating an agent for operation. Reading, parsing, validating, analyzing, or migrating from an agent definition is unrestricted regardless of lifecycle status.
+
+#### effective_date
+
+When present, value **MUST** be a valid ISO 8601 string with timezone. Indicates when the current `status` took effect.
+
+#### sunset_date
+
+When present, value **MUST** be a valid ISO 8601 string with timezone. Indicates when the agent will be or was retired. Implementations **SHOULD** warn when `sunset_date` is in the future and within 30 days. When `sunset_date` is in the past and `status` is `deprecated`, runtimes **SHOULD** treat the agent as `retired`.
+
+#### successor
+
+When present, value **MUST** be a string; **SHOULD** be a URI or URN identifying the replacement agent (see Section 6.1 for identifier formats). **SHOULD** be present when `status` is `deprecated` or `retired`. Implementations **SHOULD** warn if `successor` is present when `status` is `active` or `draft`.
+
+Example:
+
+```json
+{
+  "lifecycle": {
+    "status": "deprecated",
+    "effective_date": "2026-01-15T00:00:00Z",
+    "sunset_date": "2026-08-01T00:00:00Z",
+    "successor": "urn:adl:acme:research-assistant:3.0.0"
+  }
+}
+```
 
 ---
 
 ## 6. Agent Identity
 
-### 6.1 id
+### 6.1 Id
 
 Unique identifier for the agent. **OPTIONAL.** When present, value **MUST** be a string; **SHOULD** be a URI or URN. Recommended formats: `urn:adl:{namespace}:{name}:{version}`, `did:web:example.com:agents:{name}`, or `https://example.com/agents/{name}`.
 
-### 6.2 provider
+### 6.2 Provider
 
 Identifies the organization or entity that provides the agent. **OPTIONAL.** When present, value **MUST** be an object:
 
@@ -144,7 +216,7 @@ Identifies the organization or entity that provides the agent. **OPTIONAL.** Whe
 | url     | string | OPTIONAL | Provider website |
 | contact | string | OPTIONAL | Contact email   |
 
-### 6.3 cryptographic_identity
+### 6.3 Cryptographic Identity
 
 Cryptographic identification for the agent. **OPTIONAL.** When present, value **MUST** be an object:
 
@@ -159,7 +231,7 @@ At least one of `did` or `public_key` **SHOULD** be present. The `public_key` ob
 
 ## 7. Model Configuration
 
-### 7.1 model
+### 7.1 Model
 
 AI model configuration. **OPTIONAL.** When omitted, the runtime determines the model. When present, value **MUST** be an object:
 
@@ -175,7 +247,7 @@ AI model configuration. **OPTIONAL.** When omitted, the runtime determines the m
 
 `capabilities` values may include: `function_calling`, `vision`, `code_execution`, `streaming`.
 
-### 7.2 system_prompt
+### 7.2 System Prompt
 
 System prompt for the agent. **OPTIONAL.** Value **MUST** be a string or an object. When an object, it **MUST** contain `template` (string, REQUIRED) and **MAY** contain `variables` (object). Variables in templates use `{{variable_name}}`.
 
@@ -183,15 +255,38 @@ System prompt for the agent. **OPTIONAL.** Value **MUST** be a string or an obje
 
 ## 8. Capabilities
 
-### 8.1 tools
+### 8.1 Tools
 
 Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`. Tool names **MUST** be unique and match `^[a-z][a-z0-9_]*$`. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
 
-### 8.2 resources
+The `examples` member, when present, **MUST** be an array of example objects. Each example object **MAY** contain:
+
+| Member | Type   | Required | Description                        |
+|--------|--------|----------|------------------------------------|
+| name   | string | OPTIONAL | Human-readable name for the example |
+| input  | object | OPTIONAL | Example input parameters            |
+| output | any    | OPTIONAL | Expected output value               |
+
+The `annotations` member, when present, **MUST** be an object containing implementation hints and metadata. Annotations is an open object — implementations **MAY** add custom keys. Standard annotation members include:
+
+| Member       | Type   | Required | Description                                |
+|--------------|--------|----------|--------------------------------------------|
+| openapi_ref  | string | OPTIONAL | URI to an OpenAPI specification             |
+| operation_id | string | OPTIONAL | OpenAPI operation identifier                |
+
+See Section 15.3 for OpenAPI integration details. Implementations **MUST** preserve all annotation members when processing, including unrecognized keys.
+
+### 8.2 Resources
 
 Array of resource objects (data sources the agent can access). **OPTIONAL.** Each resource **MUST** contain `name` (string, REQUIRED) and `type` (string, REQUIRED). `type` **MUST** be one of: `vector_store`, `knowledge_base`, `file`, `api`, `database`. Each resource **MAY** contain: `description`, `uri`, `mime_types`, `schema`, `annotations`. Resource names **MUST** be unique.
 
-### 8.3 prompts
+The `mime_types` member, when present, **MUST** be an array of strings. Each value **MUST** be a valid MIME type (e.g., `"application/json"`, `"text/plain"`).
+
+The `schema` member, when present, **MUST** be a valid JSON Schema describing the structure of the resource's data.
+
+The `annotations` member, when present, **MUST** be an object. Same semantics as `tool.annotations` — an open object for implementation hints that **MUST** be preserved when processing.
+
+### 8.3 Prompts
 
 Array of prompt objects (reusable prompt templates). **OPTIONAL.** Each prompt **MUST** contain `name` (string, REQUIRED) and `template` (string, REQUIRED). Each prompt **MAY** contain `description`, `arguments` (JSON Schema). Template arguments use `{{argument_name}}`. Prompt names **MUST** be unique.
 
@@ -199,7 +294,9 @@ Array of prompt objects (reusable prompt templates). **OPTIONAL.** Each prompt *
 
 ## 9. Permissions
 
-The `permissions` member defines the agent's operational boundaries. **OPTIONAL.** When present, value **MUST** be an object containing one or more permission domain members. Permissions operate deny-by-default; runtimes **SHOULD** enforce declared permissions.
+The `permissions` member defines the agent's operational boundaries. **OPTIONAL.** When present, value **MUST** be an object containing one or more permission domain members.
+
+### 9.1 Permissions Model
 
 | Domain          | Description                    |
 |-----------------|--------------------------------|
@@ -209,25 +306,39 @@ The `permissions` member defines the agent's operational boundaries. **OPTIONAL.
 | execution       | Process execution boundaries   |
 | resource_limits | Resource consumption limits   |
 
-Permissions operate on a **deny-by-default** model: capabilities not explicitly granted are denied. Runtimes **SHOULD** enforce declared permissions. Runtimes that cannot enforce a permission domain **SHOULD** warn users before execution.
+Permissions operate on a **deny-by-default** model. Runtimes **MUST** deny any capability not explicitly granted in the `permissions` member. Runtimes **MUST** enforce declared permissions. Runtimes that cannot enforce a specific permission domain **MUST** warn users before execution and **SHOULD** refuse to execute the agent unless the user explicitly acknowledges the limitation.
 
-### 9.2 network
+When the `permissions` member is omitted from an ADL document, no permissions are granted to the agent. Runtimes **MUST** treat the absence of `permissions` as equivalent to an empty `permissions` object — the agent has no granted capabilities.
+
+When a specific permission domain (e.g., `network`, `filesystem`) is omitted from the `permissions` object, all operations in that domain are denied. For example, if `permissions` is present but does not contain `network`, the agent **MUST** have no network access.
+
+Runtimes **MUST NOT** infer, assume, or provide default permissions when `permissions` or a permission domain is absent.
+
+### 9.2 Network
 
 May contain: `allowed_hosts` (array of host patterns), `allowed_ports`, `allowed_protocols`, `deny_private` (bool). Host patterns support exact match and `*.example.com`.
 
-### 9.3 filesystem
+Host patterns in `allowed_hosts` **MUST** conform to the pattern syntax defined in Section 4.4.
+
+### 9.3 Filesystem
 
 May contain: `allowed_paths` (array of `{ path, access }` where access is `read`, `write`, or `read_write`), `denied_paths`.
 
-### 9.4 environment
+Path patterns in `allowed_paths[*].path` and `denied_paths` **MUST** conform to the pattern syntax defined in Section 4.4. The `**` multi-segment wildcard is valid in filesystem path patterns.
+
+### 9.4 Environment
 
 May contain: `allowed_variables`, `denied_variables` (patterns with wildcards, e.g., `APP_*`).
 
-### 9.5 execution
+Variable patterns in `allowed_variables` and `denied_variables` **MUST** conform to the pattern syntax defined in Section 4.4.
+
+### 9.5 Execution
 
 May contain: `allowed_commands`, `denied_commands`, `allow_shell` (bool).
 
-### 9.6 resource_limits
+Command patterns in `allowed_commands` and `denied_commands` **MUST** conform to the pattern syntax defined in Section 4.4.
+
+### 9.6 Resource Limits
 
 May contain: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concurrent`.
 
@@ -237,15 +348,15 @@ May contain: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concur
 
 The `security` member defines security requirements. **OPTIONAL.** When present, value **MUST** be an object that **MAY** contain `authentication`, `encryption`, and `attestation`.
 
-### 10.1 authentication
+### 10.1 Authentication
 
 May contain: `type` (one of `none`, `api_key`, `oauth2`, `oidc`, `mtls`), `required` (bool). Type-specific members (e.g., OAuth2: `scopes`, `token_endpoint`; OIDC: `issuer`, `audience`) **MAY** be present.
 
-### 10.2 encryption
+### 10.2 Encryption
 
 May contain: `in_transit` (`required`, `min_version`), `at_rest` (`required`, `algorithm`).
 
-### 10.3 attestation
+### 10.3 Attestation
 
 May contain: `type` (one of `self`, `third_party`, `verifiable_credential`), `issuer`, `issued_at`, `expires_at` (ISO 8601), `signature` (object). Implementations **SHOULD** warn when `expires_at` is in the past or within 30 days.
 
@@ -257,21 +368,50 @@ May contain: `type` (one of `self`, `third_party`, `verifiable_credential`), `is
 
 The `runtime` member configures agent runtime behavior. **OPTIONAL.** When present, value **MUST** be an object.
 
-### 11.1 input_handling
+### 11.1 Input Handling
 
 May contain: `max_input_length`, `content_types`, `sanitization`.
 
-### 11.2 output_handling
+The `sanitization` member, when present, **MUST** be an object describing input sanitization rules. It **MAY** contain:
+
+| Member           | Type    | Required | Description                              |
+|------------------|---------|----------|------------------------------------------|
+| enabled          | boolean | OPTIONAL | Whether input sanitization is active      |
+| strip_html       | boolean | OPTIONAL | Whether to strip HTML tags from input     |
+| max_input_length | number  | OPTIONAL | Maximum input length in characters        |
+
+The `content_types` member, when present, **MUST** be an array of strings. Each value **MUST** be a valid MIME type specifying an accepted input content type.
+
+### 11.2 Output Handling
 
 May contain: `max_output_length`, `format`, `streaming` (bool).
 
-### 11.3 tool_invocation
+The `format` member, when present, **MUST** be a string specifying the default output format. Value **MUST** be one of: `"text"`, `"json"`, `"markdown"`, `"html"`.
+
+### 11.3 Tool Invocation
 
 May contain: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`.
 
-### 11.4 error_handling
+The `retry_policy` member, when present, **MUST** be an object describing retry behavior for tool invocations. It **MAY** contain:
+
+| Member           | Type   | Required | Description                                    |
+|------------------|--------|----------|------------------------------------------------|
+| max_retries      | number | OPTIONAL | Maximum number of retry attempts                |
+| backoff_strategy | string | OPTIONAL | One of: `"fixed"`, `"exponential"`, `"linear"` |
+| initial_delay_ms | number | OPTIONAL | Initial delay between retries in milliseconds   |
+| max_delay_ms     | number | OPTIONAL | Maximum delay between retries in milliseconds   |
+
+### 11.4 Error Handling
 
 May contain: `on_tool_error` (`abort`, `continue`, or `retry`), `max_retries`, `fallback_behavior`.
+
+The `fallback_behavior` member, when present, **MUST** be an object describing behavior when errors occur and `on_tool_error` does not resolve the situation. It **MAY** contain:
+
+| Member  | Type   | Required | Description                                           |
+|---------|--------|----------|-------------------------------------------------------|
+| action  | string | OPTIONAL | One of: `"return_error"`, `"use_default"`, `"skip"`   |
+| default | any    | OPTIONAL | Default value to return when `action` is `"use_default"` |
+| message | string | OPTIONAL | User-facing message on fallback                        |
 
 ---
 
@@ -279,23 +419,23 @@ May contain: `on_tool_error` (`abort`, `continue`, or `retry`), `max_retries`, `
 
 The `metadata` member provides additional information. **OPTIONAL.** When present, value **MUST** be an object.
 
-### 12.1 authors
+### 12.1 Authors
 
 Array of author objects. Each **MAY** contain `name`, `email`, `url`.
 
-### 12.2 license
+### 12.2 License
 
 String: SPDX license identifier or URI to license document.
 
-### 12.3 documentation
+### 12.3 Documentation
 
 String: URI to documentation.
 
-### 12.4 repository
+### 12.4 Repository
 
 String: URI to source repository.
 
-### 12.5 tags
+### 12.5 Tags
 
 Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only.
 
@@ -321,7 +461,7 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 
 | Rule   | Description |
 |--------|-------------|
-| VAL-01 | `adl` MUST match a supported version |
+| VAL-01 | `adl_spec` MUST match a supported version |
 | VAL-02 | Tool names MUST be unique |
 | VAL-03 | Resource names MUST be unique |
 | VAL-04 | Prompt names MUST be unique |
@@ -329,6 +469,22 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-06 | URIs MUST be valid per RFC 3986 |
 | VAL-07 | JSON Schema in parameters/returns MUST be valid |
 | VAL-08 | Profile requirements MUST be satisfied |
+| VAL-09 | `lifecycle.status` MUST be a valid status value if present |
+| VAL-10 | `lifecycle.effective_date` MUST be valid ISO 8601 if present |
+| VAL-11 | `lifecycle.sunset_date` MUST be valid ISO 8601 if present |
+| VAL-12 | `lifecycle.successor` MUST be a valid URI if present |
+| VAL-13 | Tool names MUST match `^[a-z][a-z0-9_]*$` |
+| VAL-14 | Resource `type` MUST be a valid resource type value |
+| VAL-15 | `model.temperature` MUST be between 0.0 and 2.0 if present |
+| VAL-16 | `security.authentication.type` MUST be a valid authentication type if present |
+| VAL-17 | `security.attestation.type` MUST be a valid attestation type if present |
+| VAL-18 | `runtime.error_handling.on_tool_error` MUST be a valid error action if present |
+| VAL-19 | `runtime.output_handling.format` MUST be a valid format value if present |
+| VAL-20 | `model.capabilities` items MUST be valid capability values if present |
+| VAL-21 | Host patterns MUST conform to Section 4.4 pattern syntax |
+| VAL-22 | Filesystem path patterns MUST conform to Section 4.4 pattern syntax |
+| VAL-23 | Environment variable patterns MUST conform to Section 4.4 pattern syntax |
+| VAL-24 | Attestation `signature.signed_content` value `"digest"` MUST have `digest_algorithm` and `digest_value` present |
 
 Implementations **MAY** perform additional validation based on declared profiles.
 
@@ -355,6 +511,8 @@ Tools that invoke HTTP APIs **MAY** reference OpenAPI specs. The tool `annotatio
 ---
 
 ## 16. Errors
+
+### 16.1 Error Format
 
 Implementations **SHOULD** return errors in a consistent format, e.g.:
 
@@ -390,11 +548,26 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-2005 | Semantic | Invalid timestamp format |
 | ADL-2006 | Semantic | Invalid URI format |
 | ADL-2007 | Semantic | Invalid JSON Schema |
+| ADL-2008 | Semantic | Invalid tool name pattern |
+| ADL-2009 | Semantic | Invalid resource type value |
+| ADL-2010 | Semantic | Temperature out of range |
+| ADL-2011 | Semantic | Invalid authentication type |
+| ADL-2012 | Semantic | Invalid attestation type |
+| ADL-2013 | Semantic | Invalid error handling action |
+| ADL-2014 | Semantic | Invalid output format |
+| ADL-2015 | Semantic | Invalid model capability |
+| ADL-2016 | Semantic | Invalid host pattern syntax |
+| ADL-2017 | Semantic | Invalid filesystem path pattern |
+| ADL-2018 | Semantic | Invalid environment variable pattern |
+| ADL-2019 | Semantic | Missing digest fields for digest-mode signature |
 | ADL-3001 | Profile  | Profile requirements not satisfied |
 | ADL-3002 | Profile  | Unknown profile |
 | ADL-4001 | Security | Weak key algorithm |
 | ADL-4002 | Security | Invalid signature |
 | ADL-4003 | Security | Expired attestation |
+| ADL-5001 | Lifecycle | Invalid lifecycle status value |
+| ADL-5002 | Lifecycle | Successor present on active/draft agent |
+| ADL-5003 | Lifecycle | Sunset date in the past with non-retired status |
 
 ---
 
@@ -426,6 +599,7 @@ A registry for ADL profiles may be created (Specification Required). Each regist
 - **Permission enforcement:** Runtimes **SHOULD** enforce declared permissions (e.g., via OS security features). Runtimes **MUST NOT** allow agents to exceed declared permissions. If a runtime cannot enforce a permission, it **SHOULD** warn users.
 - **Tool security:** Validate inputs/outputs against schemas; enforce rate limits; log invocations. Tools with `requires_confirmation` **SHOULD** prompt users; `read_only` tools **SHOULD** be treated as lower risk.
 - **Supply chain:** Validate ADL from untrusted sources; verify attestations from trusted issuers; consider allowlists of trusted providers.
+- **Lifecycle enforcement:** Implementations **SHOULD** treat agents with `lifecycle.status` of `retired` as potentially unmaintained. Retired agents may have revoked credentials, unpatched vulnerabilities, or stale configurations. Runtimes **MUST NOT** provision or execute retired agents. Deploying deprecated agents may expose users to known issues; runtimes **SHOULD** surface deprecation warnings and `successor` information when available.
 
 ---
 
@@ -476,6 +650,7 @@ ADL profiles are maintained in the [profiles/](../../profiles/) directory. Each 
 | Profile | Identifier | Status |
 |---------|------------|--------|
 | [Governance](../../profiles/governance/) | `urn:adl:profile:governance:1.0` | Draft |
+| [Portfolio](../../profiles/portfolio/) | `urn:adl:profile:portfolio:1.0` | Draft |
 | [Healthcare](../../profiles/healthcare/) | `urn:adl:profile:healthcare:1.0` | Placeholder |
 | [Financial](../../profiles/financial/) | `urn:adl:profile:financial:1.0` | Placeholder |
 
