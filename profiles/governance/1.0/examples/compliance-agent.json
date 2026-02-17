@@ -5,6 +5,10 @@
   "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
   "version": "1.0.0",
   "profiles": ["urn:adl:profile:governance:1.0"],
+  "data_classification": {
+    "sensitivity": "confidential",
+    "categories": ["regulatory"]
+  },
   "provider": {
     "name": "Acme Compliance",
     "url": "https://compliance.acme.example",

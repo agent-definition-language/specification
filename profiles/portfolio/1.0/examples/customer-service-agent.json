@@ -5,6 +5,10 @@
   "description": "Handles tier-1 customer inquiries and support requests via chat and email channels.",
   "version": "1.2.0",
   "profiles": ["urn:adl:profile:portfolio:1.0"],
+  "data_classification": {
+    "sensitivity": "internal",
+    "categories": ["pii"]
+  },
   "provider": {
     "name": "Acme Support",
     "url": "https://support.acme.example",

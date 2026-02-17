@@ -82,6 +82,7 @@ An ADL document **MUST** be a single JSON object.
 - `name` (Section 5.3)
 - `description` (Section 5.4)
 - `version` (Section 5.5)
+- `data_classification` (Section 10.4)
 
 **Optional members:**
 
@@ -257,7 +258,7 @@ System prompt for the agent. **OPTIONAL.** Value **MUST** be a string or an obje
 
 ### 8.1 Tools
 
-Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`. Tool names **MUST** be unique and match `^[a-z][a-z0-9_]*$`. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
+Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`, `data_classification` (Section 10.4). Tool names **MUST** be unique and match `^[a-z][a-z0-9_]*$`. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
 
 The `examples` member, when present, **MUST** be an array of example objects. Each example object **MAY** contain:
 
@@ -278,7 +279,7 @@ See Section 15.3 for OpenAPI integration details. Implementations **MUST** prese
 
 ### 8.2 Resources
 
-Array of resource objects (data sources the agent can access). **OPTIONAL.** Each resource **MUST** contain `name` (string, REQUIRED) and `type` (string, REQUIRED). `type` **MUST** be one of: `vector_store`, `knowledge_base`, `file`, `api`, `database`. Each resource **MAY** contain: `description`, `uri`, `mime_types`, `schema`, `annotations`. Resource names **MUST** be unique.
+Array of resource objects (data sources the agent can access). **OPTIONAL.** Each resource **MUST** contain `name` (string, REQUIRED) and `type` (string, REQUIRED). `type` **MUST** be one of: `vector_store`, `knowledge_base`, `file`, `api`, `database`. Each resource **MAY** contain: `description`, `uri`, `mime_types`, `schema`, `annotations`, `data_classification` (Section 10.4). Resource names **MUST** be unique.
 
 The `mime_types` member, when present, **MUST** be an array of strings. Each value **MUST** be a valid MIME type (e.g., `"application/json"`, `"text/plain"`).
 
@@ -361,6 +362,82 @@ May contain: `in_transit` (`required`, `min_version`), `at_rest` (`required`, `a
 May contain: `type` (one of `self`, `third_party`, `verifiable_credential`), `issuer`, `issued_at`, `expires_at` (ISO 8601), `signature` (object). Implementations **SHOULD** warn when `expires_at` is in the past or within 30 days.
 
 **Signature object:** When present, **MUST** contain `algorithm`, `value` (Base64url-encoded), `signed_content` (`"canonical"` or `"digest"`). When `signed_content` is `"digest"`, **MUST** also include `digest_algorithm` and `digest_value`. Supported algorithms include Ed25519 (RECOMMENDED), Ed448, ES256/384/512, RS256, PS256 (RSA ≥ 2048). Verification: remove signature, serialize with JCS [RFC8785], verify digest if applicable, resolve public key from `cryptographic_identity`, verify signature.
+
+### 10.4 Data Classification
+
+The `data_classification` member declares the sensitivity and categories of data the agent may access, process, or produce. **REQUIRED.** Value **MUST** be an object.
+
+Data classification is required by NIST FIPS 199, NIST SP 800-60, ISO 27001:2022 Annex A.5.12, FedRAMP, SOC 2, and CMMC. It is the foundational step of security categorization across all major compliance frameworks.
+
+This member is a **reusable composable attribute**. In addition to the required top-level declaration, it **MAY** also appear within individual `tools[*]` or `resources[*]` objects to classify specific capabilities. When present on both the top level and a tool or resource, the tool/resource-level classification applies to that capability.
+
+#### High-Water Mark Rule
+
+The top-level `data_classification.sensitivity` **MUST** be greater than or equal to the highest `sensitivity` value declared in any tool-level or resource-level `data_classification` within the same document. This follows the FIPS 199 high-water mark principle: a system's overall security categorization is the highest value among its constituent information types.
+
+The sensitivity ordering from lowest to highest is: `public` < `internal` < `confidential` < `restricted`.
+
+Sensitivity levels align with NIST FIPS 199 impact categorization and ISO 27001:2022 Annex A.5.12 information classification.
+
+| Member      | Type   | Required | Description |
+|-------------|--------|----------|-------------|
+| sensitivity | string | REQUIRED | Information sensitivity level |
+| categories  | array  | OPTIONAL | Broad information categories handled |
+| retention   | object | OPTIONAL | Data retention requirements |
+| handling    | object | OPTIONAL | Data handling constraints |
+
+#### sensitivity
+
+**REQUIRED** when `data_classification` is present. Value **MUST** be one of:
+
+| Value          | Definition |
+|----------------|------------|
+| `public`       | Information approved for unrestricted disclosure |
+| `internal`     | Information limited to organizational use |
+| `confidential` | Information requiring protection; unauthorized disclosure could cause harm |
+| `restricted`   | Information requiring the highest level of protection; unauthorized disclosure could cause severe harm |
+
+#### categories
+
+When present, **MUST** be a non-empty array. Each item **MUST** be one of:
+
+| Value                   | Definition |
+|-------------------------|------------|
+| `pii`                   | Personally Identifiable Information |
+| `phi`                   | Protected Health Information (HIPAA) |
+| `financial`             | Financial data (PCI-DSS, GLBA, SOX scope) |
+| `credentials`           | Authentication credentials, secrets, keys |
+| `intellectual_property` | Trade secrets, proprietary algorithms, business-sensitive data |
+| `regulatory`            | Data subject to specific regulatory requirements |
+
+Profiles **MAY** define additional category values.
+
+#### retention
+
+When present, **MUST** be an object. **MAY** contain:
+
+| Member     | Type   | Description |
+|------------|--------|-------------|
+| min_days   | number | Minimum retention period in days |
+| max_days   | number | Maximum retention period in days |
+| policy_uri | string | URI to the governing retention policy |
+
+When both `min_days` and `max_days` are present, `min_days` **MUST** be less than or equal to `max_days`.
+
+#### handling
+
+When present, **MUST** be an object. **MAY** contain:
+
+| Member                  | Type | Description |
+|-------------------------|------|-------------|
+| encryption_required     | bool | Whether data must be encrypted at rest |
+| anonymization_required  | bool | Whether data must be anonymized before processing |
+| cross_border_restricted | bool | Whether data may not leave jurisdictional boundaries |
+| logging_required        | bool | Whether all access must be logged |
+
+#### Profile Extensions
+
+Profiles **MAY** add domain-specific sub-objects within `data_classification` to provide granular classification vocabularies. For example, a healthcare profile may add a `healthcare` sub-object with PHI type enumerations, and a financial profile may add a `financial` sub-object with financial data type enumerations. Multiple profile extensions compose naturally within the same `data_classification` object. See Section 13 for profile composition rules.
 
 ---
 
@@ -485,6 +562,10 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-22 | Filesystem path patterns MUST conform to Section 4.4 pattern syntax |
 | VAL-23 | Environment variable patterns MUST conform to Section 4.4 pattern syntax |
 | VAL-24 | Attestation `signature.signed_content` value `"digest"` MUST have `digest_algorithm` and `digest_value` present |
+| VAL-25 | `data_classification.sensitivity` MUST be a valid sensitivity level if present |
+| VAL-26 | `data_classification.categories` items MUST be valid category values if present |
+| VAL-27 | `data_classification.retention.min_days` MUST be less than or equal to `max_days` when both are present |
+| VAL-28 | Top-level `data_classification.sensitivity` MUST be >= the highest `sensitivity` in any tool or resource `data_classification` (high-water mark) |
 
 Implementations **MAY** perform additional validation based on declared profiles.
 
@@ -560,6 +641,10 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-2017 | Semantic | Invalid filesystem path pattern |
 | ADL-2018 | Semantic | Invalid environment variable pattern |
 | ADL-2019 | Semantic | Missing digest fields for digest-mode signature |
+| ADL-2020 | Semantic | Invalid data classification sensitivity level |
+| ADL-2021 | Semantic | Invalid data classification category |
+| ADL-2022 | Semantic | Retention min_days exceeds max_days |
+| ADL-2023 | Semantic | Top-level sensitivity below tool/resource sensitivity (high-water mark violation) |
 | ADL-3001 | Profile  | Profile requirements not satisfied |
 | ADL-3002 | Profile  | Unknown profile |
 | ADL-4001 | Security | Weak key algorithm |

@@ -18,8 +18,8 @@ Profiles are identified by URIs (e.g., `urn:adl:profile:governance:1.0`).
 |---------|------------|--------|-------------|
 | [Governance](./governance/) | `urn:adl:profile:governance:1.0` | Draft | Compliance frameworks, audit trails, enterprise governance |
 | [Portfolio](./portfolio/) | `urn:adl:profile:portfolio:1.0` | Draft | Agent inventory, relationships, and domain membership |
-| [Healthcare](./healthcare/) | `urn:adl:profile:healthcare:1.0` | Placeholder | HIPAA compliance, PHI handling |
-| [Financial](./financial/) | `urn:adl:profile:financial:1.0` | Placeholder | PCI-DSS, SOX compliance |
+| [Healthcare](./healthcare/) | `urn:adl:profile:healthcare:1.0` | Draft | HIPAA compliance, PHI handling, clinical safety, FHIR interoperability |
+| [Financial](./financial/) | `urn:adl:profile:financial:1.0` | Draft | PCI-DSS, SOX, GLBA, MiFID II, AML/KYC compliance |
 
 ## Profile Versioning
 

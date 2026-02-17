@@ -2,3 +2,6 @@ adl_spec: "0.1.0"
 name: Hello Agent
 description: A simple greeting agent.
 version: "1.0.0"
+
+data_classification:
+  sensitivity: public
