@@ -28,7 +28,7 @@ urn:adl:profile:governance:1.0
 
 ```json
 {
-  "adl": "0.1.0",
+  "adl_spec": "0.1.0",
   "name": "Compliance Agent",
   "description": "Reviews documents for regulatory compliance.",
   "version": "1.0.0",

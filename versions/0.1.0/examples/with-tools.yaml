@@ -1,4 +1,4 @@
-adl: "0.1.0"
+adl_spec: "0.1.0"
 name: Calculator
 description: A calculator agent that performs math operations.
 version: "0.1.0"

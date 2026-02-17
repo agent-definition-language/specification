@@ -1,9 +1,13 @@
 $schema: https://adl-spec.org/0.1/schema.json
-adl: "0.1.0"
+adl_spec: "0.1.0"
 name: Research Assistant
 description: An AI assistant that helps researchers find, summarize, and analyze academic papers.
 version: "2.1.0"
 id: urn:adl:acme:research-assistant:2.1.0
+
+lifecycle:
+  status: active
+  effective_date: "2026-01-15T00:00:00Z"
 
 provider:
   name: Acme AI

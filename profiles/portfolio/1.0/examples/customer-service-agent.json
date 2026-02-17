@@ -1,0 +1,118 @@
+{
+  "$schema": "https://adl-spec.org/0.1/schema.json",
+  "adl_spec": "0.1.0",
+  "name": "Customer Service Agent",
+  "description": "Handles tier-1 customer inquiries and support requests via chat and email channels.",
+  "version": "1.2.0",
+  "profiles": ["urn:adl:profile:portfolio:1.0"],
+  "provider": {
+    "name": "Acme Support",
+    "url": "https://support.acme.example",
+    "contact": "support-engineering@acme.example"
+  },
+  "model": {
+    "capabilities": ["function_calling", "streaming"]
+  },
+  "tools": [
+    {
+      "name": "search_knowledge_base",
+      "description": "Search the knowledge base for relevant articles",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "limit": { "type": "integer", "default": 5 }
+        },
+        "required": ["query"]
+      },
+      "read_only": true
+    },
+    {
+      "name": "create_ticket",
+      "description": "Create a support ticket for escalation",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "subject": { "type": "string" },
+          "description": { "type": "string" },
+          "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+          "customer_id": { "type": "string" }
+        },
+        "required": ["subject", "description", "customer_id"]
+      },
+      "requires_confirmation": true
+    },
+    {
+      "name": "get_customer_info",
+      "description": "Retrieve customer information",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "customer_id": { "type": "string" }
+        },
+        "required": ["customer_id"]
+      },
+      "read_only": true
+    }
+  ],
+  "permissions": {
+    "network": {
+      "allowed_hosts": [
+        "api.acme.example",
+        "kb.acme.example",
+        "tickets.acme.example"
+      ],
+      "allowed_protocols": ["https"],
+      "deny_private": true
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "scopes": ["customers:read", "tickets:write", "kb:read"]
+    },
+    "encryption": {
+      "in_transit": {
+        "required": true,
+        "min_version": "1.2"
+      }
+    }
+  },
+  "inventory": {
+    "catalog_id": "cs-agent-001",
+    "classification": {
+      "category": "support",
+      "type": "conversational"
+    },
+    "tags": ["customer-service", "support", "tier-1", "chat", "email", "production"],
+    "visibility": "internal"
+  },
+  "relationships": {
+    "depends_on": [
+      "urn:adl:acme:knowledge-base-agent:1.0",
+      "urn:adl:acme:ticket-api-agent:2.0",
+      "urn:adl:acme:customer-data-agent:1.5"
+    ],
+    "orchestrated_by": "urn:adl:acme:support-orchestrator:1.0",
+    "peers": [
+      "urn:adl:acme:billing-support-agent:1.0",
+      "urn:adl:acme:technical-support-agent:1.0",
+      "urn:adl:acme:returns-agent:1.0"
+    ]
+  },
+  "domain": {
+    "domain_id": "urn:domain:customer-service",
+    "subdomain": "inquiries",
+    "bounded_context": "support-portal",
+    "role": "primary-handler"
+  },
+  "metadata": {
+    "authors": [
+      { "name": "Support Engineering", "email": "support-engineering@acme.example" }
+    ],
+    "license": "Proprietary",
+    "documentation": "https://docs.acme.example/agents/customer-service",
+    "tags": ["customer-service", "support", "production"]
+  }
+}

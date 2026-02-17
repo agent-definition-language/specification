@@ -6,7 +6,7 @@
 
 ## 1. Introduction
 
-The Governance Profile extends ADL for regulated enterprise environments. It adds members for compliance frameworks, AI governance, operational governance, and registry metadata.
+The Governance Profile extends ADL for regulated enterprise environments. It adds members for compliance frameworks, AI governance, operational governance, lifecycle process controls, and registry metadata. Agent lifecycle status is defined by the core ADL `lifecycle` member (Section 5.6); this profile adds governance-specific process controls around lifecycle transitions.
 
 When this profile is declared in an ADL document's `profiles` array, the document **MUST** satisfy all requirements defined in this specification.
 
@@ -110,22 +110,47 @@ When present, **MAY** contain:
 
 **OPTIONAL.** An object containing operational governance information.
 
-| Member             | Type   | Required | Description |
-|--------------------|--------|----------|-------------|
-| operational_status | object | OPTIONAL | Current operational status |
-| ownership          | object | OPTIONAL | Owner and delegate information |
-| approval_workflow  | object | OPTIONAL | Approval requirements |
-| audit_trail        | object | OPTIONAL | Audit logging configuration |
+| Member              | Type   | Required | Description |
+|---------------------|--------|----------|-------------|
+| ownership           | object | OPTIONAL | Owner and delegate information |
+| approval_workflow   | object | OPTIONAL | Approval requirements |
+| audit_trail         | object | OPTIONAL | Audit logging configuration |
+| lifecycle_governance | object | OPTIONAL | Governance-specific lifecycle process controls |
 
-#### operational_status
+> **Note:** Agent lifecycle status (`draft`, `active`, `deprecated`, `retired`) is defined by the core ADL `lifecycle` member (Section 5.6). The governance profile adds process controls around lifecycle transitions via `lifecycle_governance`, not a separate status field.
+
+#### lifecycle_governance
 
 When present, **MAY** contain:
 
-| Member           | Type   | Description |
-|------------------|--------|-------------|
-| status           | string | Status: `draft`, `active`, `deprecated`, `retired` |
-| effective_date   | string | ISO 8601 timestamp when status became effective |
-| deprecation_date | string | ISO 8601 timestamp (if deprecated) |
+| Member                  | Type   | Description |
+|-------------------------|--------|-------------|
+| transition_policy       | object | Rules governing lifecycle state transitions |
+| last_transition         | object | Record of the most recent lifecycle state change |
+
+##### transition_policy
+
+When present, **MAY** contain:
+
+| Member                      | Type   | Description |
+|-----------------------------|--------|-------------|
+| requires_approval           | bool   | Whether lifecycle transitions require approval |
+| approvers                   | array  | List of required approvers for transitions |
+| approval_type               | string | Type: `any`, `all`, `quorum` |
+| notice_period_days          | number | Required notice period before deprecation/retirement |
+| allowed_transitions         | array  | Permitted state transitions (e.g., `["draft->active", "active->deprecated"]`) |
+
+##### last_transition
+
+When present, **MAY** contain:
+
+| Member      | Type   | Description |
+|-------------|--------|-------------|
+| from_status | string | Previous lifecycle status |
+| to_status   | string | New lifecycle status |
+| approved_by | string | Entity that approved the transition |
+| approved_at | string | ISO 8601 timestamp of approval |
+| reason      | string | Reason for the transition |
 
 #### ownership
 
@@ -195,14 +220,16 @@ When present, **MAY** contain:
 
 The Governance Profile provides mappings between ADL/profile sections and common compliance framework controls.
 
-| ADL / Profile Section      | Framework Controls |
-|----------------------------|--------------------|
-| permissions.network        | NIST AC-4, SC-7; SOC2 CC6.6 |
-| permissions.filesystem     | NIST AC-3, AC-6; SOC2 CC6.1 |
-| security.authentication    | NIST IA-2, IA-5; SOC2 CC6.1 |
-| security.encryption        | NIST SC-8, SC-13; SOC2 CC6.1 |
-| ai_governance              | ISO 42001 6.1, 9.1; EU AI Act Art. 9 |
-| governance.audit_trail     | NIST AU-2, AU-6; SOC2 CC7.2 |
+| ADL / Profile Section               | Framework Controls |
+|-------------------------------------|--------------------|
+| lifecycle                           | NIST CM-3, SA-10; ISO 42001 8.4; EU AI Act Art. 9, 72 |
+| permissions.network                 | NIST AC-4, SC-7; SOC2 CC6.6 |
+| permissions.filesystem              | NIST AC-3, AC-6; SOC2 CC6.1 |
+| security.authentication             | NIST IA-2, IA-5; SOC2 CC6.1 |
+| security.encryption                 | NIST SC-8, SC-13; SOC2 CC6.1 |
+| ai_governance                       | ISO 42001 6.1, 9.1; EU AI Act Art. 9 |
+| governance.audit_trail              | NIST AU-2, AU-6; SOC2 CC7.2 |
+| governance.lifecycle_governance     | NIST CM-3, CM-4; SOC2 CC8.1 |
 
 ---
 
@@ -210,11 +237,15 @@ The Governance Profile provides mappings between ADL/profile sections and common
 
 ```json
 {
-  "adl": "0.1.0",
+  "adl_spec": "0.1.0",
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance.",
   "version": "1.0.0",
   "profiles": ["urn:adl:profile:governance:1.0"],
+  "lifecycle": {
+    "status": "active",
+    "effective_date": "2025-12-01T00:00:00Z"
+  },
   "compliance_framework": {
     "primary_framework": "SOC2_TYPE_II",
     "control_mappings": [
@@ -241,13 +272,23 @@ The Governance Profile provides mappings between ADL/profile sections and common
     }
   },
   "governance": {
-    "operational_status": {
-      "status": "active",
-      "effective_date": "2025-12-01T00:00:00Z"
-    },
     "ownership": {
       "owner": "Compliance Team",
       "contact": "compliance@example.com"
+    },
+    "lifecycle_governance": {
+      "transition_policy": {
+        "requires_approval": true,
+        "approvers": ["security-team", "compliance-lead"],
+        "approval_type": "all"
+      },
+      "last_transition": {
+        "from_status": "draft",
+        "to_status": "active",
+        "approved_by": "compliance-lead",
+        "approved_at": "2025-12-01T00:00:00Z",
+        "reason": "Passed SOC2 audit and security review"
+      }
     },
     "audit_trail": {
       "enabled": true,
@@ -278,5 +319,7 @@ Implementations validating against this profile **MUST** enforce:
 | GOV-03 | `control_mappings[*].status` MUST be a valid status value |
 | GOV-04 | All timestamps MUST be valid ISO 8601 |
 | GOV-05 | `ai_governance.risk_classification.level` MUST be valid if present |
-| GOV-06 | `governance.operational_status.status` MUST be valid if present |
+| GOV-06 | `lifecycle` MUST be present (core member, Section 5.6) |
 | GOV-07 | `ai_governance.human_oversight.level` MUST be valid if present |
+| GOV-08 | `lifecycle_governance.last_transition.from_status` and `to_status` MUST be valid lifecycle status values if present |
+| GOV-09 | `lifecycle_governance.transition_policy.approval_type` MUST be one of `any`, `all`, `quorum` if present |
