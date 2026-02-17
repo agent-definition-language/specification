@@ -5,6 +5,10 @@
   "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
   "version": "1.0.0",
   "profiles": ["urn:adl:profile:governance:1.0"],
+  "lifecycle": {
+    "status": "active",
+    "effective_date": "2025-12-01T00:00:00Z"
+  },
   "data_classification": {
     "sensitivity": "confidential",
     "categories": ["regulatory"]
@@ -113,9 +117,19 @@
     }
   },
   "governance": {
-    "operational_status": {
-      "status": "active",
-      "effective_date": "2025-12-01T00:00:00Z"
+    "lifecycle_governance": {
+      "transition_policy": {
+        "requires_approval": true,
+        "approvers": ["security-team", "compliance-lead"],
+        "approval_type": "all"
+      },
+      "last_transition": {
+        "from_status": "draft",
+        "to_status": "active",
+        "approved_by": "compliance-lead",
+        "approved_at": "2025-12-01T00:00:00Z",
+        "reason": "Passed SOC2 audit and security review"
+      }
     },
     "ownership": {
       "owner": "Compliance Team",
