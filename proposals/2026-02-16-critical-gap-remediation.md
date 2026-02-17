@@ -1,7 +1,7 @@
 # ADL 0.1.0 Critical Gap Remediation
 
 **Date:** 2026-02-16
-**Status:** Draft
+**Status:** Implemented
 **Affects:** `versions/0.1.0/spec.md`, `versions/0.1.0/schema.json`, `versions/0.1.0/spec-manifest.yaml`
 
 ---
