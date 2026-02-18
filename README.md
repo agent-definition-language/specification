@@ -68,6 +68,10 @@ Use [issues](https://github.com/YOUR_ORG/agent-definition-language/issues) and [
 
 Tools and libraries that implement or consume ADL are listed in [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md). If you build one, we welcome a pull request to add it.
 
+## Intellectual Property
+
+ADL is the subject of US Provisional Patent Application No. 63/985,186 (filed February 18, 2026), assigned to Ironstead Group, LLC. The specification is published under the Apache License 2.0 to enable open implementation and adoption. Any standards submission will include appropriate IPR disclosures per the relevant standards body's policies.
+
 ## License
 
 This project is licensed under the [Apache License 2.0](LICENSE).

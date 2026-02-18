@@ -1,7 +1,8 @@
 # Agent Definition Language (ADL) Specification
 
-**Version:** 0.1.0-draft  
+**Version:** 0.1.0-draft
 **Status:** Draft
+**Patent Status:** Patent Pending (US Provisional Application No. 63/985,186, filed 2026-02-18)
 
 ## 1. Introduction
 
@@ -112,7 +113,7 @@ Example:
   "x_acme_internal_id": "inv-proc-007",
   "x_acme_cost_center": "engineering",
   "model": {
-    "name": "claude-3-5-sonnet",
+    "name": "acme-large-2024",
     "x_acme_model_tier": "premium"
   }
 }
@@ -146,6 +147,7 @@ Specifies the ADL specification version the document conforms to.
 - **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). The format **MUST** conform to the `semver` production in Appendix D.
 - Implementations **MUST** reject documents with an unsupported `adl_spec` version.
 - Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
+- Pre-release suffixes (e.g., `"0.1.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
 
 Example: `"adl_spec": "0.1.0"`
 
@@ -277,7 +279,7 @@ AI model configuration. **OPTIONAL.** When omitted, the runtime determines the m
 
 | Member         | Type   | Required | Description                    |
 |----------------|--------|----------|--------------------------------|
-| provider       | string | OPTIONAL | Model provider (e.g., anthropic, openai) |
+| provider       | string | OPTIONAL | Model provider identifier       |
 | name           | string | OPTIONAL | Model identifier               |
 | version        | string | OPTIONAL | Model version                  |
 | context_window | number | OPTIONAL | Max context window (tokens)    |
@@ -304,8 +306,8 @@ Example:
 ```json
 {
   "model": {
-    "provider": "anthropic",
-    "name": "claude-3-5-sonnet-20241022",
+    "provider": "acme-ai",
+    "name": "acme-large-2024",
     "context_window": 200000,
     "temperature": 0.7,
     "max_tokens": 4096,
