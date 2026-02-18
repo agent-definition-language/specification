@@ -1,13 +1,21 @@
 # Agent Definition Language (ADL)
 
-The **Agent Definition Language (ADL)** is a vendor-neutral, machine-readable specification for describing AI agents and their capabilities, interfaces, and constraints—analogous to [OpenAPI](https://www.openapis.org/) for REST APIs and [AsyncAPI](https://www.asyncapi.com/) for event-driven APIs.
+The **Agent Definition Language (ADL)** is a vendor-neutral, machine-readable specification for describing AI agents — their identity, permissions, lifecycle, and compliance — in one auditable document. Think of it as [OpenAPI](https://www.openapis.org/) for AI agents.
 
-This repository holds the **specification**, **examples**, and **standardization materials** for proposing ADL to multiple standards bodies, including:
+**Documentation:** [adl-spec.org](https://adl-spec.org)
 
-- **Linux Foundation** (e.g., OpenAPI Initiative, AAIF — Agentic AI Foundation)
-- **IETF** (RFC track)
-- **ISO/IEC** (e.g., JTC 1/SC 42 — Artificial Intelligence)
-- Other standards organizations as the roadmap evolves
+## Why ADL?
+
+Protocols like [MCP](https://modelcontextprotocol.io/) describe how agents connect to tools. [A2A](https://google.github.io/A2A/) describes how agents communicate. Neither answers the governance questions enterprises need before deploying agents: **who is this agent, what is it allowed to do, and who authorized it?**
+
+ADL fills that gap as the governance layer above communication and tooling protocols:
+
+- **Deny-by-default permissions** with auditable boundaries for network, data, and execution
+- **Compliance mappings** for NIST 800-53, SOC 2, ISO 27001, and the EU AI Act
+- **Lifecycle management** with status tracking, sunset dates, and successor chains
+- **Interoperability** — generates A2A Agent Cards and MCP configurations from a single source of truth
+
+Without a standard like ADL, every organization invents its own way to describe and constrain agents, making cross-vendor interoperability, auditing, and regulatory compliance harder than it needs to be.
 
 ## Design goals
 
@@ -19,14 +27,14 @@ This repository holds the **specification**, **examples**, and **standardization
 
 ## Specification
 
-- **0.1.0-draft (current):** [versions/0.1.0-draft/spec.md](versions/0.1.0-draft/spec.md) — Full spec (internal draft); JSON, snake_case.
-- **Schema (0.1.0):** [versions/0.1.0-draft/schema.json](versions/0.1.0-draft/schema.json)
+- **0.1.0 (current draft):** [versions/0.1.0/spec.md](versions/0.1.0/spec.md)
+- **JSON Schema:** [versions/0.1.0/schema.json](versions/0.1.0/schema.json)
 
 The Markdown in `versions/` is the source of truth for the draft specification until a standards body publishes an official standard.
 
 ## Examples
 
-Example ADL documents are in [versions/0.1.0/examples/](versions/0.1.0/examples/). Minimal valid document (0.1.0, YAML):
+Example ADL documents are in [versions/0.1.0/examples/](versions/0.1.0/examples/). Minimal valid document (YAML):
 
 ```yaml
 adl_spec: "0.1.0"
@@ -38,23 +46,34 @@ data_classification:
   sensitivity: public
 ```
 
+## CLI
+
+The [`@adl-spec/cli`](https://www.npmjs.com/package/@adl-spec/cli) package provides validation and tooling for ADL documents.
+
+```bash
+npm install -g @adl-spec/cli
+adl validate my-agent.yaml
+```
+
+Source: [packages/adl-cli/](packages/adl-cli/)
+
 ## Standardization
 
-- **Roadmap:** [standardization/roadmap.md](standardization/roadmap.md)
-- **Standards bodies:** [standardization/bodies/](standardization/bodies/) (Linux Foundation, IETF, ISO)
+ADL has been submitted to the **IETF** as Internet-Draft [`draft-nederveld-adl-01`](standardization/output/) (Standards Track, individual submission) with an IANA media-type registration provision.
 
-We aim to align with existing DSL standards (OpenAPI, AsyncAPI) and to submit ADL to one or more of the above bodies as the spec stabilizes.
+For the full standards strategy, see the [roadmap](standardization/roadmap.md).
 
 ## Repository structure
 
 | Path | Purpose |
 |------|---------|
-| [versions/](versions/) | Versioned specification (e.g., `0.1.0-draft/spec.md`). |
+| [versions/](versions/) | Versioned specification (e.g., `0.1.0/spec.md`). |
+| [packages/](packages/) | Tooling (`adl-cli`). |
+| [site/](site/) | Documentation site ([adl-spec.org](https://adl-spec.org)). |
 | [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial). |
-| [standardization/](standardization/) | Roadmap and per-standards-body notes. |
+| [standardization/](standardization/) | Roadmap, IETF drafts, and per-standards-body notes. |
 | [proposals/](proposals/) | Spec and process proposals. |
-| [versions/0.1.0/examples/](versions/0.1.0/examples/) | Example ADL YAML documents. |
-| [.github/](.github/) | Issue and PR templates. |
+| [.github/](.github/) | CI workflows, issue and PR templates. |
 
 ## Participation
 
@@ -62,7 +81,7 @@ We aim to align with existing DSL standards (OpenAPI, AsyncAPI) and to submit AD
 - **Governance:** See [GOVERNANCE.md](GOVERNANCE.md).
 - **Code of conduct:** See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
 
-Use [issues](https://github.com/YOUR_ORG/agent-definition-language/issues) and [pull requests](https://github.com/YOUR_ORG/agent-definition-language/pulls) for spec changes, standardization work, and examples. Replace `YOUR_ORG` with your GitHub org when this repo is under your organization.
+Use [issues](https://github.com/Ironstead-Group/agent-definition-language/issues) and [pull requests](https://github.com/Ironstead-Group/agent-definition-language/pulls) for spec changes, standardization work, and examples.
 
 ## Implementations
 
