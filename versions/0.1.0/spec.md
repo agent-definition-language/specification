@@ -31,12 +31,12 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 
 ADL builds upon and interoperates with:
 
-- **<a href="https://www.rfc-editor.org/rfc/rfc8259" target="_blank">JSON [RFC8259]</a>** — ADL documents are valid JSON.
-- **<a href="https://json-schema.org/draft/2020-12/json-schema-core" target="_blank">JSON Schema</a>** — ADL documents are validated against JSON Schema; tool parameters use JSON Schema for types.
-- **<a href="https://a2a-protocol.org/latest/specification/" target="_blank">A2A Protocol</a>** — ADL documents can generate A2A Agent Cards.
-- **<a href="https://modelcontextprotocol.io/specification" target="_blank">Model Context Protocol (MCP)</a>** — ADL documents can generate MCP server configurations; tools, resources, and prompts align with MCP primitives.
-- **<a href="https://spec.openapis.org/oas/latest.html" target="_blank">OpenAPI</a>** — ADL can reference OpenAPI specifications for HTTP-based tools.
-- **<a href="https://www.w3.org/TR/did-core/" target="_blank">W3C DIDs</a> / <a href="https://www.w3.org/TR/vc-data-model-2.0/" target="_blank">Verifiable Credentials</a>** — ADL supports DIDs for cryptographic identity and VCs for attestations.
+- **[JSON [RFC8259]](https://www.rfc-editor.org/rfc/rfc8259)** — ADL documents are valid JSON.
+- **[JSON Schema](https://json-schema.org/draft/2020-12/json-schema-core)** — ADL documents are validated against JSON Schema; tool parameters use JSON Schema for types.
+- **[A2A Protocol](https://a2a-protocol.org/latest/specification/)** — ADL documents can generate A2A Agent Cards.
+- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification)** — ADL documents can generate MCP server configurations; tools, resources, and prompts align with MCP primitives.
+- **[OpenAPI](https://spec.openapis.org/oas/latest.html)** — ADL can reference OpenAPI specifications for HTTP-based tools.
+- **[W3C DIDs](https://www.w3.org/TR/did-core/) / [Verifiable Credentials](https://www.w3.org/TR/vc-data-model-2.0/)** — ADL supports DIDs for cryptographic identity and VCs for attestations.
 
 ---
 
@@ -215,7 +215,7 @@ Example:
     "status": "deprecated",
     "effective_date": "2026-01-15T00:00:00Z",
     "sunset_date": "2026-08-01T00:00:00Z",
-    "successor": "urn:adl:acme:research-assistant:3.0.0"
+    "successor": "https://acme.example.com/agents/research-assistant"
   }
 }
 ```
@@ -226,9 +226,19 @@ Example:
 
 ### 6.1 Id
 
-Unique identifier for the agent. **OPTIONAL.** When present, value **MUST** be a string; **SHOULD** be a URI or URN. Recommended formats: `urn:adl:{namespace}:{name}:{version}`, `did:web:example.com:agents:{name}`, or `https://example.com/agents/{name}`.
+Unique identifier for the agent. **OPTIONAL.** When present, value **MUST** be a string and **MUST** be a valid URI [RFC3986] or URN [RFC8141].
 
-> **Note:** The `urn:adl:` namespace identifier is used as a convention in this specification and its examples but is not yet a registered URN namespace per [RFC8141]. Formal registration with IANA will be pursued in a future revision. Implementations **SHOULD NOT** assume that `urn:adl:` URNs are globally resolvable.
+Identifier formats, in order of preference:
+
+1. **HTTPS URI (RECOMMENDED):** `https://{domain}/agents/{name}` — Provides ownership verification via TLS, direct resolution to the agent's ADL document, and natural integration with `.well-known` discovery (Section 6.4). The domain authority **SHOULD** serve the ADL document at the identifier URL with media type `application/adl+json`.
+
+2. **Decentralized Identifier:** `did:web:{domain}:agents:{name}` — Provides cryptographic identity binding via the DID Document. Resolution follows the `did:web` method specification [W3C.DID]. **RECOMMENDED** when cryptographic verification of agent identity is required independent of transport.
+
+3. **URN (offline/catalog use):** `urn:adl:{namespace}:{name}:{version}` — Location-independent identifier suitable for air-gapped environments, offline catalogs, and internal registries where network resolution is unavailable. URN identifiers provide naming only; they do not support ownership verification or discovery without an external resolver.
+
+When an agent has both a resolvable identifier (HTTPS URI or DID) and a URN, the resolvable identifier **SHOULD** be used as the primary `id` value. The URN **MAY** be recorded in `metadata` for catalog interoperability.
+
+> **Note:** The `urn:adl:` namespace identifier is used as a convention in this specification but is not yet a registered URN namespace per [RFC8141]. Formal registration with IANA will be pursued in a future revision. Implementations **SHOULD NOT** assume that `urn:adl:` URNs are globally resolvable.
 
 ### 6.2 Provider
 
@@ -249,13 +259,13 @@ Cryptographic identification for the agent. **OPTIONAL.** When present, value **
 | did        | string | OPTIONAL | Decentralized Identifier [W3C.DID]  |
 | public_key | object | OPTIONAL | Public key for signature verification |
 
-At least one of `did` or `public_key` **SHOULD** be present. The `public_key` object, when present, **MUST** contain `algorithm` (string, REQUIRED) and `value` (string, Base64-encoded, REQUIRED). Implementations **SHOULD** reject weak algorithms (e.g., RSA &lt; 2048 bits, DSA, ECDSA &lt; P-256). EdDSA (Ed25519, Ed448) is **RECOMMENDED**.
+At least one of `did` or `public_key` **SHOULD** be present. The `public_key` object, when present, **MUST** contain `algorithm` (string, REQUIRED) and `value` (string, Base64-encoded, REQUIRED). Implementations **SHOULD** reject weak algorithms (e.g., RSA below 2048 bits, DSA, ECDSA below P-256). EdDSA (Ed25519, Ed448) is **RECOMMENDED**.
 
 Example (agent identity with DID and public key):
 
 ```json
 {
-  "id": "urn:adl:acme:invoice-processor:2.0.0",
+  "id": "https://acme.example.com/agents/invoice-processor",
   "provider": {
     "name": "Acme Corp",
     "url": "https://acme.example.com",
@@ -270,6 +280,44 @@ Example (agent identity with DID and public key):
   }
 }
 ```
+
+### 6.4 Discovery
+
+Agent discovery enables clients to locate agents published by a domain without prior knowledge of individual agent identifiers. Domains hosting ADL agents **MAY** publish a discovery document at the well-known URI [RFC8615]:
+
+```
+https://{domain}/.well-known/adl-agents
+```
+
+The discovery document, when present, **MUST** be a JSON object served with media type `application/json` and **MUST** contain an `agents` array. Each entry in the array **MUST** be an object with at least `id` (string, the agent's identifier per Section 6.1) and `adl_document` (string, URL to the full ADL document). Entries **MAY** include `name`, `version`, `description`, and `status`.
+
+Example discovery document:
+
+```json
+{
+  "adl_discovery": "1.0",
+  "agents": [
+    {
+      "id": "https://acme.example.com/agents/invoice-processor",
+      "adl_document": "https://acme.example.com/agents/invoice-processor/adl.json",
+      "name": "Invoice Processor",
+      "version": "2.0.0",
+      "status": "active"
+    },
+    {
+      "id": "https://acme.example.com/agents/research-assistant",
+      "adl_document": "https://acme.example.com/agents/research-assistant/adl.json",
+      "name": "Research Assistant",
+      "version": "2.1.0",
+      "status": "active"
+    }
+  ]
+}
+```
+
+Clients performing discovery **MUST** fetch the discovery document over HTTPS. Clients **SHOULD** validate the TLS certificate chain. The discovery document **SHOULD** be cacheable; servers **SHOULD** set appropriate `Cache-Control` headers.
+
+> **Note:** Registration of `.well-known/adl-agents` with IANA per [RFC8615] will be pursued alongside the IETF Internet-Draft submission.
 
 ---
 
@@ -1122,6 +1170,29 @@ IANA is requested to create and maintain a new registry titled **"ADL Profile Re
 3. **Complete registration template:** All required template fields **MUST** be present and non-empty. Incomplete registrations **MUST** be returned to the submitter.
 4. **Stable identifier:** The profile URI **SHOULD** be dereferenceable and **SHOULD** remain stable over time. Ephemeral or frequently changing URIs are not acceptable.
 5. **Legitimate purpose:** The profile **SHOULD** address a genuine domain or deployment need not already covered by an existing active registered profile.
+
+### 17.3 URN Namespace
+
+IANA is requested to register the `adl` URN namespace identifier in the "Formal URN Namespaces" registry in accordance with [RFC8141].
+
+- **Namespace Identifier:** `adl`
+- **Version:** 1
+- **Date:** [date of publication]
+- **Registrant:** See the Author's Address section of this document.
+- **Purpose:** The `urn:adl:` namespace provides persistent, location-independent identifiers for ADL agents, profiles, and related artifacts. These identifiers are intended for use in offline catalogs, air-gapped environments, and internal registries where network resolution is unavailable. For connected environments, HTTPS URIs (Section 6.1) are the **RECOMMENDED** identifier format.
+- **Syntax:** URNs in this namespace conform to the following structure: `urn:adl:{type}:{namespace}:{name}:{version}` where `{type}` is one of `agent` or `profile`, `{namespace}` is a lowercase alphanumeric organization identifier, `{name}` is a lowercase alphanumeric resource name with hyphens, and `{version}` is a semantic version string. The formal syntax is defined by the `adl-urn` production in Appendix D.
+- **Assignment:** Sub-namespace assignment under `urn:adl:profile:` is governed by the ADL Profile Registry (Section 17.2). Sub-namespace assignment under `urn:adl:agent:` is at the discretion of the namespace holder; no central registry is required for agent URNs.
+- **Security and Privacy:** URN identifiers in this namespace are opaque strings and carry no inherent security properties. Implementations **MUST NOT** infer ownership, trust, or authorization from a `urn:adl:` identifier alone. Verification of agent identity **MUST** rely on the mechanisms described in Section 6.3 (Cryptographic Identity) and Section 10.3 (Attestation). See Section 18 for comprehensive security considerations.
+
+### 17.4 Well-Known URI
+
+IANA is requested to register the `adl-agents` well-known URI suffix in the "Well-Known URIs" registry in accordance with [RFC8615].
+
+- **URI suffix:** adl-agents
+- **Change controller:** IETF
+- **Specification document:** Section 6.4 of [this document]
+- **Status:** permanent
+- **Related information:** The well-known URI `https://{domain}/.well-known/adl-agents` returns a JSON document listing all ADL agents published by the domain authority. The document format is defined in Section 6.4. The resource **MUST** be served over HTTPS.
 
 ---
 
