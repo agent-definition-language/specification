@@ -228,6 +228,8 @@ Example:
 
 Unique identifier for the agent. **OPTIONAL.** When present, value **MUST** be a string; **SHOULD** be a URI or URN. Recommended formats: `urn:adl:{namespace}:{name}:{version}`, `did:web:example.com:agents:{name}`, or `https://example.com/agents/{name}`.
 
+> **Note:** The `urn:adl:` namespace identifier is used as a convention in this specification and its examples but is not yet a registered URN namespace per [RFC8141]. Formal registration with IANA will be pursued in a future revision. Implementations **SHOULD NOT** assume that `urn:adl:` URNs are globally resolvable.
+
 ### 6.2 Provider
 
 Identifies the organization or entity that provides the agent. **OPTIONAL.** When present, value **MUST** be an object:
