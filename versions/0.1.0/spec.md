@@ -71,6 +71,7 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 - Member names **MUST** use **snake_case** (lowercase with underscores).
 - All timestamps **MUST** be ISO 8601 strings with timezone (e.g., `"2026-02-15T14:30:00Z"`).
 - All URIs **MUST** conform to [RFC3986].
+- **YAML authoring and JSON canonical form:** YAML is an authoring convenience; JSON is the canonical wire format. When an ADL document is authored in YAML, implementations **MUST** convert it to JSON for processing and validation. The media type `application/adl+json` applies to the JSON canonical form.
 
 ### 4.2 Top-Level Object
 
@@ -97,7 +98,25 @@ An ADL document **MUST NOT** contain members not defined by this specification, 
 
 Implementations **MUST** preserve extension members when processing but **MAY** ignore their contents. Implementations **MUST NOT** reject documents containing unknown `x_`-prefixed members.
 
-Extension members (prefixed with `x_`) **MAY** appear in any object within an ADL document, including nested objects such as `lifecycle`, `provider`, `model`, `permissions`, and `security`. Extension member names **MUST** match the pattern `x_` followed by a namespace identifier using only lowercase letters, digits, and underscores (e.g., `x_acme_internal_id`).
+Extension members (prefixed with `x_`) **MAY** appear in any object within an ADL document, including nested objects such as `lifecycle`, `provider`, `model`, `permissions`, and `security`. Extension member names **MUST** match the pattern `x_` followed by a namespace identifier using only lowercase letters, digits, and underscores (e.g., `x_acme_internal_id`). Extension member names **MUST** conform to the `ext-member-name` production in Appendix D.
+
+Example:
+
+```json
+{
+  "name": "Invoice Processor",
+  "version": "2.0.0",
+  "adl_spec": "0.1.0",
+  "description": "Processes and routes invoices.",
+  "data_classification": { "sensitivity": "confidential" },
+  "x_acme_internal_id": "inv-proc-007",
+  "x_acme_cost_center": "engineering",
+  "model": {
+    "name": "claude-3-5-sonnet",
+    "x_acme_model_tier": "premium"
+  }
+}
+```
 
 ### 4.4 Pattern Matching
 
@@ -114,7 +133,7 @@ Several ADL members use patterns to specify allowed or denied values. ADL define
 
 4. **Restrictions.** Patterns **MUST** contain wildcards only in the positions described above. Mid-string wildcards (e.g., `foo*bar`) are **NOT RECOMMENDED**; implementations **MAY** reject them. A bare `*` as an entire pattern (matching everything) is valid but **NOT RECOMMENDED** for security-sensitive domains (`allowed_hosts`, `allowed_variables`). Implementations **SHOULD** warn when a bare `*` wildcard is used in permission patterns.
 
-Implementations **MUST** apply patterns using the rules defined in this section. Implementations **MUST NOT** interpret patterns as regular expressions.
+Implementations **MUST** apply patterns using the rules defined in this section. Implementations **MUST NOT** interpret patterns as regular expressions. Formal grammar productions for pattern elements are defined in Appendix D.
 
 ---
 
@@ -124,7 +143,7 @@ Implementations **MUST** apply patterns using the rules defined in this section.
 
 Specifies the ADL specification version the document conforms to.
 
-- **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH).
+- **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). The format **MUST** conform to the `semver` production in Appendix D.
 - Implementations **MUST** reject documents with an unsupported `adl_spec` version.
 - Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
 
@@ -144,7 +163,7 @@ Human-readable description of the agent's purpose and capabilities. **REQUIRED.*
 
 ### 5.5 Version
 
-Agent's version. **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). Agent version changes **SHOULD** follow SemVer (MAJOR: breaking; MINOR: new capabilities; PATCH: fixes, docs).
+Agent's version. **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH); the format **MUST** conform to the `semver` production in Appendix D. Agent version changes **SHOULD** follow SemVer (MAJOR: breaking; MINOR: new capabilities; PATCH: fixes, docs).
 
 ### 5.6 Lifecycle
 
@@ -228,6 +247,26 @@ Cryptographic identification for the agent. **OPTIONAL.** When present, value **
 
 At least one of `did` or `public_key` **SHOULD** be present. The `public_key` object, when present, **MUST** contain `algorithm` (string, REQUIRED) and `value` (string, Base64-encoded, REQUIRED). Implementations **SHOULD** reject weak algorithms (e.g., RSA &lt; 2048 bits, DSA, ECDSA &lt; P-256). EdDSA (Ed25519, Ed448) is **RECOMMENDED**.
 
+Example (agent identity with DID and public key):
+
+```json
+{
+  "id": "urn:adl:acme:invoice-processor:2.0.0",
+  "provider": {
+    "name": "Acme Corp",
+    "url": "https://acme.example.com",
+    "contact": "ai-platform@acme.example.com"
+  },
+  "cryptographic_identity": {
+    "did": "did:web:acme.example.com:agents:invoice-processor",
+    "public_key": {
+      "algorithm": "Ed25519",
+      "value": "MCowBQYDK2VwAyEAGb9ECWmEzf6FQbrBZ9w7lshQhqowtrbLDFw4rXAxZuE="
+    }
+  }
+}
+```
+
 ---
 
 ## 7. Model Configuration
@@ -250,7 +289,37 @@ AI model configuration. **OPTIONAL.** When omitted, the runtime determines the m
 
 ### 7.2 System Prompt
 
-System prompt for the agent. **OPTIONAL.** Value **MUST** be a string or an object. When an object, it **MUST** contain `template` (string, REQUIRED) and **MAY** contain `variables` (object). Variables in templates use `{{variable_name}}`.
+System prompt for the agent. **OPTIONAL.** Value **MUST** be a string or an object. When an object, it **MUST** contain `template` (string, REQUIRED) and **MAY** contain `variables` (object).
+
+#### Template Variable Syntax
+
+Variables in templates use the `{{variable_name}}` syntax and **MUST** conform to the `template-var` production in Appendix D. Variable names **MUST** begin with a letter (`A`–`Z` or `a`–`z`) and **MAY** contain letters, digits, and underscores.
+
+**Escaping:** To include a literal `{{` in template text without triggering variable substitution, implementations **MUST** support the escape sequence `\{{`. A `\{{` in the template string is rendered as `{{` and is not treated as a variable reference.
+
+**Undefined variables:** When a template references a variable name not present in `variables`, the implementation **MUST** treat this as an error (error code ADL-1006) and **MUST NOT** silently substitute an empty string. Implementations **SHOULD** include the undefined variable name in the error detail.
+
+Example:
+
+```json
+{
+  "model": {
+    "provider": "anthropic",
+    "name": "claude-3-5-sonnet-20241022",
+    "context_window": 200000,
+    "temperature": 0.7,
+    "max_tokens": 4096,
+    "capabilities": ["function_calling", "vision"]
+  },
+  "system_prompt": {
+    "template": "You are a helpful assistant for {{company_name}}. Today is {{current_date}}.",
+    "variables": {
+      "company_name": "Acme Corp",
+      "current_date": "2026-02-18"
+    }
+  }
+}
+```
 
 ---
 
@@ -258,7 +327,7 @@ System prompt for the agent. **OPTIONAL.** Value **MUST** be a string or an obje
 
 ### 8.1 Tools
 
-Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`, `data_classification` (Section 10.4). Tool names **MUST** be unique and match `^[a-z][a-z0-9_]*$`. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
+Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`, `data_classification` (Section 10.4). Tool names **MUST** be unique, **MUST** match `^[a-z][a-z0-9_]*$`, and **MUST** conform to the `tool-name` production in Appendix D. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
 
 The `examples` member, when present, **MUST** be an array of example objects. Each example object **MAY** contain:
 
@@ -277,6 +346,46 @@ The `annotations` member, when present, **MUST** be an object containing impleme
 
 See Section 15.3 for OpenAPI integration details. Implementations **MUST** preserve all annotation members when processing, including unrecognized keys.
 
+Example:
+
+```json
+{
+  "tools": [
+    {
+      "name": "search_invoices",
+      "description": "Search for invoices by vendor name, date range, or amount.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "vendor": { "type": "string", "description": "Vendor name to search" },
+          "date_from": { "type": "string", "format": "date" },
+          "date_to": { "type": "string", "format": "date" }
+        },
+        "required": []
+      },
+      "returns": {
+        "type": "array",
+        "items": { "type": "object" }
+      },
+      "examples": [
+        {
+          "name": "Search by vendor",
+          "input": { "vendor": "Acme Supplies" },
+          "output": [{ "id": "INV-001", "amount": 1500.00 }]
+        }
+      ],
+      "idempotent": true,
+      "read_only": true,
+      "annotations": {
+        "openapi_ref": "https://api.acme.example.com/openapi.json",
+        "operation_id": "searchInvoices"
+      },
+      "data_classification": { "sensitivity": "confidential" }
+    }
+  ]
+}
+```
+
 ### 8.2 Resources
 
 Array of resource objects (data sources the agent can access). **OPTIONAL.** Each resource **MUST** contain `name` (string, REQUIRED) and `type` (string, REQUIRED). `type` **MUST** be one of: `vector_store`, `knowledge_base`, `file`, `api`, `database`. Each resource **MAY** contain: `description`, `uri`, `mime_types`, `schema`, `annotations`, `data_classification` (Section 10.4). Resource names **MUST** be unique.
@@ -287,9 +396,49 @@ The `schema` member, when present, **MUST** be a valid JSON Schema describing th
 
 The `annotations` member, when present, **MUST** be an object. Same semantics as `tool.annotations` — an open object for implementation hints that **MUST** be preserved when processing.
 
+Example:
+
+```json
+{
+  "resources": [
+    {
+      "name": "invoice_store",
+      "type": "vector_store",
+      "description": "Vector store containing indexed invoice documents for semantic search.",
+      "uri": "https://store.acme.example.com/invoices",
+      "mime_types": ["application/pdf", "application/json"],
+      "data_classification": { "sensitivity": "confidential" }
+    }
+  ]
+}
+```
+
 ### 8.3 Prompts
 
-Array of prompt objects (reusable prompt templates). **OPTIONAL.** Each prompt **MUST** contain `name` (string, REQUIRED) and `template` (string, REQUIRED). Each prompt **MAY** contain `description`, `arguments` (JSON Schema). Template arguments use `{{argument_name}}`. Prompt names **MUST** be unique.
+Array of prompt objects (reusable prompt templates). **OPTIONAL.** Each prompt **MUST** contain `name` (string, REQUIRED) and `template` (string, REQUIRED). Each prompt **MAY** contain `description`, `arguments` (JSON Schema). Template arguments use `{{argument_name}}` and **MUST** conform to the `template-var` production in Appendix D. Prompt names **MUST** be unique.
+
+Example:
+
+```json
+{
+  "prompts": [
+    {
+      "name": "summarize_invoice",
+      "description": "Summarizes an invoice for a reviewer.",
+      "template": "Summarize the following invoice for {{reviewer_role}}:\n\n{{invoice_text}}\n\nHighlight amounts over {{threshold}}.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "reviewer_role": { "type": "string" },
+          "invoice_text": { "type": "string" },
+          "threshold": { "type": "number" }
+        },
+        "required": ["reviewer_role", "invoice_text"]
+      }
+    }
+  ]
+}
+```
 
 ---
 
@@ -314,6 +463,12 @@ When the `permissions` member is omitted from an ADL document, no permissions ar
 When a specific permission domain (e.g., `network`, `filesystem`) is omitted from the `permissions` object, all operations in that domain are denied. For example, if `permissions` is present but does not contain `network`, the agent **MUST** have no network access.
 
 Runtimes **MUST NOT** infer, assume, or provide default permissions when `permissions` or a permission domain is absent.
+
+#### Conflict Resolution
+
+When a value matches both an `allowed_*` pattern and a `denied_*` pattern within the same permission domain, the `denied_*` pattern **MUST** take precedence. The agent **MUST NOT** be granted access to any value matched by a `denied_*` pattern, regardless of whether it also matches an `allowed_*` pattern. This deny-takes-precedence rule ensures that explicit exclusions cannot be overridden by broad allow patterns.
+
+Example: If `allowed_variables` is `["APP_*"]` and `denied_variables` is `["APP_SECRET_*"]`, the variable `APP_SECRET_KEY` is **denied** even though it matches `APP_*`.
 
 ### 9.2 Network
 
@@ -343,6 +498,41 @@ Command patterns in `allowed_commands` and `denied_commands` **MUST** conform to
 
 May contain: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concurrent`.
 
+Example (complete permissions object):
+
+```json
+{
+  "permissions": {
+    "network": {
+      "allowed_hosts": ["api.acme.example.com", "*.storage.example.com"],
+      "allowed_ports": [443],
+      "allowed_protocols": ["https"],
+      "deny_private": true
+    },
+    "filesystem": {
+      "allowed_paths": [
+        { "path": "/data/invoices/**", "access": "read" },
+        { "path": "/tmp/processing/**", "access": "read_write" }
+      ],
+      "denied_paths": ["/tmp/processing/**/secrets"]
+    },
+    "environment": {
+      "allowed_variables": ["APP_*", "INVOICE_*"],
+      "denied_variables": ["APP_SECRET_*"]
+    },
+    "execution": {
+      "allowed_commands": ["python3", "jq"],
+      "allow_shell": false
+    },
+    "resource_limits": {
+      "max_memory_mb": 512,
+      "max_cpu_percent": 25,
+      "max_duration_sec": 300
+    }
+  }
+}
+```
+
 ---
 
 ## 10. Security
@@ -362,6 +552,31 @@ May contain: `in_transit` (`required`, `min_version`), `at_rest` (`required`, `a
 May contain: `type` (one of `self`, `third_party`, `verifiable_credential`), `issuer`, `issued_at`, `expires_at` (ISO 8601), `signature` (object). Implementations **SHOULD** warn when `expires_at` is in the past or within 30 days.
 
 **Signature object:** When present, **MUST** contain `algorithm`, `value` (Base64url-encoded), `signed_content` (`"canonical"` or `"digest"`). When `signed_content` is `"digest"`, **MUST** also include `digest_algorithm` and `digest_value`. Supported algorithms include Ed25519 (RECOMMENDED), Ed448, ES256/384/512, RS256, PS256 (RSA ≥ 2048). Verification: remove signature, serialize with JCS [RFC8785], verify digest if applicable, resolve public key from `cryptographic_identity`, verify signature.
+
+Example:
+
+```json
+{
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "scopes": ["invoices:read", "invoices:write"],
+      "token_endpoint": "https://auth.acme.example.com/oauth/token"
+    },
+    "encryption": {
+      "in_transit": { "required": true, "min_version": "TLS1.3" },
+      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
+    },
+    "attestation": {
+      "type": "third_party",
+      "issuer": "https://trust.acme.example.com",
+      "issued_at": "2026-01-01T00:00:00Z",
+      "expires_at": "2027-01-01T00:00:00Z"
+    }
+  }
+}
+```
 
 ### 10.4 Data Classification
 
@@ -439,6 +654,39 @@ When present, **MUST** be an object. **MAY** contain:
 
 Profiles **MAY** add domain-specific sub-objects within `data_classification` to provide granular classification vocabularies. For example, a healthcare profile may add a `healthcare` sub-object with PHI type enumerations, and a financial profile may add a `financial` sub-object with financial data type enumerations. Multiple profile extensions compose naturally within the same `data_classification` object. See Section 13 for profile composition rules.
 
+Example (top-level and tool-level data classification demonstrating the high-water mark rule):
+
+```json
+{
+  "data_classification": {
+    "sensitivity": "confidential",
+    "categories": ["financial", "pii"],
+    "retention": { "max_days": 2555, "policy_uri": "https://acme.example.com/data-retention" },
+    "handling": {
+      "encryption_required": true,
+      "logging_required": true
+    }
+  },
+  "tools": [
+    {
+      "name": "get_invoice_details",
+      "description": "Returns detailed invoice data including PII.",
+      "data_classification": {
+        "sensitivity": "confidential",
+        "categories": ["financial", "pii"]
+      }
+    },
+    {
+      "name": "get_invoice_summary",
+      "description": "Returns anonymized invoice summary.",
+      "data_classification": { "sensitivity": "internal" }
+    }
+  ]
+}
+```
+
+The top-level `sensitivity` of `"confidential"` satisfies the high-water mark rule: it equals the highest tool-level value (`"confidential"` for `get_invoice_details`).
+
 ---
 
 ## 11. Runtime Behavior
@@ -490,6 +738,44 @@ The `fallback_behavior` member, when present, **MUST** be an object describing b
 | default | any    | OPTIONAL | Default value to return when `action` is `"use_default"` |
 | message | string | OPTIONAL | User-facing message on fallback                        |
 
+Example:
+
+```json
+{
+  "runtime": {
+    "input_handling": {
+      "max_input_length": 32768,
+      "content_types": ["text/plain", "application/json"],
+      "sanitization": { "enabled": true, "strip_html": true }
+    },
+    "output_handling": {
+      "format": "json",
+      "max_output_length": 8192,
+      "streaming": false
+    },
+    "tool_invocation": {
+      "parallel": true,
+      "max_concurrent": 3,
+      "timeout_ms": 30000,
+      "retry_policy": {
+        "max_retries": 2,
+        "backoff_strategy": "exponential",
+        "initial_delay_ms": 500,
+        "max_delay_ms": 5000
+      }
+    },
+    "error_handling": {
+      "on_tool_error": "retry",
+      "max_retries": 2,
+      "fallback_behavior": {
+        "action": "return_error",
+        "message": "Invoice processing temporarily unavailable."
+      }
+    }
+  }
+}
+```
+
 ---
 
 ## 12. Metadata
@@ -514,7 +800,7 @@ String: URI to source repository.
 
 ### 12.5 Tags
 
-Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only.
+Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only. Tags **SHOULD** conform to the `tag` production in Appendix D.
 
 ---
 
@@ -523,6 +809,25 @@ Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only.
 The `profiles` member declares which profiles the document conforms to. **OPTIONAL.** Value **MUST** be an array of profile identifiers (URIs or registered names). When a profile is declared: the document **MUST** satisfy all profile requirements, **MAY** use profile-defined members, and validators **SHOULD** check profile-specific rules. Profiles **MUST NOT** redefine core ADL members; they **MAY** add top-level members, add members to existing objects, define validation rules, or require specific values for optional members.
 
 **Standard profiles (examples):** Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial. Additional profiles may be registered (e.g., IANA profile registry).
+
+Example:
+
+```json
+{
+  "adl_spec": "0.1.0",
+  "name": "Invoice Processor",
+  "version": "2.0.0",
+  "description": "Processes invoices with governance and financial compliance.",
+  "data_classification": {
+    "sensitivity": "confidential",
+    "categories": ["financial"]
+  },
+  "profiles": [
+    "urn:adl:profile:governance:1.0",
+    "urn:adl:profile:financial:1.0"
+  ]
+}
+```
 
 ---
 
@@ -660,31 +965,149 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 
 ### 17.1 Media Type
 
-- **Type name:** application  
-- **Subtype name:** adl+json  
-- **Required parameters:** None  
-- **Optional parameters:** `profile` — comma-separated list of profile identifiers  
-- **Encoding considerations:** binary (UTF-8 JSON)  
-- **File extensions:** .adl.json, .adl  
-- **Fragment identifier:** JSON Pointer [RFC6901]  
-- **Intended usage:** COMMON  
-- **Applications:** AI agent platforms, agent registries, development tools, runtime environments  
-- **Security considerations:** See Section 18
+This document requests IANA to register the `application/adl+json` media type in the "Media Types" registry in accordance with [RFC6838].
+
+- **Type name:** application
+- **Subtype name:** adl+json
+- **Required parameters:** None
+- **Optional parameters:**
+  - `profile` — A comma-separated list of ADL profile identifiers (URIs or registered names from the ADL Profile Registry defined in Section 17.2) that the document conforms to. Each identifier **MUST** be a URI conforming to [RFC3986]. Consumers that do not recognize a profile identifier **MAY** ignore the parameter and **MUST** preserve it when retransmitting the document.
+- **Encoding considerations:** binary — ADL documents are JSON text sequences encoded in UTF-8 [RFC8259]. No other character encoding is permitted. Consistent with [RFC8259], UTF-8 without a byte-order mark (BOM) is **RECOMMENDED**.
+- **Security considerations:** ADL documents declare agent behavior including permission grants, system prompt templates, tool invocation configuration, and cryptographic identity. Processors **MUST** treat content from untrusted sources with appropriate caution. Template variables in `system_prompt` and prompt templates use a `{{variable_name}}` substitution syntax; processors **MUST** sanitize variable values before substitution to prevent prompt injection attacks that could alter agent behavior. ADL documents include URI references in fields such as `$schema`, `openapi_ref`, `documentation`, and `repository`; processors **MUST NOT** automatically dereference these URIs from untrusted documents, as doing so may target internal network resources and enable Server-Side Request Forgery (SSRF). Documents that declare broad permissions (e.g., a bare `*` wildcard in `allowed_hosts`) represent elevated risk and **SHOULD** require explicit human review before deployment. Processors **SHOULD** impose limits on document size, JSON nesting depth, and array lengths to prevent resource exhaustion from adversarially crafted documents. For a comprehensive treatment of all security considerations applicable to this media type, see Section 18.
+- **Interoperability considerations:** ADL documents **MUST** be processed as JSON [RFC8259] regardless of authoring format. YAML is a common authoring convenience, but processors **MUST** operate on the JSON form; documents intended to be signed using JCS [RFC8785] **MUST** be serialized as JSON before signing. Profile declarations — whether via the `profile` optional parameter or the `profiles` document member — allow multiple profiles to compose within a single document; consumers that partially implement profile requirements **SHOULD** process the members they recognize and preserve unrecognized members per Section 14.3. Validation against the JSON Schema defined in Appendix A provides a baseline interoperability check. Implementations that generate A2A Agent Cards or MCP server configurations from ADL documents **SHOULD** follow the mappings defined in Section 15. Producers **SHOULD** include the `$schema` member to enable tooling-assisted validation.
+- **Published specification:** [this document]
+- **Applications that use this media type:** AI agent platforms, agent registries, development tools, orchestration frameworks, and runtime environments that provision and manage AI agents.
+- **Fragment identifier considerations:** Fragment identifiers for resources of this type **SHOULD** be interpreted as JSON Pointer expressions [RFC6901] identifying a location within the ADL document object.
+- **Additional information:**
+  - Deprecated alias names for this type: N/A
+  - Magic number(s): N/A
+  - File extension(s): `.adl.json`, `.adl`
+  - Macintosh file type code(s): N/A
+  - Object Identifiers: N/A
+- **Person and email address to contact for further information:** See the Author's Address section of this document.
+- **Intended usage:** COMMON
+- **Restrictions on usage:** None
+- **Author:** See the Author's Address section of this document.
+- **Change controller:** IETF
 
 ### 17.2 Profile Registry
 
-A registry for ADL profiles may be created (Specification Required). Each registration **MUST** include profile identifier (URI), name, specification reference, and contact information.
+IANA is requested to create and maintain a new registry titled **"ADL Profile Registry"** within a new "Agent Definition Language (ADL)" registry group.
+
+**Registration Policy:** Specification Required [RFC8126]. The designated expert reviews registration requests to verify that the profile is documented in a publicly available, stable specification and that all required registration template fields are complete.
+
+**Registration Template:** Parties wishing to register a profile **MUST** provide all of the following fields:
+
+| Field | Description |
+|-------|-------------|
+| Identifier (URI) | A URI that uniquely identifies the profile, conforming to [RFC3986]. The URI **SHOULD** be dereferenceable and return a human-readable description of the profile. |
+| Name | A short human-readable name for the profile (e.g., "ADL Governance Profile"). |
+| Version | The profile version string in MAJOR.MINOR.PATCH semantic versioning format. |
+| Specification Reference | A stable, publicly accessible URI or document reference for the profile specification. The specification **MUST** define all profile-required members, validation rules, and any additional semantics added by the profile. |
+| ADL Version Compatibility | The ADL specification version(s) with which the profile is designed to operate (e.g., "0.1.x"). |
+| Contact | Name and email address of the person or group responsible for the profile registration. |
+| Status | One of: `active` (currently maintained) or `deprecated` (superseded or abandoned). |
+
+**Initial Registry Contents:**
+
+| Identifier (URI) | Name | Version | Specification Reference | ADL Compatibility | Contact | Status |
+|------------------|------|---------|------------------------|-------------------|---------|--------|
+| `urn:adl:profile:governance:1.0` | ADL Governance Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
+| `urn:adl:profile:portfolio:1.0` | ADL Portfolio Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
+| `urn:adl:profile:healthcare:1.0` | ADL Healthcare Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
+| `urn:adl:profile:financial:1.0` | ADL Financial Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
+
+**Designated Expert Criteria:** The designated expert **SHOULD** evaluate requests against the following criteria:
+
+1. **Publicly available specification:** The profile specification **MUST** be accessible at a stable, public URI. Specifications behind paywalls or access controls are not acceptable for registration.
+2. **Non-conflict with core ADL:** The profile **MUST NOT** redefine or contradict normative requirements of the core ADL specification. Profiles **MAY** add new members, constrain optional members to a subset of permitted values, or require that optional core members be present.
+3. **Complete registration template:** All required template fields **MUST** be present and non-empty. Incomplete registrations **MUST** be returned to the submitter.
+4. **Stable identifier:** The profile URI **SHOULD** be dereferenceable and **SHOULD** remain stable over time. Ephemeral or frequently changing URIs are not acceptable.
+5. **Legitimate purpose:** The profile **SHOULD** address a genuine domain or deployment need not already covered by an existing active registered profile.
 
 ---
 
 ## 18. Security Considerations
 
-- **Document integrity:** Signed documents use `security.attestation.signature`. Implementations **SHOULD** verify signatures before trusting contents; **SHOULD** warn or reject invalid signatures.
-- **Sensitive data:** ADL documents **SHOULD NOT** contain secrets (API keys, passwords, private keys). Sensitive configuration **SHOULD** use environment variables or secret manager URIs. Implementations **SHOULD** warn on sensitive patterns in string values.
-- **Permission enforcement:** Runtimes **SHOULD** enforce declared permissions (e.g., via OS security features). Runtimes **MUST NOT** allow agents to exceed declared permissions. If a runtime cannot enforce a permission, it **SHOULD** warn users.
-- **Tool security:** Validate inputs/outputs against schemas; enforce rate limits; log invocations. Tools with `requires_confirmation` **SHOULD** prompt users; `read_only` tools **SHOULD** be treated as lower risk.
-- **Supply chain:** Validate ADL from untrusted sources; verify attestations from trusted issuers; consider allowlists of trusted providers.
-- **Lifecycle enforcement:** Implementations **SHOULD** treat agents with `lifecycle.status` of `retired` as potentially unmaintained. Retired agents may have revoked credentials, unpatched vulnerabilities, or stale configurations. Runtimes **MUST NOT** provision or execute retired agents. Deploying deprecated agents may expose users to known issues; runtimes **SHOULD** surface deprecation warnings and `successor` information when available.
+### 18.1 Document Integrity
+
+ADL documents define agent behavior, permission grants, and security requirements. The trust model for an ADL document depends on its provenance and the integrity mechanisms applied to it. Unsigned ADL documents from untrusted or unverified sources **MUST** be treated as potentially malicious.
+
+When a document includes a cryptographic signature in `security.attestation.signature`, implementations **MUST** verify the signature before acting on the document's permission or security declarations. Signature verification requires serializing the document (with the signature object removed) using JCS [RFC8785] to produce a canonical byte sequence, then verifying the resulting digest using the algorithm and public key declared in `cryptographic_identity`. Implementations **MUST** reject documents that claim to be signed but whose signature does not verify. Implementations **SHOULD** warn when processing signed documents whose attestation has expired (`expires_at` is in the past). An ADL document whose permissions or capabilities have been modified after signing will produce a different canonical byte sequence and fail signature verification; this is the intended behavior and provides protection against privilege escalation via document tampering.
+
+### 18.2 Sensitive Data in ADL Documents
+
+ADL documents **SHOULD NOT** contain secrets, credentials, or other sensitive data in plaintext. Fields such as `system_prompt`, `provider.contact`, `metadata.authors`, and tool parameter examples may inadvertently expose confidential information if documents are logged, cached, or transmitted without adequate access controls.
+
+API keys, passwords, private keys, bearer tokens, and other authentication material **MUST NOT** appear as literal string values in ADL documents. Where agent configuration requires secret values at runtime, implementations **SHOULD** use environment variable references or external secret manager URIs rather than embedding values directly. Implementations **SHOULD** warn when string values match patterns commonly associated with credentials (e.g., values matching the format of known API key prefixes). Organizations **SHOULD** subject ADL documents to the same secret-scanning controls applied to source code repositories before storage or distribution.
+
+### 18.3 Template Injection
+
+The `system_prompt` member (Section 7.2) and `prompts[*].template` members (Section 8.3) support a template substitution syntax using `{{variable_name}}` placeholders. If variable values are derived from untrusted user input and substituted without sanitization, an attacker may be able to alter agent behavior by injecting malicious instructions into the rendered prompt — including instructions that override the intended agent behavior or cause the agent to exfiltrate information.
+
+Implementations **MUST** sanitize template variable values before substitution. At minimum, implementations **SHOULD** escape or reject values that contain the template delimiter sequence `{{` or `}}`, and **SHOULD** apply length limits to variable values. Applications that allow end users to supply template variable values **SHOULD** treat such values as untrusted and apply content validation appropriate to the deployment context. Runtimes operating on agents with `data_classification.sensitivity` of `confidential` or `restricted` **SHOULD** log rendered prompts (after variable substitution) to enable post-incident review, subject to applicable privacy constraints.
+
+### 18.4 Information Disclosure
+
+ADL documents may reveal infrastructure details that are useful to attackers. The `name`, `description`, and tool `description` fields may disclose the existence of internal services or system architecture. The `permissions.network.allowed_hosts` list may reveal internal hostname patterns, private IP ranges, or internal service naming conventions. The `permissions.filesystem.allowed_paths` list may reveal sensitive directory structures. The `provider.url`, `metadata.documentation`, and `metadata.repository` fields may reference internal systems not intended for public visibility.
+
+ADL documents intended for public distribution **SHOULD** be reviewed to remove or generalize infrastructure-specific information. Host patterns **SHOULD** use registered domain names rather than IP addresses or internal hostnames. Path patterns **SHOULD** avoid exposing sensitive directory names. Documents with `data_classification.sensitivity` of `confidential` or `restricted` **SHOULD** only be distributed to parties with appropriate access authorization and **SHOULD NOT** be published to public registries without thorough review.
+
+### 18.5 Resource Exhaustion
+
+Implementations that parse and validate ADL documents are susceptible to resource exhaustion from adversarially crafted inputs. Specific attack vectors include: deeply nested JSON Schema in `parameters` and `returns` members (including circular `$ref` chains or exponentially expanding `allOf`/`anyOf` combinators); documents with very large numbers of tools, resources, or prompts; and documents with excessively long string values in `system_prompt`, description fields, or pattern arrays.
+
+Implementations **SHOULD** enforce and document limits on: total document size (recommended maximum: 1 MB); JSON nesting depth (recommended maximum: 32 levels); number of entries in `tools`, `resources`, and `prompts` arrays (recommended maximum: 1000 each); string length for `system_prompt` and description fields (recommended maximum: 1 MB per field); and number of entries in any permission pattern array (recommended maximum: 500 patterns per domain). Implementations **SHOULD** terminate processing with an appropriate error code when any of these limits is exceeded rather than continuing to consume resources.
+
+### 18.6 Pattern Matching Abuse
+
+The permission pattern syntax (Section 4.4) governs access grants across network, filesystem, environment variable, and execution domains. Overly permissive patterns undermine the deny-by-default permission model; patterns that are expensive to evaluate can enable denial-of-service.
+
+A bare `*` as the sole value of an entry in `allowed_hosts` grants access to all hostnames and effectively disables network permission enforcement. Implementations **MUST** warn when a bare `*` wildcard is used in any security-sensitive permission pattern, including `allowed_hosts` and `allowed_variables`. Implementations **SHOULD** require explicit user acknowledgment — or refuse to deploy — agents that use bare `*` patterns in these domains. Pattern evaluation **SHOULD** be bounded in time and space: implementations that use backtracking pattern matchers **SHOULD** reject or normalize patterns that would require exponential backtracking (e.g., consecutive wildcards such as `***`). The `**` multi-segment wildcard **MUST NOT** appear in host, environment, or command patterns, and implementations **MUST** reject documents in which it does.
+
+### 18.7 URI Reference Attacks (SSRF)
+
+Multiple ADL fields accept URI values: `$schema`, `id`, `provider.url`, `metadata.documentation`, `metadata.repository`, `resource.uri`, `tool.annotations.openapi_ref`, `lifecycle.successor`, `security.attestation.issuer`, and others defined by profiles. If an implementation automatically dereferences these URIs when processing a document from an untrusted source, an attacker may cause the implementation to issue requests to arbitrary endpoints, including internal services not reachable from the public internet — a class of vulnerability known as Server-Side Request Forgery (SSRF).
+
+Implementations **MUST NOT** automatically dereference URI values from ADL documents received from untrusted sources without explicit operator or user consent. Implementations that fetch external schema documents (e.g., via `$schema`) for validation purposes **SHOULD** use an allowlist of trusted schema hosts and **MUST NOT** follow redirects that leave the trusted set. When fetching `openapi_ref` documents for tool description or validation, implementations **SHOULD** verify that the target URI matches a pre-approved allowlist. Implementations **SHOULD** validate that URI values in ADL documents conform to [RFC3986] and **SHOULD** reject URIs with schemes other than `https`, `http`, or `urn` unless the deployment context explicitly allows them.
+
+### 18.8 Canonicalization Attacks
+
+ADL supports document integrity verification via cryptographic signatures using JCS canonicalization [RFC8785]. The security of this mechanism depends on all conforming implementations producing identical canonical byte sequences for the same logical document. Subtle differences in JCS implementations — such as incorrect handling of Unicode escape sequences, floating-point number serialization, or object member ordering — could cause a legitimate signature to fail verification, or, more critically, allow an attacker to construct a document where different implementations produce different canonical forms, potentially enabling a signature verification bypass.
+
+Implementations **MUST** use a conformant JCS [RFC8785] implementation for both signing and verification. Implementations **SHOULD** validate their JCS implementation against the test vectors provided in RFC 8785 before use in a production environment. Implementations **MUST NOT** verify signatures against non-canonical serializations such as pretty-printed JSON or YAML. Implementations that process ADL documents containing IEEE 754 floating-point values in signed content **SHOULD** be aware that platform-specific floating-point representation differences may affect canonicalization and **SHOULD** avoid floating-point values in fields that will be signed when possible.
+
+### 18.9 Privacy Considerations
+
+ADL documents may contain personal information subject to applicable privacy regulations. The `provider.contact` field (Section 6.2) contains a contact email address. The `metadata.authors` array (Section 12.1) may contain author names, email addresses, and URLs. The `system_prompt` member may contain information about intended user roles, user populations, or organizational context. When ADL documents are published to public registries or shared broadly, this information becomes publicly accessible.
+
+Publishers **SHOULD** review ADL documents for personally identifiable information (PII) before public distribution and **SHOULD** use organizational or role-based contact addresses rather than personal email addresses. Implementations that log ADL document contents for debugging or auditing **SHOULD** redact or omit `provider.contact`, `metadata.authors`, and `system_prompt` fields from logs unless there is a documented operational requirement to retain them. Users **SHOULD** be informed when their ADL documents are transmitted to third-party services for validation, indexing, or registry queries.
+
+### 18.10 Privilege Escalation
+
+An ADL document that has been modified — whether by a malicious actor during transmission or by a compromised storage or distribution system — could grant an agent permissions or capabilities beyond those that were reviewed and approved for deployment. This risk is the primary motivator for the integrity mechanisms described in Section 10.3.
+
+Implementations **SHOULD** verify document integrity (Section 10.3) before enforcing the permissions declared in a document, particularly when documents are retrieved from network locations, shared storage systems, or public registries. Runtimes that cannot verify document integrity **SHOULD** apply compensating controls — such as mandatory human review — before deploying agents that declare elevated permissions or sensitive data access. When a document's `data_classification.sensitivity` is `confidential` or `restricted`, runtimes **SHOULD** require a verified signature or a verified supply chain (e.g., document retrieved from a trusted registry over an authenticated and integrity-protected channel) before provisioning. Organizations **SHOULD** maintain an inventory of approved ADL documents along with their expected signatures or cryptographic digests, and **SHOULD** treat any discrepancy between the recorded and observed document as a potential security incident.
+
+### 18.11 Cross-Origin and Supply Chain Concerns
+
+ADL documents may be fetched from remote sources: registries, source control systems, artifact stores, or agent marketplaces. A document tampered with in transit or at the origin could cause a runtime to provision a malicious agent without the operator's knowledge.
+
+ADL documents **SHOULD** be fetched over authenticated, integrity-protected channels (HTTPS with full certificate validation). Implementations **SHOULD** verify document signatures (Section 10.3) when documents are retrieved from remote or third-party sources. Implementations **SHOULD** validate that the signing identity declared in `cryptographic_identity` matches an expected, trusted identity for the document's declared `provider`.
+
+Supply chain integrity requires attention at every reference boundary: the ADL document itself, referenced OpenAPI specifications (`openapi_ref`), and external JSON Schemas (`$schema`). Implementations that automatically resolve external references during provisioning **SHOULD** pin or verify all such references. When accepting ADL documents from third-party sources, implementations **SHOULD** apply an allowlist of trusted providers (based on `provider.name` or `id` URI authority), verify attestation signatures from trusted issuers, and treat documents from unverified sources with the same caution applied to untrusted executable code.
+
+### 18.12 Permission Model and Defense in Depth
+
+The deny-by-default permission model (Section 9.1) is a foundational security property of ADL: an agent can only access resources and capabilities that its ADL document explicitly permits. However, the effectiveness of this model depends entirely on the runtime correctly enforcing declared permissions. No permission model is a substitute for defense in depth.
+
+Runtimes **MUST** enforce declared permissions and **MUST NOT** allow agents to exceed those permissions under any circumstances, including error conditions or fallback behaviors. Runtimes that cannot enforce a specific permission domain (e.g., because the underlying platform lacks the required isolation primitives) **MUST** warn users before execution and **SHOULD** refuse to execute the agent unless the user explicitly acknowledges the limitation.
+
+Beyond permission enforcement, runtimes **SHOULD** monitor agent behavior during execution: logging tool invocations, recording network destinations contacted, and alerting on anomalous activity such as repeated attempts to access resources outside declared permissions. The ADL document represents intended access boundaries at definition time; runtime monitoring ensures actual behavior remains within those boundaries in production.
+
+Runtimes **SHOULD** validate tool inputs and outputs against the declared JSON Schema (Section 8.1) before passing them to or from the agent. Malformed responses from external tool implementations could inject unexpected data into agent reasoning; runtime-level schema validation provides a defense against malfunctioning or malicious tool backends. Tools annotated with `requires_confirmation: true` **MUST** receive explicit user confirmation before invocation; runtimes **MUST NOT** invoke such tools autonomously regardless of other configuration.
+
+Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NOT** provision or execute agents with `lifecycle.status` of `retired`. Retired agents may have revoked credentials, unpatched vulnerabilities, or stale permission configurations. Agents with `lifecycle.status` of `deprecated` **SHOULD** trigger warnings to operators, who **SHOULD** migrate to the agent identified by `lifecycle.successor` before the `sunset_date` is reached.
 
 ---
 
@@ -740,3 +1163,61 @@ ADL profiles are maintained in the [profiles/](../../profiles/) directory. Each 
 | [Financial](../../profiles/financial/overview) | `urn:adl:profile:financial:1.0` | Draft |
 
 See the [profiles/](../../profiles/) directory for the full profile index and contribution guidelines.
+
+---
+
+## Appendix D. ABNF Grammar
+
+This appendix defines formal ABNF grammar productions (RFC 5234 / RFC 7405) for syntactic constructs specified in this document. All productions use ASCII character references consistent with RFC 5234, Appendix B. The core ABNF rules `ALPHA` (letters), `DIGIT` (decimal digits), and `VCHAR` (visible ASCII characters) are defined in RFC 5234 Section 6 (B.1).
+
+```abnf
+; Semantic Versioning format (Sections 5.1, 5.5)
+semver          = 1*DIGIT "." 1*DIGIT "." 1*DIGIT
+
+; Tool name (Section 8.1)
+; All alpha characters MUST be lowercase; satisfies ^[a-z][a-z0-9_]*$
+tool-name       = lc-alpha *( lc-alpha / DIGIT / "_" )
+lc-alpha        = %x61-7A          ; a-z (lowercase letters only)
+
+; Extension member name (Section 4.3)
+; "x_" prefix followed by a namespace identifier
+ext-member-name = "x_" ns-id
+ns-id           = 1*( lc-alpha / DIGIT / "_" )
+
+; Template variable (Sections 7.2, 8.3)
+; Used in system_prompt templates and prompt templates
+template-var    = "{{" var-name "}}"
+var-name        = ALPHA *( ALPHA / DIGIT / "_" )
+                  ; First character MUST be a letter (upper or lowercase)
+
+; Tag (Section 12.5)
+; Lowercase alphanumeric characters and hyphens
+tag             = 1*( lc-alpha / DIGIT / "-" )
+
+; Pattern syntax (Section 4.4)
+; An ADL pattern consists of literal characters and optional wildcard tokens
+pattern         = 1*pattern-element
+pattern-element = multi-wildcard / single-wildcard / literal-chars
+multi-wildcard  = "**"
+                  ; Valid only in filesystem path patterns (Section 9.3)
+                  ; MUST NOT appear in host, env-variable, or command patterns
+single-wildcard = "*"
+                  ; Matches within one segment; does not cross "." in host
+                  ; patterns or "/" in filesystem path patterns
+literal-chars   = 1*literal-char
+literal-char    = %x21-29 / %x2B-7E
+                  ; Printable ASCII except "*" (%x2A)
+                  ; "/" (%x2F) carries segment-boundary meaning in path patterns
+                  ; "." (%x2E) carries segment-boundary meaning in host patterns
+```
+
+### Cross-Reference Summary
+
+| Production | Normative Section | Usage |
+|---|---|---|
+| `semver` | 5.1, 5.5 | `adl_spec` and `version` values |
+| `tool-name` | 8.1 | Tool `name` values |
+| `ext-member-name` | 4.3 | Custom extension member names |
+| `template-var` | 7.2, 8.3 | `{{variable}}` references in templates |
+| `tag` | 12.5 | `metadata.tags` array items |
+| `pattern` | 4.4, 9.2–9.5 | Permission domain pattern strings |
