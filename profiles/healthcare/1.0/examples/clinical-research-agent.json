@@ -1,0 +1,157 @@
+{
+  "$schema": "https://adl-spec.org/0.1/schema.json",
+  "adl_spec": "0.1.0",
+  "name": "Clinical Research Assistant",
+  "description": "Assists researchers with patient record analysis and clinical trial matching.",
+  "version": "1.0.0",
+  "profiles": [
+    "urn:adl:profile:governance:1.0",
+    "urn:adl:profile:healthcare:1.0"
+  ],
+  "lifecycle": {
+    "status": "active",
+    "effective_date": "2026-01-15T00:00:00Z"
+  },
+  "provider": {
+    "name": "HealthTech Corp",
+    "url": "https://healthtech.example",
+    "contact": "compliance@healthtech.example"
+  },
+  "model": {
+    "capabilities": ["function_calling"]
+  },
+  "tools": [
+    {
+      "name": "search_patient_records",
+      "description": "Search de-identified patient records for clinical trial matching",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "criteria": { "type": "string" },
+          "limit": { "type": "integer", "default": 20 }
+        },
+        "required": ["criteria"]
+      },
+      "read_only": true
+    },
+    {
+      "name": "generate_cohort_report",
+      "description": "Generate a cohort analysis report from matched records",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "cohort_id": { "type": "string" },
+          "format": { "type": "string", "enum": ["pdf", "json"] }
+        },
+        "required": ["cohort_id"]
+      }
+    }
+  ],
+  "permissions": {
+    "network": {
+      "allowed_hosts": ["ehr.healthtech.example", "fhir.healthtech.example"],
+      "allowed_protocols": ["https"],
+      "deny_private": true
+    },
+    "filesystem": {
+      "allowed_paths": [
+        { "path": "/data/deidentified/**", "access": "read" },
+        { "path": "/data/reports/**", "access": "read_write" }
+      ]
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "scopes": ["patient:read", "report:write"]
+    },
+    "encryption": {
+      "in_transit": { "required": true, "min_version": "1.2" },
+      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
+    }
+  },
+  "data_classification": {
+    "sensitivity": "restricted",
+    "categories": ["pii", "phi"],
+    "retention": {
+      "min_days": 2190
+    },
+    "handling": {
+      "encryption_required": true,
+      "logging_required": true
+    },
+    "healthcare": {
+      "phi_types": ["demographics", "medical_records"],
+      "hipaa_applicability": true
+    }
+  },
+  "hipaa_compliance": {
+    "covered_entity_type": "business_associate",
+    "baa_required": true,
+    "minimum_necessary": {
+      "scope": "task_specific",
+      "justification": "Access limited to de-identified records for clinical trial matching",
+      "review_frequency": "quarterly"
+    },
+    "security_rule": {
+      "encryption_at_rest": "AES_256",
+      "encryption_in_transit": "TLS_1_2",
+      "mfa_required": true,
+      "data_retention": "none",
+      "restoration_hours": 72
+    }
+  },
+  "phi_handling": {
+    "de_identification": {
+      "method": "safe_harbor",
+      "re_identification_controls": true
+    },
+    "breach_notification": {
+      "notification_hours": 60,
+      "contact": "privacy-officer@healthtech.example",
+      "threshold": 500
+    },
+    "consent_management": {
+      "required": true,
+      "consent_types": ["research"],
+      "granularity": "purpose_specific",
+      "revocation_supported": true
+    }
+  },
+  "clinical_safety": {
+    "bias_monitoring": {
+      "enabled": true,
+      "protected_classes": ["race", "ethnicity", "sex", "age"],
+      "assessment_frequency": "quarterly",
+      "last_assessment": "2026-01-01T00:00:00Z"
+    },
+    "human_in_the_loop": {
+      "level": "approval_required",
+      "role": "Principal Investigator",
+      "escalation_path": "IRB Committee"
+    }
+  },
+  "interoperability": {
+    "fhir_version": "R4",
+    "terminology_bindings": ["ICD-10", "SNOMED-CT", "LOINC"],
+    "information_blocking": {
+      "compliant": true
+    }
+  },
+  "compliance_framework": {
+    "primary_framework": "HIPAA",
+    "control_mappings": [
+      { "framework": "HIPAA", "control_id": "§164.312(a)(1)", "status": "implemented" },
+      { "framework": "HIPAA", "control_id": "§164.312(e)(1)", "status": "implemented" },
+      { "framework": "NIST", "control_id": "AC-6", "status": "implemented" }
+    ]
+  },
+  "metadata": {
+    "authors": [
+      { "name": "HealthTech Compliance Team", "email": "compliance@healthtech.example" }
+    ],
+    "license": "Proprietary",
+    "tags": ["healthcare", "hipaa", "clinical-research", "fhir"]
+  }
+}

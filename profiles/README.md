@@ -1,6 +1,17 @@
-# ADL Profiles
+---
+id: index
+title: Profiles
+sidebar_position: 1
+slug: /profiles
+description: ADL Profiles extend the core specification with domain-specific requirements for regulated industries.
+keywords: [adl, profiles, governance, healthcare, financial, compliance]
+---
+
+# Profiles
 
 Profiles extend the core ADL specification with domain-specific requirements, members, and validation rules. They enable regulated industries and specialized use cases to build on ADL without modifying the core spec.
+
+> **Tip:** Use profiles when your agents need to comply with industry regulations (HIPAA, SOC2, PCI-DSS) or organizational governance requirements. Profiles add structured compliance tracking without changing core ADL semantics.
 
 ## Overview
 
@@ -18,8 +29,8 @@ Profiles are identified by URIs (e.g., `urn:adl:profile:governance:1.0`).
 |---------|------------|--------|-------------|
 | [Governance](./governance/) | `urn:adl:profile:governance:1.0` | Draft | Compliance frameworks, audit trails, enterprise governance |
 | [Portfolio](./portfolio/) | `urn:adl:profile:portfolio:1.0` | Draft | Agent inventory, relationships, and domain membership |
-| [Healthcare](./healthcare/) | `urn:adl:profile:healthcare:1.0` | Placeholder | HIPAA compliance, PHI handling |
-| [Financial](./financial/) | `urn:adl:profile:financial:1.0` | Placeholder | PCI-DSS, SOX compliance |
+| [Healthcare](./healthcare/) | `urn:adl:profile:healthcare:1.0` | Draft | HIPAA compliance, PHI handling, clinical safety, FHIR interoperability |
+| [Financial](./financial/) | `urn:adl:profile:financial:1.0` | Draft | PCI-DSS, SOX, GLBA, MiFID II, AML/KYC compliance |
 
 ## Profile Versioning
 
@@ -54,5 +65,5 @@ Profiles **MAY**:
 
 ## See Also
 
-- [ADL Specification — Section 13: Profiles](../versions/0.1.0-draft/spec.md#13-profiles)
-- [CONTRIBUTING.md](../CONTRIBUTING.md)
+- [ADL Specification — Section 13: Profiles](../versions/0.1.0/spec.md#13-profiles)
+- [Contributing Guide](../CONTRIBUTING.md)

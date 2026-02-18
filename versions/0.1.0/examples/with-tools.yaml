@@ -3,6 +3,9 @@ name: Calculator
 description: A calculator agent that performs math operations.
 version: "0.1.0"
 
+data_classification:
+  sensitivity: public
+
 model:
   capabilities:
     - function_calling

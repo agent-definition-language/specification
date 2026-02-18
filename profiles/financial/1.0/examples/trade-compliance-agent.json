@@ -1,0 +1,145 @@
+{
+  "$schema": "https://adl-spec.org/0.1/schema.json",
+  "adl_spec": "0.1.0",
+  "name": "Trade Compliance Monitor",
+  "description": "Monitors trading activity for regulatory compliance and suspicious patterns.",
+  "version": "1.0.0",
+  "profiles": [
+    "urn:adl:profile:governance:1.0",
+    "urn:adl:profile:financial:1.0"
+  ],
+  "lifecycle": {
+    "status": "active",
+    "effective_date": "2026-01-01T00:00:00Z"
+  },
+  "provider": {
+    "name": "FinSecure Inc",
+    "url": "https://finsecure.example",
+    "contact": "compliance@finsecure.example"
+  },
+  "model": {
+    "capabilities": ["function_calling"]
+  },
+  "tools": [
+    {
+      "name": "scan_transactions",
+      "description": "Scan recent transactions for compliance violations and suspicious patterns",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "account_id": { "type": "string" },
+          "lookback_days": { "type": "integer", "default": 30 }
+        },
+        "required": ["account_id"]
+      },
+      "read_only": true
+    },
+    {
+      "name": "file_sar",
+      "description": "File a Suspicious Activity Report with FinCEN",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "transaction_ids": { "type": "array", "items": { "type": "string" } },
+          "narrative": { "type": "string" },
+          "priority": { "type": "string", "enum": ["routine", "expedited"] }
+        },
+        "required": ["transaction_ids", "narrative"]
+      },
+      "requires_confirmation": true
+    }
+  ],
+  "permissions": {
+    "network": {
+      "allowed_hosts": ["api.finsecure.example", "fincen.gov"],
+      "allowed_protocols": ["https"],
+      "deny_private": true
+    },
+    "filesystem": {
+      "allowed_paths": [
+        { "path": "/data/transactions/**", "access": "read" },
+        { "path": "/data/reports/**", "access": "read_write" }
+      ]
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "mtls",
+      "required": true
+    },
+    "encryption": {
+      "in_transit": { "required": true, "min_version": "1.3" },
+      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
+    }
+  },
+  "data_classification": {
+    "sensitivity": "confidential",
+    "categories": ["pii", "financial"],
+    "retention": {
+      "min_days": 1825
+    },
+    "handling": {
+      "encryption_required": true,
+      "logging_required": true
+    },
+    "financial": {
+      "data_types": ["transaction_data", "nonpublic_personal_info"],
+      "pci_applicable": false
+    }
+  },
+  "financial_data_handling": {
+    "pci_scope": {
+      "in_scope": false
+    },
+    "data_residency": [
+      { "jurisdiction": "US", "regulation": "GLBA" }
+    ]
+  },
+  "transaction_controls": {
+    "kill_switch": {
+      "enabled": true,
+      "trigger_conditions": ["error_rate_threshold", "anomaly_detection"],
+      "notification_targets": ["compliance-team@finsecure.example"]
+    },
+    "segregation_of_duties": {
+      "enabled": true,
+      "restricted_actions": ["file_sar"],
+      "approval_role": "Compliance Officer"
+    }
+  },
+  "regulatory_scope": {
+    "applicable_regulations": ["GLBA", "BSA_AML", "FINRA", "SEC_REG"],
+    "record_retention": {
+      "min_retention_days": 1825,
+      "tamper_proof": true
+    }
+  },
+  "financial_risk_management": {
+    "model_risk": {
+      "tier": "tier_2",
+      "validated_by": "Model Risk Committee",
+      "validated_at": "2025-12-15T00:00:00Z",
+      "methodology": "Champion-challenger with backtesting"
+    },
+    "aml_controls": {
+      "screening_required": true,
+      "monitoring_level": "real_time",
+      "kyc_refresh_days": 365
+    }
+  },
+  "compliance_framework": {
+    "primary_framework": "NIST_800_53",
+    "control_mappings": [
+      { "framework": "NIST", "control_id": "AU-2", "status": "implemented" },
+      { "framework": "NIST", "control_id": "AC-5", "status": "implemented" },
+      { "framework": "NIST", "control_id": "SC-13", "status": "implemented" }
+    ]
+  },
+  "metadata": {
+    "authors": [
+      { "name": "FinSecure Compliance Team", "email": "compliance@finsecure.example" }
+    ],
+    "license": "Proprietary",
+    "tags": ["financial", "compliance", "aml", "trading"]
+  }
+}

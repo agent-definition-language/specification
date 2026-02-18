@@ -1,0 +1,43 @@
+# ADL Profile Manifest
+# Single source of truth for profile metadata used by sync-profiles.ts
+
+profiles:
+  - id: governance
+    version: "1.0"
+    status: draft
+    title: "Governance Profile Specification"
+    description: "compliance frameworks, AI governance, and audit trails"
+    adl_compatibility: "0.1.x"
+    overview: hand_authored
+    keywords: [adl, governance, specification, compliance, audit, soc2, nist]
+    example_filename: "compliance-review-agent.adl.json"
+
+  - id: healthcare
+    version: "1.0"
+    status: draft
+    title: "Healthcare Profile Specification"
+    description: "HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability"
+    adl_compatibility: "0.1.x"
+    overview: hand_authored
+    keywords: [adl, healthcare, specification, hipaa, phi, fhir, clinical, compliance]
+    example_filename: "clinical-research-agent.adl.json"
+
+  - id: financial
+    version: "1.0"
+    status: draft
+    title: "Financial Profile Specification"
+    description: "PCI-DSS, SOX, GLBA, MiFID II, and AML/KYC compliance"
+    adl_compatibility: "0.1.x"
+    overview: hand_authored
+    keywords: [adl, financial, specification, pci-dss, sox, glba, mifid, aml, compliance]
+    example_filename: "trade-compliance-agent.adl.json"
+
+  - id: portfolio
+    version: "1.0"
+    status: draft
+    title: "Portfolio Profile Specification"
+    description: "agent inventory, relationships, and domain membership"
+    adl_compatibility: "0.1.x"
+    overview: hand_authored
+    keywords: [adl, portfolio, specification, inventory, relationships, domain]
+    example_filename: "customer-service-agent.adl.json"

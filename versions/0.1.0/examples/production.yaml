@@ -5,6 +5,11 @@ description: An AI assistant that helps researchers find, summarize, and analyze
 version: "2.1.0"
 id: urn:adl:acme:research-assistant:2.1.0
 
+data_classification:
+  sensitivity: internal
+  categories:
+    - intellectual_property
+
 lifecycle:
   status: active
   effective_date: "2026-01-15T00:00:00Z"

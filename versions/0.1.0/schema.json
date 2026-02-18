@@ -3,8 +3,62 @@
   "$id": "https://adl-spec.org/0.1/schema.json",
   "title": "ADL Document",
   "description": "Agent Definition Language v0.1.0",
+  "$defs": {
+    "data_classification": {
+      "type": "object",
+      "required": ["sensitivity"],
+      "properties": {
+        "sensitivity": {
+          "type": "string",
+          "enum": ["public", "internal", "confidential", "restricted"],
+          "description": "Information sensitivity level (NIST FIPS 199 / ISO 27001)"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pii", "phi", "financial", "credentials", "intellectual_property", "regulatory"]
+          },
+          "minItems": 1,
+          "description": "Broad information categories handled"
+        },
+        "retention": {
+          "type": "object",
+          "properties": {
+            "min_days": { "type": "number", "minimum": 0 },
+            "max_days": { "type": "number", "minimum": 0 },
+            "policy_uri": { "type": "string", "format": "uri" }
+          },
+          "patternProperties": {
+            "^x_[a-z][a-z0-9_]*$": true
+          },
+          "additionalProperties": false,
+          "description": "Data retention requirements"
+        },
+        "handling": {
+          "type": "object",
+          "properties": {
+            "encryption_required": { "type": "boolean" },
+            "anonymization_required": { "type": "boolean" },
+            "cross_border_restricted": { "type": "boolean" },
+            "logging_required": { "type": "boolean" }
+          },
+          "patternProperties": {
+            "^x_[a-z][a-z0-9_]*$": true
+          },
+          "additionalProperties": false,
+          "description": "Data handling constraints"
+        }
+      },
+      "patternProperties": {
+        "^x_[a-z][a-z0-9_]*$": true
+      },
+      "additionalProperties": false,
+      "description": "Data classification (composable; profiles MAY add domain-specific sub-objects via schema composition)"
+    }
+  },
   "type": "object",
-  "required": ["adl_spec", "name", "description", "version"],
+  "required": ["adl_spec", "name", "description", "version", "data_classification"],
   "properties": {
     "adl_spec": {
       "type": "string",
@@ -190,6 +244,9 @@
             },
             "additionalProperties": true,
             "description": "Implementation hints and metadata (open object)"
+          },
+          "data_classification": {
+            "$ref": "#/$defs/data_classification"
           }
         },
         "patternProperties": {
@@ -224,6 +281,9 @@
             "type": "object",
             "additionalProperties": true,
             "description": "Implementation hints and metadata (open object)"
+          },
+          "data_classification": {
+            "$ref": "#/$defs/data_classification"
           }
         },
         "patternProperties": {
@@ -458,6 +518,9 @@
       },
       "additionalProperties": false,
       "description": "Security requirements"
+    },
+    "data_classification": {
+      "$ref": "#/$defs/data_classification"
     },
     "runtime": {
       "type": "object",
