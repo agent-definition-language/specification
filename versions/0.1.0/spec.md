@@ -804,6 +804,26 @@ String: URI to source repository.
 
 Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only. Tags **SHOULD** conform to the `tag` production in Appendix D.
 
+### 12.6 Example
+
+```json
+{
+  "metadata": {
+    "authors": [
+      {
+        "name": "Platform Team",
+        "email": "platform@example.com",
+        "url": "https://example.com/team/platform"
+      }
+    ],
+    "license": "Apache-2.0",
+    "documentation": "https://docs.example.com/agents/invoice-processor",
+    "repository": "https://github.com/example/invoice-processor",
+    "tags": ["finance", "invoice", "production"]
+  }
+}
+```
+
 ---
 
 ## 13. Profiles
@@ -960,6 +980,80 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-5001 | Lifecycle | Invalid lifecycle status value |
 | ADL-5002 | Lifecycle | Successor present on active/draft agent |
 | ADL-5003 | Lifecycle | Sunset date in the past with non-retired status |
+
+### 16.3 Error Source Examples
+
+The `source.pointer` member uses JSON Pointer [RFC6901] to identify the location of the error within the ADL document. The following examples illustrate `source` values for representative error codes from each category:
+
+```json
+// ADL-1003 (Schema): Missing required member "data_classification"
+{
+  "code": "ADL-1003",
+  "title": "Missing required member",
+  "detail": "Required member 'data_classification' is missing",
+  "source": { "pointer": "" }
+}
+```
+
+```json
+// ADL-2002 (Semantic): Duplicate tool name at index 2
+{
+  "code": "ADL-2002",
+  "title": "Duplicate tool name",
+  "detail": "Tool name 'search_documents' already defined at index 0",
+  "source": { "pointer": "/tools/2/name" }
+}
+```
+
+```json
+// ADL-2016 (Semantic): Invalid host pattern in permissions
+{
+  "code": "ADL-2016",
+  "title": "Invalid host pattern syntax",
+  "detail": "Pattern '**' is not a valid host pattern",
+  "source": { "pointer": "/permissions/network/allowed_hosts/1" }
+}
+```
+
+```json
+// ADL-2023 (Semantic): High-water mark violation on a tool
+{
+  "code": "ADL-2023",
+  "title": "High-water mark violation",
+  "detail": "Tool 'query_records' has sensitivity 'confidential' which exceeds top-level 'internal'",
+  "source": { "pointer": "/tools/1/data_classification/sensitivity" }
+}
+```
+
+```json
+// ADL-3001 (Profile): Profile requirement not satisfied
+{
+  "code": "ADL-3001",
+  "title": "Profile requirements not satisfied",
+  "detail": "Governance profile requires 'compliance' member",
+  "source": { "pointer": "/profiles/0" }
+}
+```
+
+```json
+// ADL-4001 (Security): Weak key algorithm
+{
+  "code": "ADL-4001",
+  "title": "Weak key algorithm",
+  "detail": "Algorithm 'RS256' with 1024-bit key does not meet minimum strength requirements",
+  "source": { "pointer": "/security/attestation/public_key" }
+}
+```
+
+```json
+// ADL-5002 (Lifecycle): Successor on active agent
+{
+  "code": "ADL-5002",
+  "title": "Successor present on non-retired agent",
+  "detail": "Member 'successor' is only valid when lifecycle.status is 'retired'",
+  "source": { "pointer": "/lifecycle/successor" }
+}
+```
 
 ---
 
