@@ -1,7 +1,7 @@
 # Agent Definition Language (ADL) Specification
 
 **Version:** 0.1.0-draft  
-**Status:** Draft (internal draft of ADL)
+**Status:** Draft
 
 ## 1. Introduction
 
@@ -718,11 +718,11 @@ The normative JSON Schema for ADL is available at `https://adl-spec.org/0.1/sche
 
 ## Appendix B. Examples
 
-See the [examples/](../../examples/) directory:
+See the [examples/](./examples/) directory:
 
-- **Minimal:** [minimal-0.1.0.json](../../examples/minimal-0.1.0.json)
-- **Agent with tools:** [with-tools-0.1.0.json](../../examples/with-tools-0.1.0.json)
-- **Production agent:** [production-0.1.0.json](../../examples/production-0.1.0.json)
+- **Minimal:** [minimal.yaml](./examples/minimal.yaml)
+- **Agent with tools:** [with-tools.yaml](./examples/with-tools.yaml)
+- **Production agent:** [production.yaml](./examples/production.yaml)
 
 ---
 
@@ -734,9 +734,9 @@ ADL profiles are maintained in the [profiles/](../../profiles/) directory. Each 
 
 | Profile | Identifier | Status |
 |---------|------------|--------|
-| [Governance](../../profiles/governance/) | `urn:adl:profile:governance:1.0` | Draft |
-| [Portfolio](../../profiles/portfolio/) | `urn:adl:profile:portfolio:1.0` | Draft |
-| [Healthcare](../../profiles/healthcare/) | `urn:adl:profile:healthcare:1.0` | Placeholder |
-| [Financial](../../profiles/financial/) | `urn:adl:profile:financial:1.0` | Placeholder |
+| [Governance](../../profiles/governance/overview) | `urn:adl:profile:governance:1.0` | Draft |
+| [Portfolio](../../profiles/portfolio/overview) | `urn:adl:profile:portfolio:1.0` | Draft |
+| [Healthcare](../../profiles/healthcare/overview) | `urn:adl:profile:healthcare:1.0` | Draft |
+| [Financial](../../profiles/financial/overview) | `urn:adl:profile:financial:1.0` | Draft |
 
-See [profiles/README.md](../../profiles/README.md) for the full profile index and contribution guidelines.
+See the [profiles/](../../profiles/) directory for the full profile index and contribution guidelines.

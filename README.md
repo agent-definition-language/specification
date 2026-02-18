@@ -26,15 +26,16 @@ The Markdown in `versions/` is the source of truth for the draft specification u
 
 ## Examples
 
-Example ADL documents are in [examples/](examples/). Minimal valid document (0.1.0, JSON):
+Example ADL documents are in [versions/0.1.0/examples/](versions/0.1.0/examples/). Minimal valid document (0.1.0, YAML):
 
-```json
-{
-  "adl_spec": "0.1.0",
-  "name": "My Agent",
-  "description": "An agent defined with ADL.",
-  "version": "1.0.0"
-}
+```yaml
+adl_spec: "0.1.0"
+name: My Agent
+description: An agent defined with ADL.
+version: "1.0.0"
+
+data_classification:
+  sensitivity: public
 ```
 
 ## Standardization
@@ -52,7 +53,7 @@ We aim to align with existing DSL standards (OpenAPI, AsyncAPI) and to submit AD
 | [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial). |
 | [standardization/](standardization/) | Roadmap and per-standards-body notes. |
 | [proposals/](proposals/) | Spec and process proposals. |
-| [examples/](examples/) | Example ADL YAML/JSON documents. |
+| [versions/0.1.0/examples/](versions/0.1.0/examples/) | Example ADL YAML documents. |
 | [.github/](.github/) | Issue and PR templates. |
 
 ## Participation
