@@ -1156,12 +1156,14 @@ IANA is requested to create and maintain a new registry titled **"ADL Profile Re
 
 **Initial Registry Contents:**
 
-| Identifier (URI) | Name | Version | Specification Reference | ADL Compatibility | Contact | Status |
-|------------------|------|---------|------------------------|-------------------|---------|--------|
-| `urn:adl:profile:governance:1.0` | ADL Governance Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
-| `urn:adl:profile:portfolio:1.0` | ADL Portfolio Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
-| `urn:adl:profile:healthcare:1.0` | ADL Healthcare Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
-| `urn:adl:profile:financial:1.0` | ADL Financial Profile | 1.0.0 | Appendix C, [this document] | 0.1.x | See Author's Address | active |
+| Identifier (URI) | Name | Version |
+|------------------|------|---------|
+| `urn:adl:profile:governance:1.0` | ADL Governance Profile | 1.0.0 |
+| `urn:adl:profile:portfolio:1.0` | ADL Portfolio Profile | 1.0.0 |
+| `urn:adl:profile:healthcare:1.0` | ADL Healthcare Profile | 1.0.0 |
+| `urn:adl:profile:financial:1.0` | ADL Financial Profile | 1.0.0 |
+
+All initial entries reference Appendix C of this document, target ADL compatibility 0.1.x, are `active`, and list the Author's Address as contact.
 
 **Designated Expert Criteria:** The designated expert **SHOULD** evaluate requests against the following criteria:
 
