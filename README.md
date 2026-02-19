@@ -48,18 +48,17 @@ data_classification:
 
 ## CLI
 
-The [`@adl-spec/cli`](https://www.npmjs.com/package/@adl-spec/cli) package provides validation and tooling for ADL documents.
+The [`@adl-spec/cli`](https://www.npmjs.com/package/@adl-spec/cli) package provides validation and tooling for ADL documents. The CLI requires [Bun](https://bun.sh/) to be installed.
 
 ```bash
-npm install -g @adl-spec/cli
-adl validate my-agent.yaml
+bunx @adl-spec/cli validate my-agent.yaml
 ```
 
 Source: [packages/adl-cli/](packages/adl-cli/)
 
 ## Standardization
 
-ADL has been submitted to the **IETF** as Internet-Draft [`draft-nederveld-adl-01`](standardization/output/) (Standards Track, individual submission) with an IANA media-type registration provision.
+ADL has been submitted to the **IETF** as Internet-Draft `draft-nederveld-adl-01` (Standards Track, individual submission) with an IANA media-type registration provision.
 
 For the full standards strategy, see the [roadmap](standardization/roadmap.md).
 
