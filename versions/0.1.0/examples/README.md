@@ -4,7 +4,7 @@ title: Examples
 sidebar_position: 1
 slug: /examples
 description: Example ADL documents demonstrating minimal, intermediate, and production-ready agent definitions.
-keywords: [adl, examples, json, agent definition]
+keywords: [adl, examples, agent definition, agentic ai, ai agent configuration, json, yaml, agent manifest]
 ---
 
 # Examples

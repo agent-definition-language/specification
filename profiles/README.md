@@ -4,7 +4,7 @@ title: Profiles
 sidebar_position: 1
 slug: /profiles
 description: ADL Profiles extend the core specification with domain-specific requirements for regulated industries.
-keywords: [adl, profiles, governance, healthcare, financial, compliance]
+keywords: [adl, profiles, ai governance, agentic ai, ai compliance, healthcare ai, financial ai, regulated ai, ai safety, domain profiles]
 ---
 
 # Profiles
