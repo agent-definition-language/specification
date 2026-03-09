@@ -25,12 +25,7 @@ When this profile is declared in an ADL document's `profiles` array, the documen
 
 ### 1.1 Passport Model
 
-The Governance Profile follows the **passport model**: the ADL document carries the minimum governance declarations that a counterparty (peer agent, gateway, orchestrator, runtime) needs to make a trust decision. Operational governance detail — escalation contacts, full accountability chains, audit schedules, evaluation reports — is maintained in a separate **governance record** stored in the agent registry and linked from the passport via `governance_record_ref`.
-
-This separation ensures that:
-- Personnel changes and policy updates do not require re-signing the agent passport.
-- The passport remains compact for agent-to-agent interactions.
-- Internal operational detail is not exposed to external counterparties.
+This profile applies ADL's passport model (Section 1.3 of the core specification) to governance. The ADL document carries the minimum governance declarations needed for trust decisions; operational governance detail — escalation contacts, full accountability chains, audit schedules, evaluation reports — is maintained in a separate **governance record** stored in the agent registry and linked from the passport via `governance_record_ref`.
 
 See the companion [Governance Record Specification](governance-record.md) for the governance record schema.
 
