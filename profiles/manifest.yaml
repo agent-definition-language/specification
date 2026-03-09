@@ -8,7 +8,7 @@ profiles:
     title: "Governance Profile Specification"
     description: "compliance frameworks, AI governance, and audit trails"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
+    overview: "The Governance Profile extends ADL for regulated enterprise environments with compliance tracking and audit trails."
     keywords: [adl, governance specification, ai compliance, ai audit, soc2, nist 800-53, iso 27001, eu ai act, agentic ai, ai governance, responsible ai]
     example_filename: "compliance-review-agent.adl.json"
 
@@ -18,7 +18,7 @@ profiles:
     title: "Healthcare Profile Specification"
     description: "HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
+    overview: "The Healthcare Profile extends ADL for healthcare environments with HIPAA compliance, PHI handling, and clinical safety controls."
     keywords: [adl, healthcare specification, hipaa, phi, fhir, clinical ai, agentic ai, healthcare ai compliance, medical ai, ai safety]
     example_filename: "clinical-research-agent.adl.json"
 
@@ -28,16 +28,26 @@ profiles:
     title: "Financial Profile Specification"
     description: "PCI-DSS, SOX, GLBA, MiFID II, and AML/KYC compliance"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
+    overview: "The Financial Profile extends ADL for financial services with PCI-DSS, SOX, GLBA, and MiFID II compliance."
     keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
     example_filename: "trade-compliance-agent.adl.json"
+
+  - id: registry
+    version: "1.0"
+    status: draft
+    title: "Registry Profile Specification"
+    description: "agent catalog identity, classification, and federation"
+    adl_compatibility: "0.1.x"
+    overview: "The Registry Profile extends ADL with agent catalog identity, classification, and multi-registry federation capabilities."
+    keywords: [adl, registry specification, agent catalog, agent registry, agentic ai, agent discovery, agent classification, agent federation]
+    example_filename: "registered-agent.adl.json"
 
   - id: portfolio
     version: "1.0"
     status: draft
     title: "Portfolio Profile Specification"
-    description: "agent inventory, relationships, and domain membership"
+    description: "agent relationships and domain membership"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
-    keywords: [adl, portfolio specification, agent inventory, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
+    overview: "The Portfolio Profile extends ADL with agent relationships and domain membership for managing agent portfolios at scale."
+    keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
     example_filename: "customer-service-agent.adl.json"

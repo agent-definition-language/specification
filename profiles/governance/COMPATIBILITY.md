@@ -1,3 +1,11 @@
+---
+id: compatibility
+title: Compatibility
+sidebar_position: 4
+description: Compatibility matrix between Governance Profile and ADL specification versions.
+keywords: [adl, governance, compatibility, versioning]
+---
+
 # Governance Profile Compatibility
 
 This document tracks compatibility between Governance Profile versions and ADL specification versions.
