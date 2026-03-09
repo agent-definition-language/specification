@@ -2,19 +2,19 @@
 id: compatibility
 title: Compatibility
 sidebar_position: 4
-description: Compatibility matrix between Portfolio Profile and ADL specification versions.
-keywords: [adl, portfolio, compatibility, versioning]
+description: Compatibility matrix between Registry Profile and ADL specification versions.
+keywords: [adl, registry, compatibility, versioning]
 ---
 
-# Portfolio Profile Compatibility
+# Registry Profile Compatibility
 
-This document tracks compatibility between Portfolio Profile versions and ADL specification versions.
+This document tracks compatibility between Registry Profile versions and ADL specification versions.
 
 ## Compatibility Matrix
 
 | Profile Version | ADL Versions | Status | Notes |
 |-----------------|--------------|--------|-------|
-| 1.0             | 0.1.x        | Draft  | Relationships and domain membership; catalog identity in Registry Profile |
+| 1.0             | 0.1.x        | Draft  | Initial release |
 
 ## Compatibility Policy
 

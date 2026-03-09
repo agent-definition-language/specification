@@ -1,0 +1,27 @@
+---
+id: examples
+title: Examples
+sidebar_position: 3
+description: Example ADL document using the Registry Profile for agent catalog and federation.
+keywords: [adl, registry, example, catalog, federation, agent discovery]
+---
+
+import CodeTabs from '@site/src/components/CodeTabs';
+import registeredAgent from './examples/registered-agent.json';
+
+# Registry Profile Examples
+
+## Registered Agent
+
+A compliance review agent registered in an enterprise catalog with classification and federation metadata.
+
+<CodeTabs json={registeredAgent} title="registered-agent.adl" />
+
+### Key Registry Fields
+
+| Field | Purpose |
+|-------|---------|
+| `registry.catalog_id` | Unique identifier in the agent catalog |
+| `registry.catalog_classification` | Domain, subdomain, and capability taxonomy |
+| `registry.visibility` | Access scope (`internal`, `public`, `restricted`) |
+| `registry.federation` | Cross-registry discovery and sync configuration |

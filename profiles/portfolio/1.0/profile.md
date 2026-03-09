@@ -1,60 +1,51 @@
+---
+id: specification
+title: "Specification"
+sidebar_position: 2
+slug: ../specification
+description: "Full specification for the ADL Portfolio Profile including agent relationships and domain membership."
+keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
+adl_profile_meta:
+  example_filename: "customer-service-agent.adl.json"
+---
+
 # Portfolio Profile Specification
 
 **Identifier:** `urn:adl:profile:portfolio:1.0`
 **Status:** Draft
 **ADL Compatibility:** 0.1.x
+**Schema:** [`schema.json`](schema.json)
+**Dependencies:** None
 
 ## 1. Introduction
 
-The Portfolio Profile extends ADL with inventory, relationships, and domain membership capabilities. It enables organizations to manage agent portfolios at scale, track agent dependencies, and align agents with business domains.
+The Portfolio Profile extends ADL with agent relationships and business domain membership capabilities. It enables organizations to track agent dependencies, composition hierarchies, and business domain alignment at scale.
 
 When this profile is declared in an ADL document's `profiles` array, the document **MUST** satisfy all requirements defined in this specification.
+
+### 1.1 Relationship to Other Profiles
+
+The Portfolio Profile is independent of other ADL profiles:
+
+- **Registry Profile** — Provides catalog identity and classification. Portfolio does not depend on registry — an enterprise may track portfolio relationships in a Git repository, CMDB, or spreadsheet without requiring formal registry integration.
+- **Governance Profile** — Provides compliance and governance controls. Portfolio does not depend on governance — an agent can have portfolio relationships without being governed.
+
+Organizations that need both registry and portfolio capabilities declare both profiles as siblings:
+
+```json
+{
+  "profiles": [
+    "urn:adl:profile:registry:1.0",
+    "urn:adl:profile:portfolio:1.0"
+  ]
+}
+```
 
 ---
 
 ## 2. Additional Members
 
-### 2.1 inventory
-
-**REQUIRED** when using this profile.
-
-An object containing agent catalog and inventory information.
-
-| Member         | Type   | Required | Description |
-|----------------|--------|----------|-------------|
-| catalog_id     | string | REQUIRED | Unique catalog identifier |
-| classification | object | OPTIONAL | Category/type classification |
-| tags           | array  | OPTIONAL | Discovery and grouping tags |
-| visibility     | string | OPTIONAL | Visibility level |
-
-#### catalog_id
-
-A unique identifier for this agent within the organization's catalog. **MUST** be a non-empty string. **SHOULD** be unique across the agent portfolio.
-
-#### classification
-
-When present, **MAY** contain:
-
-| Member   | Type   | Description |
-|----------|--------|-------------|
-| category | string | Primary category (e.g., "support", "analytics", "automation") |
-| type     | string | Agent type (e.g., "conversational", "batch", "orchestrator") |
-
-#### tags
-
-When present, **MUST** be an array of strings. Tags **SHOULD** be lowercase, alphanumeric, and may contain hyphens. Tags enable discovery, grouping, and filtering of agents.
-
-#### visibility
-
-When present, **MUST** be one of:
-
-- `private` — Visible only to the owning team
-- `internal` — Visible within the organization
-- `public` — Visible externally
-
----
-
-### 2.2 relationships
+### 2.1 relationships
 
 **OPTIONAL.** An object containing agent dependencies and composition relationships.
 
@@ -83,7 +74,7 @@ When present, **MUST** be an array of strings. Each string **SHOULD** be an agen
 
 ---
 
-### 2.3 domain
+### 2.2 domain
 
 **OPTIONAL.** An object containing business/functional domain membership information, aligned with Domain-Driven Design (DDD) concepts.
 
@@ -120,16 +111,11 @@ When present, describes the agent's role within the domain (e.g., "primary-handl
   "name": "Customer Service Agent",
   "description": "Handles tier-1 customer inquiries and support requests.",
   "version": "1.2.0",
-  "profiles": ["urn:adl:profile:portfolio:1.0"],
-  "inventory": {
-    "catalog_id": "cs-agent-001",
-    "classification": {
-      "category": "support",
-      "type": "conversational"
-    },
-    "tags": ["customer-service", "support", "tier-1", "production"],
-    "visibility": "internal"
+  "data_classification": {
+    "sensitivity": "internal",
+    "categories": ["pii"]
   },
+  "profiles": ["urn:adl:profile:portfolio:1.0"],
   "relationships": {
     "depends_on": [
       "urn:adl:acme:knowledge-base-agent:1.0",
@@ -158,28 +144,32 @@ Implementations validating against this profile **MUST** enforce:
 
 | Rule   | Description |
 |--------|-------------|
-| PFL-01 | `inventory` MUST be present |
-| PFL-02 | `inventory.catalog_id` MUST be present and non-empty |
-| PFL-03 | `inventory.visibility` MUST be a valid visibility value if present |
-| PFL-04 | `inventory.tags` elements MUST be strings if present |
-| PFL-05 | `relationships.depends_on` elements MUST be strings if present |
-| PFL-06 | `relationships.composed_of` elements MUST be strings if present |
-| PFL-07 | `relationships.orchestrated_by` MUST be a string if present |
-| PFL-08 | `relationships.peers` elements MUST be strings if present |
+| PFL-01 | `relationships` or `domain` **MUST** be present (at least one) |
+| PFL-02 | `relationships.depends_on` elements **MUST** be strings if present |
+| PFL-03 | `relationships.composed_of` elements **MUST** be strings if present |
+| PFL-04 | `relationships.orchestrated_by` **MUST** be a string if present |
+| PFL-05 | `relationships.peers` elements **MUST** be strings if present |
+
+### 4.1 Schema Validation
+
+The portfolio profile provides a JSON Schema ([`schema.json`](schema.json)) that extends the base ADL schema via `allOf` composition per Section 13.1 of the core specification. The profile schema:
+
+1. References the base ADL schema via `allOf` with `$ref`.
+2. Declares all portfolio-specific members in its own `properties`.
+3. Uses `anyOf` to enforce that at least one of `relationships` or `domain` is present.
+4. Adds `unevaluatedProperties: false` to reject members not defined by either the base schema or this profile.
+
+Validators **SHOULD** use this schema for structural validation of documents declaring the portfolio profile.
+
+### 4.2 Profile Dependencies
+
+This profile has no dependencies. It **MAY** be declared alongside other profiles (e.g., registry, governance) as a sibling. See Section 13.3 of the core specification for dependency rules.
 
 ---
 
 ## 5. Use Cases
 
-### 5.1 Agent Discovery
-
-The `inventory` member enables catalog systems to:
-- Index agents by `catalog_id` for unique lookup
-- Filter agents by `classification` category and type
-- Search agents by `tags`
-- Control access based on `visibility`
-
-### 5.2 Dependency Management
+### 5.1 Dependency Management
 
 The `relationships` member enables:
 - Deployment order determination via `depends_on`
@@ -187,7 +177,7 @@ The `relationships` member enables:
 - Impact analysis when agents change
 - Visualization of agent relationships
 
-### 5.3 Domain Alignment
+### 5.2 Domain Alignment
 
 The `domain` member enables:
 - Grouping agents by business capability

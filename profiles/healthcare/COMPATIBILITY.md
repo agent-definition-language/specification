@@ -1,3 +1,11 @@
+---
+id: compatibility
+title: Compatibility
+sidebar_position: 4
+description: Compatibility matrix between Healthcare Profile and ADL specification versions.
+keywords: [adl, healthcare, compatibility, versioning]
+---
+
 # Healthcare Profile Compatibility
 
 This document tracks compatibility between Healthcare Profile versions and ADL specification versions.

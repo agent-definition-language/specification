@@ -1,3 +1,11 @@
+---
+id: compatibility
+title: Compatibility
+sidebar_position: 4
+description: Compatibility matrix between Financial Profile and ADL specification versions.
+keywords: [adl, financial, compatibility, versioning]
+---
+
 # Financial Profile Compatibility
 
 This document tracks compatibility between Financial Profile versions and ADL specification versions.

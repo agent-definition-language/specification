@@ -1,50 +1,98 @@
+---
+id: overview
+slug: overview
+title: Overview
+sidebar_position: 1
+description: "The Financial Profile extends ADL for financial services with PCI-DSS, SOX, GLBA, and MiFID II compliance."
+keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
+---
+
 # Financial Profile
 
-The Financial Profile extends ADL for financial services environments with financial data classification, transaction controls, regulatory scope declarations, and risk management.
+**Identifier:** `urn:adl:profile:financial:1.0`
+**Status:** Draft
+**ADL Compatibility:** 0.1.x
 
-## Status
+> **Note:** This profile is in **draft** status. The specification is stable for early adoption, but minor changes may occur before 1.0.
 
-| Version | Status | ADL Compatibility |
-|---------|--------|-------------------|
-| 1.0     | Draft  | 0.1.x             |
+> **Regulatory Disclaimer:** This profile does not constitute legal, regulatory, or compliance advice. It has not been reviewed or endorsed by the PCI Security Standards Council, the SEC, FINRA, the FTC, or any regulatory body. Compliance with PCI-DSS requires a Qualified Security Assessor (QSA) assessment. Compliance with SOX requires audit by a registered public accounting firm.
 
-## Identifier
+## Overview
 
+The Financial Profile extends ADL for financial services and banking environments. It adds members for financial data classification, transaction controls, regulatory scope declarations, and risk management. This profile addresses requirements from PCI-DSS v4.0, SOX, GLBA, Basel III/IV, FINRA, SEC regulations, DORA, MiFID II, and AML/KYC frameworks.
+
+This profile is designed to compose with the [Governance Profile](../governance/). Organizations **SHOULD** declare both profiles for full enterprise financial compliance coverage.
+
+## Use Cases
+
+- Trade compliance monitoring agents
+- AML/KYC screening agents
+- Risk analysis and assessment agents
+- Fraud detection systems
+- Regulatory reporting agents
+- Customer service agents for financial institutions
+- Algorithmic trading oversight agents
+
+## Quick Start
+
+Add the Financial Profile to your ADL document — minimum viable declaration:
+
+```json
+{
+  "adl_spec": "0.1.0",
+  "name": "Transaction Monitor",
+  "description": "Monitors transactions for compliance violations.",
+  "version": "1.0.0",
+  "profiles": ["urn:adl:profile:financial:1.0"],
+  "data_classification": {
+    "sensitivity": "confidential",
+    "categories": ["financial"],
+    "financial": {
+      "data_types": ["transaction_data"]
+    }
+  },
+  "financial_data_handling": {}
+}
 ```
-urn:adl:profile:financial:1.0
-```
-
-## Scope
-
-This profile addresses:
-
-- **Financial data handling** — Data classification (CHD, NPI, MNPI), PCI-DSS scoping, data residency
-- **Transaction controls** — Limits, pre-execution checks, kill switches, segregation of duties
-- **Regulatory scope** — Multi-regulation declarations, record retention, reporting obligations
-- **Risk management** — Model risk (SR 11-7), AML controls, operational risk classification
 
 ## Additional Members
 
+The Financial Profile adds the following top-level members:
+
 | Member | Required | Description |
 |--------|----------|-------------|
-| `financial_data_handling` | REQUIRED | Data classification, PCI scope, data residency |
-| `transaction_controls` | OPTIONAL | Transaction limits, pre-execution controls, kill switch, segregation of duties |
-| `regulatory_scope` | OPTIONAL | Applicable regulations, jurisdictions, record retention |
-| `financial_risk_management` | OPTIONAL | Model risk, AML controls, operational risk |
+| `data_classification.financial` | **REQUIRED** | Financial data types (composable; extends core `data_classification`) |
+| `financial_data_handling` | **REQUIRED** | PCI scope, data residency |
+| `transaction_controls` | Optional | Transaction limits, pre-execution checks, kill switch, segregation of duties |
+| `regulatory_scope` | Optional | Applicable regulations, jurisdictions, record retention |
+| `financial_risk_management` | Optional | Model risk (SR 11-7), AML controls, operational risk |
+
+See the [full specification](./1.0/profile.md) for detailed member definitions.
 
 ## Regulatory Foundation
 
-- PCI-DSS v4.0
-- Sarbanes-Oxley Act (SOX)
-- Gramm-Leach-Bliley Act (GLBA)
-- Basel III/IV Capital Framework
-- FINRA Rules
-- SEC Regulations
-- DORA (EU Digital Operational Resilience Act)
-- MiFID II (Markets in Financial Instruments Directive)
-- Bank Secrecy Act / AML (BSA)
-- EU Anti-Money Laundering Directive (AMLD)
-- FFIEC IT Examination Handbook
+This profile maps requirements from:
+
+- **PCI-DSS v4.0** — Payment card data security
+- **SOX** (Sarbanes-Oxley) — Internal controls, audit trails, segregation of duties
+- **GLBA** (Gramm-Leach-Bliley) — Financial privacy, NPI safeguards
+- **Basel III/IV** — Capital adequacy, operational risk
+- **FINRA** — Broker-dealer supervision, AI agent oversight
+- **SEC** — Securities regulations, MNPI controls
+- **DORA** — EU digital operational resilience
+- **MiFID II** — Algorithmic trading controls, kill switches, record retention
+- **BSA/AML** — Anti-money laundering, suspicious activity reporting
+- **FFIEC** — IT examination, model risk management (SR 11-7)
+
+## Specification
+
+- [Profile Specification (1.0)](./1.0/profile.md)
+- [Compatibility](./COMPATIBILITY.md)
+- [Examples](./1.0/examples/)
+
+## Maintainers
+
+- ADL Working Group
 
 ## See Also
 

@@ -1,0 +1,37 @@
+---
+id: examples
+title: Examples
+sidebar_position: 3
+description: Example ADL document using the Financial Profile for trading compliance and AML controls.
+keywords: [adl, financial, example, aml, kyc, pci-dss, glba, trading, compliance]
+---
+
+import CodeTabs from '@site/src/components/CodeTabs';
+import tradeAgent from './examples/trade-compliance-agent.json';
+
+# Financial Profile Examples
+
+## Trade Compliance Monitor
+
+A trading surveillance agent that monitors activity for regulatory compliance and suspicious patterns, with AML controls and segregation of duties.
+
+<CodeTabs json={tradeAgent} title="trade-compliance-agent.adl" />
+
+### Key Financial Fields
+
+| Field | Purpose |
+|-------|---------|
+| `financial_data_handling` | PCI scope assessment and data residency requirements |
+| `transaction_controls` | Kill switch, segregation of duties, approval roles |
+| `regulatory_scope` | Applicable regulations (GLBA, BSA/AML, FINRA, SEC) |
+| `financial_risk_management` | Model risk tier, AML controls, KYC refresh cadence |
+| `data_classification.financial` | Financial data types and PCI applicability |
+
+### Compliance Highlights
+
+- **Authentication**: Mutual TLS (mTLS) for all connections
+- **Encryption**: TLS 1.3 in transit, AES-256-GCM at rest
+- **Kill Switch**: Triggered on error rate threshold or anomaly detection
+- **Segregation of Duties**: SAR filing requires Compliance Officer approval
+- **Record Retention**: 5-year minimum, tamper-proof storage
+- **AML**: Real-time transaction monitoring, annual KYC refresh

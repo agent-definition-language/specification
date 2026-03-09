@@ -1,0 +1,41 @@
+---
+id: examples
+title: Examples
+sidebar_position: 3
+description: Example ADL document using the Portfolio Profile for agent relationships and domain membership.
+keywords: [adl, portfolio, example, agent relationships, orchestration, domain, multi-agent]
+---
+
+import CodeTabs from '@site/src/components/CodeTabs';
+import customerServiceAgent from './examples/customer-service-agent.json';
+
+# Portfolio Profile Examples
+
+## Customer Service Agent
+
+A tier-1 support agent with defined relationships to peer agents, dependencies, and an orchestrator within the customer service domain.
+
+<CodeTabs json={customerServiceAgent} title="customer-service-agent.adl" />
+
+### Key Portfolio Fields
+
+| Field | Purpose |
+|-------|---------|
+| `relationships.depends_on` | Agents this agent requires to function |
+| `relationships.orchestrated_by` | The orchestrator that coordinates this agent |
+| `relationships.peers` | Sibling agents in the same domain |
+| `domain.domain_id` | Domain membership identifier |
+| `domain.bounded_context` | The bounded context this agent operates within |
+| `domain.role` | The agent's role within the domain |
+
+### Agent Topology
+
+```
+support-orchestrator (orchestrator)
+├── customer-service-agent (this agent)
+├── billing-support-agent (peer)
+├── technical-support-agent (peer)
+└── returns-agent (peer)
+```
+
+Dependencies: `knowledge-base-agent`, `ticket-api-agent`, `customer-data-agent`
