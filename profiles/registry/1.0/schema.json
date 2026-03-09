@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/profiles/registry/1.0/schema.json",
+  "title": "ADL Registry Profile",
+  "description": "JSON Schema for ADL documents declaring the registry profile (urn:adl:profile:registry:1.0). Extends the base ADL schema via allOf composition.",
+  "allOf": [
+    { "$ref": "https://adl-spec.org/0.1/schema.json" }
+  ],
+  "type": "object",
+  "required": ["registry"],
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "contains": { "const": "urn:adl:profile:registry:1.0" }
+    },
+    "registry": {
+      "type": "object",
+      "required": ["catalog_id"],
+      "properties": {
+        "catalog_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "catalog_classification": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["domain"],
+            "properties": {
+              "domain": {
+                "type": "string",
+                "minLength": 1
+              },
+              "subdomain": { "type": "string" },
+              "capability": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "visibility": {
+          "type": "string",
+          "enum": ["private", "internal", "public"]
+        },
+        "federation": {
+          "type": "object",
+          "properties": {
+            "registries": {
+              "type": "array",
+              "items": { "type": "string", "format": "uri" }
+            },
+            "primary": { "type": "string", "format": "uri" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false
+}

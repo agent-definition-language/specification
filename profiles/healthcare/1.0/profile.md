@@ -1,3 +1,14 @@
+---
+id: specification
+title: "Specification"
+sidebar_position: 2
+slug: ../specification
+description: "Full specification for the ADL Healthcare Profile including HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability."
+keywords: [adl, healthcare specification, hipaa, phi, fhir, clinical ai, agentic ai, healthcare ai compliance, medical ai, ai safety]
+adl_profile_meta:
+  example_filename: "clinical-research-agent.adl.json"
+---
+
 # Healthcare Profile Specification
 
 **Identifier:** `urn:adl:profile:healthcare:1.0`

@@ -1,3 +1,12 @@
+---
+id: specification
+title: "Agent Definition Language Specification"
+description: "The complete ADL v0.1.0 specification — defining agent identity, permissions, lifecycle, compliance, and governance in a machine-readable format."
+keywords: [adl, specification, agent definition language, ai agent, agentic ai, agentic, ai governance, ai safety, ai compliance, agent permissions, agent lifecycle, multi-agent, trustworthy ai, responsible ai]
+toc_max_heading_level: 3
+hide_table_of_contents: false
+---
+
 # Agent Definition Language (ADL) Specification
 
 **Version:** 0.1.0-draft
@@ -27,7 +36,22 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 - **Machine-readable:** ADL documents are validated against JSON Schema and can be processed programmatically.
 - **Human-friendly:** Clear naming conventions and structures that are easy to read and author.
 
-### 1.3 Relationship to Other Specifications
+### 1.3 Design Model
+
+An ADL document functions as a **passport** for an AI agent. It carries the declarations that a counterparty — peer agent, gateway, orchestrator, registry, or human operator — needs to make a trust decision: identity, capabilities, permissions, security posture, and governance signals.
+
+The passport model establishes two principles:
+
+1. **Self-contained trust signals.** An ADL document **MUST** contain enough information for a counterparty to evaluate whether to interact with the agent, without requiring access to external systems.
+
+2. **Separation of declaration from operations.** Operational detail that changes independently of the agent's declared behavior — escalation contacts, audit schedules, evaluation reports, deployment logs — belongs in external records (e.g., a governance record in a registry), not in the passport. Profiles **MAY** define linking members (e.g., `governance_record_ref`) that reference such records by stable URI.
+
+This separation ensures that:
+- The passport remains compact for agent-to-agent and agent-to-gateway interactions.
+- Operational changes (personnel rotation, policy updates) do not require re-issuing the passport.
+- Internal operational detail is not exposed to external counterparties.
+
+### 1.4 Relationship to Other Specifications
 
 ADL builds upon and interoperates with:
 
@@ -878,11 +902,68 @@ Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only. Tags *
 
 ## 13. Profiles
 
-The `profiles` member declares which profiles the document conforms to. **OPTIONAL.** Value **MUST** be an array of profile identifiers (URIs or registered names). When a profile is declared: the document **MUST** satisfy all profile requirements, **MAY** use profile-defined members, and validators **SHOULD** check profile-specific rules. Profiles **MUST NOT** redefine core ADL members; they **MAY** add top-level members, add members to existing objects, define validation rules, or require specific values for optional members.
+The `profiles` member declares which profiles the document conforms to. **OPTIONAL.** Value **MUST** be an array of profile identifiers (URIs or registered names). When a profile is declared: the document **MUST** satisfy all profile requirements, **MAY** use profile-defined members, and validators **SHOULD** check profile-specific rules.
 
-**Standard profiles (examples):** Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial. Additional profiles may be registered (e.g., IANA profile registry).
+**Standard profiles (examples):** Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial. Additional profiles **MAY** be registered (e.g., IANA profile registry).
 
-Example:
+### 13.1 Profile Schema Composition
+
+Profiles extend the base ADL schema using the JSON Schema 2020-12 `allOf` composition mechanism. Each profile publishes a JSON Schema that:
+
+1. References the base ADL schema via `allOf` with `$ref`.
+2. Declares the profile's additional top-level members in its own `properties`.
+3. Adds `unevaluatedProperties: false` to close the composed schema, ensuring only base ADL members, profile-defined members, and `x_`-prefixed extension members are accepted.
+
+The base ADL schema (Appendix A) does not restrict unknown top-level properties — it declares `properties` and `patternProperties` but omits `additionalProperties` and `unevaluatedProperties`. This allows profile schemas to add members via composition without conflict. For documents that do not declare any profiles, validators **SHOULD** use the strict schema (`schema-strict.json`), which adds `unevaluatedProperties: false` to reject unknown top-level members.
+
+Profile schemas **MUST NOT** redefine core ADL members with incompatible types. Profiles **MAY**:
+
+- Add top-level members.
+- Add members to existing objects (e.g., extending `data_classification` with domain-specific sub-objects).
+- Define validation rules.
+- Require specific values for optional core members.
+- Use conditional validation (`if`/`then`) to enforce tier-based or context-dependent requirements.
+
+### 13.2 Multi-Profile Composition
+
+When a document declares multiple profiles, the document **MUST** satisfy all declared profile requirements. Validators compose profile schemas using `allOf` — each profile's schema is included as an element. JSON Schema `allOf` uses "strictest wins" semantics: if any profile requires a member, the composed result requires it.
+
+Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. The IANA profile registry designated expert review (see Section 13.4) prevents cross-profile field naming conflicts.
+
+### 13.3 Profile Dependencies
+
+A profile **MAY** declare dependencies on other profiles. When a profile declares a dependency, documents using that profile **MUST** also satisfy the dependency profile's requirements. The `profiles` array **MUST** include all transitive dependencies.
+
+At the schema level, a dependent profile composes its parent via `allOf`:
+
+```json
+{
+  "allOf": [
+    { "$ref": "https://adl-spec.org/0.1/schema.json" },
+    { "$ref": "https://adl-spec.org/profiles/governance/1.0/schema.json" }
+  ],
+  "properties": {
+    "hipaa_data_handling": { "type": "object" }
+  },
+  "unevaluatedProperties": false
+}
+```
+
+A dependent profile **MAY** tighten constraints from its parent (e.g., make an optional parent field required, narrow an enum). A dependent profile **MUST NOT** loosen constraints from its parent (e.g., make a required parent field optional). This follows from `allOf` semantics — the parent's constraints remain in force.
+
+If a dependent profile needs a parent field to not be required, this indicates a design issue. Resolutions include: refactoring the parent into a base profile with looser constraints, changing the relationship from dependency to sibling, or revising the parent profile in a new major version.
+
+### 13.4 Profile Registration
+
+Profile identifiers **SHOULD** be registered to prevent naming conflicts. The registration authority (e.g., IANA profile registry) **MUST** employ designated expert review to ensure:
+
+1. New profiles do not redefine members from existing profiles with incompatible semantics.
+2. New profiles do not introduce field names that conflict with existing profiles.
+3. Dependencies between profiles are explicitly declared and acyclic.
+
+If a member becomes cross-cutting (needed by multiple profiles), the registration authority **MAY** recommend promoting it to the core ADL specification.
+
+### 13.5 Example
 
 ```json
 {

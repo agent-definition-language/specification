@@ -1,0 +1,36 @@
+---
+id: examples
+title: Examples
+sidebar_position: 3
+description: Example ADL document using the Healthcare Profile for HIPAA compliance and clinical safety.
+keywords: [adl, healthcare, example, hipaa, phi, fhir, clinical safety, ehr]
+---
+
+import CodeTabs from '@site/src/components/CodeTabs';
+import clinicalAgent from './examples/clinical-research-agent.json';
+
+# Healthcare Profile Examples
+
+## Clinical Research Assistant
+
+A clinical research agent that assists with patient record analysis and clinical trial matching, with full HIPAA compliance and PHI handling controls.
+
+<CodeTabs json={clinicalAgent} title="clinical-research-agent.adl" />
+
+### Key Healthcare Fields
+
+| Field | Purpose |
+|-------|---------|
+| `hipaa_compliance` | Covered entity type, BAA requirements, minimum necessary scope |
+| `phi_handling` | De-identification method, breach notification, consent management |
+| `clinical_safety` | Bias monitoring across protected classes, human-in-the-loop requirements |
+| `interoperability` | FHIR version, terminology bindings (ICD-10, SNOMED-CT, LOINC) |
+| `data_classification.healthcare` | PHI types and HIPAA applicability flag |
+
+### Compliance Highlights
+
+- **HIPAA Security Rule**: AES-256 at rest, TLS 1.2+ in transit, MFA required
+- **De-identification**: Safe Harbor method with re-identification controls
+- **Breach Notification**: 60-hour notification window, 500-record threshold
+- **Consent**: Purpose-specific, revocation supported
+- **Bias Monitoring**: Quarterly assessment across race, ethnicity, sex, and age

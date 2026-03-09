@@ -1,43 +1,284 @@
 # ADL Profile Manifest
-# Single source of truth for profile metadata used by sync-profiles.ts
+# Single source of truth for profile metadata and section structure.
+# Used by site remark plugins for badge rendering and by standardization
+# generators for body-specific output.
 
 profiles:
   - id: governance
     version: "1.0"
+    identifier: "urn:adl:profile:governance:1.0"
     status: draft
     title: "Governance Profile Specification"
     description: "compliance frameworks, AI governance, and audit trails"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
+    schema: "schema.json"
+    dependencies: []
+    overview: "The Governance Profile extends ADL for regulated enterprise environments with compliance tracking and audit trails."
     keywords: [adl, governance specification, ai compliance, ai audit, soc2, nist 800-53, iso 27001, eu ai act, agentic ai, ai governance, responsible ai]
     example_filename: "compliance-review-agent.adl.json"
+    companion_specs:
+      - id: governance-record
+        title: "Governance Record Specification"
+        source: "governance-record.md"
+    sections:
+      - id: introduction
+        number: "1"
+        title: Introduction
+        subsections:
+          - id: passport-model
+            number: "1.1"
+            title: Passport Model
+          - id: conformance-tiers
+            number: "1.2"
+            title: Conformance Tiers
+      - id: additional-members
+        number: "2"
+        title: Additional Members
+        subsections:
+          - id: compliance-framework
+            number: "2.1"
+            title: compliance_framework
+          - id: autonomy
+            number: "2.2"
+            title: autonomy
+          - id: risk-classification
+            number: "2.3"
+            title: risk_classification
+          - id: human-oversight
+            number: "2.4"
+            title: human_oversight
+          - id: incident-response
+            number: "2.5"
+            title: incident_response
+          - id: evaluation-attestation
+            number: "2.6"
+            title: evaluation_attestation
+          - id: disclosure
+            number: "2.7"
+            title: disclosure
+          - id: safety-reviews
+            number: "2.8"
+            title: safety_reviews
+          - id: governance
+            number: "2.9"
+            title: governance
+          - id: governance-record-ref
+            number: "2.10"
+            title: governance_record_ref
+      - id: compliance-mapping
+        number: "3"
+        title: Compliance Mapping
+      - id: example
+        number: "4"
+        title: Example
+      - id: validation-rules
+        number: "5"
+        title: Validation Rules
+        subsections:
+          - id: tier-conditional-validation
+            number: "5.1"
+            title: Tier-Conditional Validation
+          - id: schema-validation
+            number: "5.2"
+            title: Schema Validation
+          - id: profile-dependencies
+            number: "5.3"
+            title: Profile Dependencies
+
+  - id: registry
+    version: "1.0"
+    identifier: "urn:adl:profile:registry:1.0"
+    status: draft
+    title: "Registry Profile Specification"
+    description: "agent catalog identity, classification, and federation"
+    adl_compatibility: "0.1.x"
+    schema: "schema.json"
+    dependencies: []
+    overview: "The Registry Profile extends ADL with agent catalog identity, classification, and multi-registry federation capabilities."
+    keywords: [adl, registry specification, agent catalog, agent registry, agentic ai, agent discovery, agent classification, agent federation]
+    example_filename: "registered-agent.adl.json"
+    sections:
+      - id: introduction
+        number: "1"
+        title: Introduction
+        subsections:
+          - id: relationship-other-profiles
+            number: "1.1"
+            title: Relationship to Other Profiles
+      - id: additional-members
+        number: "2"
+        title: Additional Members
+        subsections:
+          - id: registry
+            number: "2.1"
+            title: registry
+      - id: example
+        number: "3"
+        title: Example
+      - id: validation-rules
+        number: "4"
+        title: Validation Rules
+        subsections:
+          - id: schema-validation
+            number: "4.1"
+            title: Schema Validation
+          - id: profile-dependencies
+            number: "4.2"
+            title: Profile Dependencies
+      - id: use-cases
+        number: "5"
+        title: Use Cases
+        subsections:
+          - id: agent-catalog
+            number: "5.1"
+            title: Agent Catalog
+          - id: multi-registry-federation
+            number: "5.2"
+            title: Multi-Registry Federation
+          - id: multi-path-classification
+            number: "5.3"
+            title: Multi-Path Classification
 
   - id: healthcare
     version: "1.0"
+    identifier: "urn:adl:profile:healthcare:1.0"
     status: draft
     title: "Healthcare Profile Specification"
     description: "HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
+    schema: null
+    dependencies: []
+    overview: "The Healthcare Profile extends ADL for healthcare environments with HIPAA compliance, PHI handling, and clinical safety controls."
     keywords: [adl, healthcare specification, hipaa, phi, fhir, clinical ai, agentic ai, healthcare ai compliance, medical ai, ai safety]
     example_filename: "clinical-research-agent.adl.json"
+    sections:
+      - id: introduction
+        number: "1"
+        title: Introduction
+      - id: additional-members
+        number: "2"
+        title: Additional Members
+        subsections:
+          - id: hipaa-compliance
+            number: "2.1"
+            title: hipaa_compliance
+          - id: phi-handling
+            number: "2.2"
+            title: phi_handling
+          - id: clinical-safety
+            number: "2.3"
+            title: clinical_safety
+          - id: interoperability
+            number: "2.4"
+            title: interoperability
+          - id: data-classification-extension
+            number: "2.5"
+            title: data_classification Extension
+      - id: compliance-mapping
+        number: "3"
+        title: Compliance Mapping
+      - id: example
+        number: "4"
+        title: Example
+      - id: validation-rules
+        number: "5"
+        title: Validation Rules
 
   - id: financial
     version: "1.0"
+    identifier: "urn:adl:profile:financial:1.0"
     status: draft
     title: "Financial Profile Specification"
     description: "PCI-DSS, SOX, GLBA, MiFID II, and AML/KYC compliance"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
+    schema: null
+    dependencies: []
+    overview: "The Financial Profile extends ADL for financial services with PCI-DSS, SOX, GLBA, and MiFID II compliance."
     keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
     example_filename: "trade-compliance-agent.adl.json"
+    sections:
+      - id: introduction
+        number: "1"
+        title: Introduction
+      - id: additional-members
+        number: "2"
+        title: Additional Members
+        subsections:
+          - id: financial-data-handling
+            number: "2.1"
+            title: financial_data_handling
+          - id: transaction-controls
+            number: "2.2"
+            title: transaction_controls
+          - id: regulatory-scope
+            number: "2.3"
+            title: regulatory_scope
+          - id: financial-risk-management
+            number: "2.4"
+            title: financial_risk_management
+          - id: data-classification-extension
+            number: "2.5"
+            title: data_classification Extension
+      - id: compliance-mapping
+        number: "3"
+        title: Compliance Mapping
+      - id: example
+        number: "4"
+        title: Example
+      - id: validation-rules
+        number: "5"
+        title: Validation Rules
 
   - id: portfolio
     version: "1.0"
+    identifier: "urn:adl:profile:portfolio:1.0"
     status: draft
     title: "Portfolio Profile Specification"
-    description: "agent inventory, relationships, and domain membership"
+    description: "agent relationships and domain membership"
     adl_compatibility: "0.1.x"
-    overview: hand_authored
-    keywords: [adl, portfolio specification, agent inventory, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
+    schema: "schema.json"
+    dependencies: []
+    overview: "The Portfolio Profile extends ADL with agent relationships and domain membership for managing agent portfolios at scale."
+    keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
     example_filename: "customer-service-agent.adl.json"
+    sections:
+      - id: introduction
+        number: "1"
+        title: Introduction
+        subsections:
+          - id: relationship-other-profiles
+            number: "1.1"
+            title: Relationship to Other Profiles
+      - id: additional-members
+        number: "2"
+        title: Additional Members
+        subsections:
+          - id: relationships
+            number: "2.1"
+            title: relationships
+          - id: domain
+            number: "2.2"
+            title: domain
+      - id: example
+        number: "3"
+        title: Example
+      - id: validation-rules
+        number: "4"
+        title: Validation Rules
+        subsections:
+          - id: schema-validation
+            number: "4.1"
+            title: Schema Validation
+          - id: profile-dependencies
+            number: "4.2"
+            title: Profile Dependencies
+      - id: use-cases
+        number: "5"
+        title: Use Cases
+        subsections:
+          - id: dependency-management
+            number: "5.1"
+            title: Dependency Management
+          - id: domain-alignment
+            number: "5.2"
+            title: Domain Alignment

@@ -1,0 +1,48 @@
+---
+id: examples
+title: Examples
+sidebar_position: 3
+description: Example ADL documents using the Governance Profile with conformance tiers.
+keywords: [adl, governance, example, compliance, soc2, audit, tier 2, tier 3]
+---
+
+import CodeTabs from '@site/src/components/CodeTabs';
+import complianceAgent from './examples/compliance-agent.json';
+import tier3Agent from './examples/compliance-agent-tier3.json';
+
+# Governance Profile Examples
+
+## Tier 2
+
+### Compliance Review Agent
+
+A document review agent with conditional autonomy. Requires human approval for compliance determinations affecting regulatory filings.
+
+<CodeTabs json={complianceAgent} title="compliance-agent.adl" />
+
+### Key Governance Fields
+
+| Field | Value | Why |
+|-------|-------|-----|
+| `autonomy.tier` | `2` | Agent acts within boundaries; human oversight on exceptions |
+| `human_oversight.triggers` | 3 triggers defined | Required at Tier 2+ |
+| `incident_response.policy_documented` | `true` | Required at Tier 2+ |
+| `disclosure.required` | `true` | Required at Tier 2+ |
+| `governance_record_ref` | URI | Links to operational detail in registry |
+
+## Tier 3
+
+### Autonomous Risk Assessment Agent
+
+A fully autonomous agent that continuously scans portfolios, classifies risks, and generates regulatory reports without human initiation.
+
+<CodeTabs json={tier3Agent} title="risk-assessment-agent.adl" />
+
+### Additional Tier 3 Requirements
+
+| Field | Value | Why |
+|-------|-------|-----|
+| `autonomy.tier` | `3` | Agent operates independently; periodic oversight |
+| `evaluation_attestation.result` | `passed` | Required at Tier 3 with `passed` result |
+| `evaluation_attestation.evaluator` | External auditor | Third-party evaluation |
+| `human_oversight.level` | `periodic` | Post-hoc review model |

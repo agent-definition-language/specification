@@ -1,0 +1,143 @@
+{
+  "agent_ref": "https://acme.example/agents/compliance-review",
+  "record_version": "3.1.0",
+  "updated_at": "2026-03-01T14:00:00Z",
+  "incident_escalation": {
+    "contacts": [
+      {
+        "role": "first_responder",
+        "contact": "mailto:soc@acme.example",
+        "response_time_minutes": 15,
+        "severity_threshold": "high"
+      },
+      {
+        "role": "incident_commander",
+        "contact": "https://pagerduty.acme.example/escalation/ai-incidents",
+        "response_time_minutes": 30,
+        "severity_threshold": "critical"
+      },
+      {
+        "role": "executive_sponsor",
+        "contact": "mailto:vp-compliance@acme.example",
+        "response_time_minutes": 120,
+        "severity_threshold": "critical"
+      }
+    ],
+    "triggers": [
+      "Agent produces output contradicting established regulatory guidance",
+      "Agent attempts to access resources outside declared permissions",
+      "Anomalous volume of tool invocations detected",
+      "User reports incorrect compliance determination"
+    ],
+    "external_reporting_required": false,
+    "last_tested": "2026-02-01T00:00:00Z"
+  },
+  "oversight_operations": {
+    "escalation_contact": "mailto:compliance-lead@acme.example",
+    "audit_cadence": "quarterly",
+    "review_history": [
+      {
+        "date": "2026-01-15T00:00:00Z",
+        "reviewer": "AI Ethics Committee",
+        "findings_summary": "Oversight triggers functioning as designed. Response times within SLA. No false negatives detected in trigger evaluation."
+      },
+      {
+        "date": "2025-10-10T00:00:00Z",
+        "reviewer": "AI Ethics Committee",
+        "findings_summary": "Initial oversight review post-deployment. Recommended adding cost-threshold trigger for remediation recommendations."
+      }
+    ]
+  },
+  "evaluation_detail": {
+    "dimensions_covered": [
+      "task_execution_accuracy",
+      "policy_compliance",
+      "robustness",
+      "security"
+    ],
+    "report_uri": "https://gorvnd.acme.example/reports/compliance-review/eval-2026-02.pdf",
+    "continuous_testing_enabled": true,
+    "evaluation_history": [
+      {
+        "date": "2026-02-15T00:00:00Z",
+        "evaluator": "AI Safety Review Board",
+        "result": "passed",
+        "report_uri": "https://gorvnd.acme.example/reports/compliance-review/eval-2026-02.pdf"
+      },
+      {
+        "date": "2025-08-20T00:00:00Z",
+        "evaluator": "External Audit Partners LLP",
+        "result": "conditional",
+        "report_uri": "https://gorvnd.acme.example/reports/compliance-review/eval-2025-08.pdf"
+      }
+    ]
+  },
+  "accountability": {
+    "accountability_chain": [
+      {
+        "role": "deployer",
+        "entity": "Compliance Team",
+        "contact": "mailto:compliance@acme.example",
+        "scope": "Day-to-day operation and monitoring"
+      },
+      {
+        "role": "product_owner",
+        "entity": "VP of Compliance",
+        "contact": "mailto:vp-compliance@acme.example",
+        "scope": "Strategic direction and risk acceptance"
+      },
+      {
+        "role": "model_developer",
+        "entity": "Acme AI Platform",
+        "contact": "mailto:ai-platform@acme.example",
+        "scope": "Underlying model behavior and updates"
+      }
+    ],
+    "external_dependencies": [
+      {
+        "service": "Regulatory Database API",
+        "provider": "RegData Corp",
+        "accountability_ref": "https://regdata.example/terms",
+        "notes": "Agent queries this API for current regulatory text. Data freshness SLA: 24 hours."
+      },
+      {
+        "service": "Document Storage",
+        "provider": "Acme Infrastructure (internal)",
+        "notes": "S3-compatible storage for compliance documents and reports"
+      }
+    ]
+  },
+  "compliance_detail": {
+    "control_mappings": [
+      {
+        "framework": "SOC2",
+        "control_id": "CC6.1",
+        "status": "implemented",
+        "evidence_uri": "https://gorvnd.acme.example/evidence/cc6.1"
+      },
+      {
+        "framework": "SOC2",
+        "control_id": "CC6.6",
+        "status": "implemented",
+        "evidence_uri": "https://gorvnd.acme.example/evidence/cc6.6"
+      },
+      {
+        "framework": "SOC2",
+        "control_id": "CC7.2",
+        "status": "implemented",
+        "evidence_uri": "https://gorvnd.acme.example/evidence/cc7.2"
+      },
+      {
+        "framework": "SOC2",
+        "control_id": "CC8.1",
+        "status": "implemented",
+        "evidence_uri": "https://gorvnd.acme.example/evidence/cc8.1"
+      }
+    ],
+    "audit_schedule": {
+      "last_audit": "2025-11-15T00:00:00Z",
+      "next_audit": "2026-11-15T00:00:00Z",
+      "auditor": "External Audit Partners LLP"
+    }
+  }
+}

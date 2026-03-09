@@ -1,3 +1,14 @@
+---
+id: specification
+title: "Specification"
+sidebar_position: 2
+slug: ../specification
+description: "Full specification for the ADL Financial Profile including PCI-DSS, SOX, GLBA, MiFID II, and AML/KYC compliance."
+keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
+adl_profile_meta:
+  example_filename: "trade-compliance-agent.adl.json"
+---
+
 # Financial Profile Specification
 
 **Identifier:** `urn:adl:profile:financial:1.0`

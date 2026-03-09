@@ -2,7 +2,7 @@
 id: index
 title: Profiles
 sidebar_position: 1
-slug: /profiles
+slug: /
 description: ADL Profiles extend the core specification with domain-specific requirements for regulated industries.
 keywords: [adl, profiles, ai governance, agentic ai, ai compliance, healthcare ai, financial ai, regulated ai, ai safety, domain profiles]
 ---
@@ -11,7 +11,9 @@ keywords: [adl, profiles, ai governance, agentic ai, ai compliance, healthcare a
 
 Profiles extend the core ADL specification with domain-specific requirements, members, and validation rules. They enable regulated industries and specialized use cases to build on ADL without modifying the core spec.
 
-> **Tip:** Use profiles when your agents need to comply with industry regulations (HIPAA, SOC2, PCI-DSS) or organizational governance requirements. Profiles add structured compliance tracking without changing core ADL semantics.
+:::tip When to Use Profiles
+Use profiles when your agents need to comply with industry regulations (HIPAA, SOC2, PCI-DSS) or organizational governance requirements. Profiles add structured compliance tracking without changing core ADL semantics.
+:::
 
 ## Overview
 
@@ -27,10 +29,11 @@ Profiles are identified by URIs (e.g., `urn:adl:profile:governance:1.0`).
 
 | Profile | Identifier | Status | Description |
 |---------|------------|--------|-------------|
-| [Governance](./governance/) | `urn:adl:profile:governance:1.0` | Draft | Compliance frameworks, audit trails, enterprise governance |
-| [Portfolio](./portfolio/) | `urn:adl:profile:portfolio:1.0` | Draft | Agent inventory, relationships, and domain membership |
-| [Healthcare](./healthcare/) | `urn:adl:profile:healthcare:1.0` | Draft | HIPAA compliance, PHI handling, clinical safety, FHIR interoperability |
-| [Financial](./financial/) | `urn:adl:profile:financial:1.0` | Draft | PCI-DSS, SOX, GLBA, MiFID II, AML/KYC compliance |
+| [Governance](./governance/README.md) | `urn:adl:profile:governance:1.0` | Draft | Compliance frameworks, audit trails, enterprise governance |
+| [Registry](./registry/README.md) | `urn:adl:profile:registry:1.0` | Draft | Agent catalog identity, classification, and federation |
+| [Portfolio](./portfolio/README.md) | `urn:adl:profile:portfolio:1.0` | Draft | Agent relationships and domain membership |
+| [Healthcare](./healthcare/README.md) | `urn:adl:profile:healthcare:1.0` | Draft | HIPAA compliance, PHI handling, clinical safety, FHIR interoperability |
+| [Financial](./financial/README.md) | `urn:adl:profile:financial:1.0` | Draft | PCI-DSS, SOX, GLBA, MiFID II, AML/KYC compliance |
 
 ## Profile Versioning
 

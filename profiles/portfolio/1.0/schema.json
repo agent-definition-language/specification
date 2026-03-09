@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/profiles/portfolio/1.0/schema.json",
+  "title": "ADL Portfolio Profile",
+  "description": "JSON Schema for ADL documents declaring the portfolio profile (urn:adl:profile:portfolio:1.0). Extends the base ADL schema via allOf composition.",
+  "allOf": [
+    { "$ref": "https://adl-spec.org/0.1/schema.json" }
+  ],
+  "type": "object",
+  "anyOf": [
+    { "required": ["relationships"] },
+    { "required": ["domain"] }
+  ],
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "contains": { "const": "urn:adl:profile:portfolio:1.0" }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "composed_of": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "orchestrated_by": {
+          "type": "string"
+        },
+        "peers": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "domain": {
+      "type": "object",
+      "properties": {
+        "domain_id": { "type": "string" },
+        "subdomain": { "type": "string" },
+        "bounded_context": { "type": "string" },
+        "role": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false
+}

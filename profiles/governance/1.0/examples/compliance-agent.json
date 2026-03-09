@@ -1,13 +1,13 @@
 {
-  "$schema": "https://adl-spec.org/0.1/schema.json",
+  "$schema": "https://adl-spec.org/profiles/governance/1.0/schema.json",
   "adl_spec": "0.1.0",
   "name": "Compliance Review Agent",
-  "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
-  "version": "1.0.0",
-  "profiles": ["urn:adl:profile:governance:1.0"],
+  "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls. Flags potential violations and recommends remediation actions.",
+  "version": "2.0.0",
+  "profiles": ["urn:adl:profile:governance:1.0", "urn:adl:profile:registry:1.0"],
   "lifecycle": {
     "status": "active",
-    "effective_date": "2025-12-01T00:00:00Z"
+    "effective_date": "2026-01-15T00:00:00Z"
   },
   "data_classification": {
     "sensitivity": "confidential",
@@ -74,47 +74,58 @@
       }
     }
   },
+  "autonomy": {
+    "tier": 2,
+    "basis": "Agent reviews documents independently but requires human approval for compliance determinations affecting regulatory filings.",
+    "classified_by": "AI Ethics Committee",
+    "classified_at": "2026-01-10T00:00:00Z"
+  },
   "compliance_framework": {
     "primary_framework": "SOC2_TYPE_II",
-    "control_mappings": [
-      {
-        "framework": "SOC2",
-        "control_id": "CC6.1",
-        "status": "implemented"
-      },
-      {
-        "framework": "SOC2",
-        "control_id": "CC6.6",
-        "status": "implemented"
-      },
-      {
-        "framework": "SOC2",
-        "control_id": "CC7.2",
-        "status": "implemented"
-      }
-    ],
     "audit_dates": {
       "last_audit": "2025-11-15T00:00:00Z",
       "next_audit": "2026-11-15T00:00:00Z"
     }
   },
-  "ai_governance": {
-    "risk_classification": {
-      "level": "medium",
-      "assessed_by": "AI Ethics Committee",
-      "assessed_at": "2025-10-01T00:00:00Z",
-      "rationale": "Agent processes sensitive compliance data but does not make autonomous decisions"
-    },
-    "safety_reviews": {
-      "required": true,
-      "frequency": "quarterly",
-      "last_review": "2025-12-01T00:00:00Z",
-      "review_board": "AI Safety Board"
-    },
-    "human_oversight": {
-      "level": "on_exception",
-      "role": "Compliance Officer"
-    }
+  "risk_classification": {
+    "level": "medium",
+    "autonomy_level": "L3",
+    "assessed_by": "AI Ethics Committee",
+    "assessed_at": "2026-01-10T00:00:00Z",
+    "rationale": "Agent processes sensitive compliance data with conditional autonomy within defined review boundaries"
+  },
+  "safety_reviews": {
+    "required": true,
+    "frequency": "quarterly",
+    "last_review": "2026-01-15T00:00:00Z",
+    "review_board": "AI Safety Board"
+  },
+  "human_oversight": {
+    "level": "on_exception",
+    "role": "Compliance Officer",
+    "triggers": [
+      "Compliance determination affecting regulatory filing",
+      "Document classified as restricted sensitivity",
+      "Remediation recommendation with estimated cost exceeding $50,000"
+    ],
+    "response_time_minutes": 60,
+    "intervention_model": "approve_reject"
+  },
+  "incident_response": {
+    "policy_documented": true,
+    "last_tested": "2026-02-01T00:00:00Z"
+  },
+  "disclosure": {
+    "required": true,
+    "known_limitations": [
+      "May produce inaccurate regulatory citations for jurisdictions outside the US and EU",
+      "Not trained on regulatory guidance published after 2025-12-01"
+    ],
+    "prohibited_uses": [
+      "Final regulatory determination without human review",
+      "Legal advice to external parties"
+    ],
+    "reporting_contact": "mailto:ai-issues@acme.example"
   },
   "governance": {
     "lifecycle_governance": {
@@ -127,14 +138,32 @@
         "from_status": "draft",
         "to_status": "active",
         "approved_by": "compliance-lead",
-        "approved_at": "2025-12-01T00:00:00Z",
-        "reason": "Passed SOC2 audit and security review"
+        "approved_at": "2026-01-15T00:00:00Z",
+        "reason": "Passed SOC2 audit, security review, and Tier 2 governance validation"
       }
     },
     "ownership": {
       "owner": "Compliance Team",
       "delegate": "Security Team",
-      "contact": "compliance@acme.example"
+      "contact": "compliance@acme.example",
+      "user_escalation_contact": "mailto:ai-support@acme.example",
+      "decision_boundaries": [
+        {
+          "decision_type": "regulatory_filing",
+          "owner": "human_only",
+          "rationale": "Regulatory filings require human sign-off per SOC2 CC6.1"
+        },
+        {
+          "decision_type": "document_review",
+          "owner": "agent",
+          "rationale": "Routine document reviews are within the agent's authorized scope"
+        },
+        {
+          "decision_type": "remediation_recommendation",
+          "owner": "human_in_loop",
+          "rationale": "Remediation actions may have budgetary implications"
+        }
+      ]
     },
     "approval_workflow": {
       "required": true,
@@ -147,14 +176,17 @@
       "destination": "s3://acme-audit-logs/compliance-agent/"
     }
   },
-  "registry_metadata": {
-    "urn": "urn:acme:agents:compliance-review:1.0.0",
-    "taxonomy": {
-      "domain": "compliance",
-      "subdomain": "document-review",
-      "capability": "soc2-review"
-    },
-    "discovery_tags": ["compliance", "soc2", "audit", "document-review"],
+  "governance_record_ref": "https://gorvnd.acme.example/agents/compliance-review/governance-record",
+  "registry": {
+    "catalog_id": "urn:acme:agents:compliance-review:2.0.0",
+    "catalog_classification": [
+      {
+        "domain": "compliance",
+        "subdomain": "document-review",
+        "capability": "soc2-review"
+      }
+    ],
+    "visibility": "internal",
     "federation": {
       "registries": [
         "https://registry.acme.example",

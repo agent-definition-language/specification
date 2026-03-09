@@ -1,10 +1,13 @@
 {
-  "$schema": "https://adl-spec.org/0.1/schema.json",
+  "$schema": "https://adl-spec.org/profiles/portfolio/1.0/schema.json",
   "adl_spec": "0.1.0",
   "name": "Customer Service Agent",
   "description": "Handles tier-1 customer inquiries and support requests via chat and email channels.",
   "version": "1.2.0",
-  "profiles": ["urn:adl:profile:portfolio:1.0"],
+  "profiles": [
+    "urn:adl:profile:registry:1.0",
+    "urn:adl:profile:portfolio:1.0"
+  ],
   "data_classification": {
     "sensitivity": "internal",
     "categories": ["pii"]
@@ -83,13 +86,15 @@
       }
     }
   },
-  "inventory": {
+  "registry": {
     "catalog_id": "cs-agent-001",
-    "classification": {
-      "category": "support",
-      "type": "conversational"
-    },
-    "tags": ["customer-service", "support", "tier-1", "chat", "email", "production"],
+    "catalog_classification": [
+      {
+        "domain": "support",
+        "subdomain": "customer-service",
+        "capability": "conversational"
+      }
+    ],
     "visibility": "internal"
   },
   "relationships": {
