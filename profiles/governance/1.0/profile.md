@@ -652,3 +652,12 @@ Validators **SHOULD** use this schema for structural validation of documents dec
 ### 5.3 Profile Dependencies
 
 This profile has no dependencies. Profiles that depend on the governance profile (e.g., a healthcare profile) compose by referencing this profile's schema in their own `allOf` and **MAY** tighten governance constraints (e.g., require `human_oversight` at Tier 1). See Section 13.3 of the core specification for dependency rules.
+
+---
+
+## 6. References
+
+The following works informed the design of this profile's conformance tiers, compliance mappings, and governance field requirements:
+
+- **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Generative AI — Agentic AI Companion", January 2026, <https://aiwp.aist.go.jp/pdf/Model_AI_Governance_Framework_for_Generative_AI_Agentic_AI.pdf>.
+- **[CLTC-AGENTIC]** Center for Long-Term Cybersecurity (CLTC), UC Berkeley, "An Agentic AI Risk Management Standards Profile Based on NIST AI 600-1", February 2026, <https://cltc.berkeley.edu/publication/an-agentic-ai-risk-management-standards-profile/>.
