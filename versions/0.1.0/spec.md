@@ -1377,6 +1377,8 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 ### 19.2 Informative References
 
 - **[A2A]** A2A Protocol Working Group, "Agent-to-Agent Protocol Specification", <https://a2a-protocol.org/specification>.
+- **[CLTC-AGENTIC]** Center for Long-Term Cybersecurity (CLTC), UC Berkeley, "An Agentic AI Risk Management Standards Profile Based on NIST AI 600-1", February 2026, <https://cltc.berkeley.edu/publication/an-agentic-ai-risk-management-standards-profile/>.
+- **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Generative AI — Agentic AI Companion", January 2026, <https://aiwp.aist.go.jp/pdf/Model_AI_Governance_Framework_for_Generative_AI_Agentic_AI.pdf>.
 - **[JSON-SCHEMA]** Wright, A., et al., "JSON Schema: A Media Type for Describing JSON Documents", <https://json-schema.org/draft/2020-12/json-schema-core>.
 - **[MCP]** Anthropic, "Model Context Protocol Specification", <https://modelcontextprotocol.io/specification>.
 - **[OPENAPI]** OpenAPI Initiative, "OpenAPI Specification", Version 3.1, <https://spec.openapis.org/oas/v3.1.0>.
