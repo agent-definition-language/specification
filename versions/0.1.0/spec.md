@@ -129,7 +129,7 @@ Vendor namespace keys **MUST** use reverse-domain notation with at least two dot
 
 Implementations **MUST** preserve `extensions` members when round-tripping ADL documents. Implementations **MAY** ignore the contents of `extensions`. Implementations **MUST NOT** reject documents containing `extensions` with unknown vendor namespaces.
 
-The member name `extensions` is **RESERVED** at every object level in an ADL document.
+The member name `extensions` is reserved at every object level in an ADL document. Implementations **MUST NOT** define non-extension semantics for the `extensions` member.
 
 Example:
 
@@ -994,7 +994,7 @@ Vendor profiles are subject to the following constraints:
 - Documents **MAY** include `extensions` data for a vendor without declaring the vendor's profile. In this case, the data is preserved but unvalidated — implementations treat it as opaque.
 - Multiple vendor profiles compose independently. Each vendor's `extensions` constraints apply only within its own namespace.
 
-Vendor profiles do **NOT** require IANA registration. The reverse-domain namespace provides collision prevention through DNS ownership. This contrasts with standard profiles, which use the `urn:adl:profile:*` namespace and require designated expert review (Section 13.5).
+Vendor profiles do not require IANA registration. The reverse-domain namespace provides collision prevention through DNS ownership. This contrasts with standard profiles, which use the `urn:adl:profile:*` namespace and require designated expert review (Section 13.5).
 
 Vendors **SHOULD**:
 
