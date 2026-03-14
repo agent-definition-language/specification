@@ -72,17 +72,21 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 
 ## 3. Terminology
 
+The terms "AI agent", "AI system", "autonomy", and "automation" are used in this document consistent with their definitions in [ISO-22989]. Where this specification narrows an ISO/IEC 22989 term, the narrower definition below takes precedence.
+
 | Term | Definition |
 |------|------------|
 | **ADL document** | A JSON object that conforms to this specification. |
-| **agent** | An AI system capable of autonomous operation within defined boundaries, described by an ADL document. |
-| **tool** | A function or capability that an agent can invoke (equivalent to "function" in function-calling). |
+| **agent** | An AI agent [ISO-22989] further scoped as an AI system [ISO-22989] that operates within boundaries declared by an ADL document. An agent senses and responds to its environment and takes actions to achieve its goals, subject to the permissions and constraints expressed in its ADL document. |
+| **AI system** | An engineered system that generates outputs such as content, forecasts, recommendations, or decisions for a given set of human-defined objectives [ISO-22989]. |
+| **model** | The AI model (e.g., large language model) that powers an agent's reasoning. In [ISO-22989] terms, a model is the learned computational artifact within an AI system. |
+| **tool** | A function or capability that an agent can invoke to perform an action or retrieve information (equivalent to "function" in function-calling and "tool" in [MCP]). |
 | **resource** | A data source that an agent can read from (e.g., vector store, knowledge base, file system). |
 | **prompt** | A predefined prompt template that an agent can use. |
 | **profile** | A set of additional requirements and members that extend the core ADL specification for specific domains. |
-| **permission domain** | A category of system access (network, filesystem, etc.) that defines operational boundaries. |
+| **permission domain** | A category of system access (network, filesystem, etc.) that defines operational boundaries for an agent. |
 | **runtime** | The system or environment that executes an agent based on its ADL definition. |
-| **model** | The LLM or other AI model that powers the agent's reasoning. |
+| **autonomy** | The characteristic of a system that is capable of modifying its intended domain of use or goal without external intervention, control, or oversight [ISO-22989]. ADL expresses the degree of permitted autonomy through the `autonomy` member and governance profile tiers. |
 
 ---
 
