@@ -927,7 +927,12 @@ Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only. Tags *
 
 The `profiles` member declares which profiles the document conforms to. **OPTIONAL.** Value **MUST** be an array of profile identifiers (URIs or registered names). When a profile is declared: the document **MUST** satisfy all profile requirements, **MAY** use profile-defined members, and validators **SHOULD** check profile-specific rules.
 
-**Standard profiles (examples):** Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial. Additional profiles **MAY** be registered (e.g., IANA profile registry).
+ADL defines two categories of profiles:
+
+- **Standard profiles** define domain-specific top-level members and validation rules. Standard profiles use the `urn:adl:profile:*` namespace and **SHOULD** be registered with the IANA profile registry (Section 13.5) to prevent naming conflicts. Examples: Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial.
+- **Vendor profiles** declare vendor-specific extensions with schema validation, targeting the `extensions` namespace rather than defining new top-level members. Vendor profiles use URI identifiers controlled by the vendor (e.g., `https://acme.com/adl/extensions/v1`) and do not require registration — the reverse-domain namespace provides collision prevention through DNS ownership. See Section 13.4.
+
+Both categories use the same `allOf` composition mechanism (Section 13.1) and **MAY** appear together in a document's `profiles` array.
 
 ### 13.1 Profile Schema Composition
 
@@ -951,7 +956,7 @@ Profile schemas **MUST NOT** redefine core ADL members with incompatible types. 
 
 When a document declares multiple profiles, the document **MUST** satisfy all declared profile requirements. Validators compose profile schemas using `allOf` — each profile's schema is included as an element. JSON Schema `allOf` uses "strictest wins" semantics: if any profile requires a member, the composed result requires it.
 
-Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. The IANA profile registry designated expert review (see Section 13.5) prevents cross-profile field naming conflicts.
+Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. For standard profiles, the IANA profile registry designated expert review (see Section 13.5) prevents cross-profile field naming conflicts. Vendor profiles avoid conflicts through their reverse-domain namespace isolation.
 
 ### 13.3 Profile Dependencies
 
@@ -978,9 +983,9 @@ If a dependent profile needs a parent field to not be required, this indicates a
 
 ### 13.4 Vendor Profiles
 
-A **vendor profile** is a profile published by an organization to declare vendor-specific extensions with schema validation. Vendor profiles use the same `allOf` composition mechanism as standard profiles (Section 13.1) but target the `extensions` namespace rather than defining new top-level members.
+A **vendor profile** is a profile published by an organization to declare vendor-specific extensions with schema validation. Vendor profiles use the same `allOf` composition mechanism as standard profiles (Section 13.1) but target the `extensions` namespace rather than defining new top-level members. See Section 13 for an overview of the standard/vendor profile taxonomy.
 
-Vendor profiles use URI identifiers controlled by the vendor (e.g., `https://acme.com/adl/extensions/v1`). The `urn:adl:profile:*` namespace is reserved for standard (registered) profiles. Vendor profiles **MUST NOT** use this namespace.
+Vendor profiles use URI identifiers controlled by the vendor (e.g., `https://acme.com/adl/extensions/v1`). The `urn:adl:profile:*` namespace is reserved for standard profiles. Vendor profiles **MUST NOT** use this namespace.
 
 A vendor profile **MAY** add schema constraints to the `extensions` object at any level, validating that its reverse-domain namespace contains the expected structure. The profile schema references the base ADL schema via `allOf` and declares `properties` for `extensions` within the relevant objects.
 
@@ -994,7 +999,7 @@ Vendor profiles are subject to the following constraints:
 - Documents **MAY** include `extensions` data for a vendor without declaring the vendor's profile. In this case, the data is preserved but unvalidated — implementations treat it as opaque.
 - Multiple vendor profiles compose independently. Each vendor's `extensions` constraints apply only within its own namespace.
 
-Vendor profiles do not require IANA registration. The reverse-domain namespace provides collision prevention through DNS ownership. This contrasts with standard profiles, which use the `urn:adl:profile:*` namespace and require designated expert review (Section 13.5).
+Vendor profiles do not require IANA registration. The reverse-domain namespace provides collision prevention through DNS ownership.
 
 Vendors **SHOULD**:
 
@@ -1002,15 +1007,17 @@ Vendors **SHOULD**:
 - Version their profile schemas (e.g., `/v1/`, `/v2/`).
 - Document the semantics of their extension fields.
 
-### 13.5 Profile Registration
+### 13.5 Standard Profile Registration
 
-Profile identifiers **SHOULD** be registered to prevent naming conflicts. The registration authority (e.g., IANA profile registry) **MUST** employ designated expert review to ensure:
+Standard profile identifiers **SHOULD** be registered to prevent naming conflicts. Only standard profiles — those using the `urn:adl:profile:*` namespace — are subject to registration. Vendor profiles rely on reverse-domain namespace isolation and do not require registration (see Section 13.4).
 
-1. New profiles do not redefine members from existing profiles with incompatible semantics.
-2. New profiles do not introduce field names that conflict with existing profiles.
+The registration authority (e.g., IANA profile registry) **MUST** employ designated expert review to ensure:
+
+1. New standard profiles do not redefine members from existing profiles with incompatible semantics.
+2. New standard profiles do not introduce field names that conflict with existing profiles.
 3. Dependencies between profiles are explicitly declared and acyclic.
 
-If a member becomes cross-cutting (needed by multiple profiles), the registration authority **MAY** recommend promoting it to the core ADL specification.
+If a member becomes cross-cutting (needed by multiple standard profiles), the registration authority **MAY** recommend promoting it to the core ADL specification.
 
 ### 13.6 Example
 
