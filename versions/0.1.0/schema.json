@@ -27,10 +27,8 @@
           "properties": {
             "min_days": { "type": "number", "minimum": 0 },
             "max_days": { "type": "number", "minimum": 0 },
-            "policy_uri": { "type": "string", "format": "uri" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "policy_uri": { "type": "string", "format": "uri" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false,
           "description": "Data retention requirements"
@@ -41,20 +39,26 @@
             "encryption_required": { "type": "boolean" },
             "anonymization_required": { "type": "boolean" },
             "cross_border_restricted": { "type": "boolean" },
-            "logging_required": { "type": "boolean" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "logging_required": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false,
           "description": "Data handling constraints"
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "description": "Data classification (composable; profiles MAY add domain-specific sub-objects via schema composition)"
+    },
+    "extensions": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$": {
+          "type": "object",
+          "additionalProperties": true
         }
       },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
-      },
       "additionalProperties": false,
-      "description": "Data classification (composable; profiles MAY add domain-specific sub-objects via schema composition)"
+      "description": "Vendor-namespaced extensions. Keys are reverse-domain identifiers."
     }
   },
   "type": "object",
@@ -108,10 +112,8 @@
           "type": "string",
           "format": "uri",
           "description": "URI or URN of the replacement agent"
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -125,10 +127,8 @@
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "url": { "type": "string", "format": "uri" },
-        "contact": { "type": "string", "format": "email" }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        "contact": { "type": "string", "format": "email" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "Organization or entity that provides the agent"
@@ -142,16 +142,12 @@
           "required": ["algorithm", "value"],
           "properties": {
             "algorithm": { "type": "string" },
-            "value": { "type": "string" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "value": { "type": "string" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "Cryptographic identification for the agent"
@@ -171,10 +167,8 @@
             "type": "string",
             "enum": ["function_calling", "vision", "code_execution", "streaming"]
           }
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "AI model configuration"
@@ -187,10 +181,8 @@
           "required": ["template"],
           "properties": {
             "template": { "type": "string", "minLength": 1 },
-            "variables": { "type": "object" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "variables": { "type": "object" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         }
@@ -224,10 +216,8 @@
               "properties": {
                 "name": { "type": "string" },
                 "input": { "type": "object" },
-                "output": {}
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "output": {},
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
             },
@@ -247,10 +237,8 @@
           },
           "data_classification": {
             "$ref": "#/$defs/data_classification"
-          }
-        },
-        "patternProperties": {
-          "^x_[a-z][a-z0-9_]*$": true
+          },
+          "extensions": { "$ref": "#/$defs/extensions" }
         },
         "additionalProperties": false
       },
@@ -284,10 +272,8 @@
           },
           "data_classification": {
             "$ref": "#/$defs/data_classification"
-          }
-        },
-        "patternProperties": {
-          "^x_[a-z][a-z0-9_]*$": true
+          },
+          "extensions": { "$ref": "#/$defs/extensions" }
         },
         "additionalProperties": false
       },
@@ -305,10 +291,8 @@
           "arguments": {
             "type": "object",
             "description": "JSON Schema for template arguments"
-          }
-        },
-        "patternProperties": {
-          "^x_[a-z][a-z0-9_]*$": true
+          },
+          "extensions": { "$ref": "#/$defs/extensions" }
         },
         "additionalProperties": false
       },
@@ -333,10 +317,8 @@
               "type": "array",
               "items": { "type": "string" }
             },
-            "deny_private": { "type": "boolean" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "deny_private": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -362,10 +344,8 @@
               "type": "array",
               "items": { "type": "string" },
               "description": "Path patterns to deny (see Section 4.4)"
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -381,10 +361,8 @@
               "type": "array",
               "items": { "type": "string" },
               "description": "Variable name patterns to deny (see Section 4.4)"
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -399,10 +377,8 @@
               "type": "array",
               "items": { "type": "string" }
             },
-            "allow_shell": { "type": "boolean" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "allow_shell": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -412,16 +388,12 @@
             "max_memory_mb": { "type": "number", "minimum": 0 },
             "max_cpu_percent": { "type": "number", "minimum": 0, "maximum": 100 },
             "max_duration_sec": { "type": "number", "minimum": 0 },
-            "max_concurrent": { "type": "integer", "minimum": 1 }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "max_concurrent": { "type": "integer", "minimum": 1 },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "Agent operational boundaries (deny-by-default)"
@@ -440,10 +412,8 @@
             "scopes": { "type": "array", "items": { "type": "string" } },
             "token_endpoint": { "type": "string", "format": "uri" },
             "issuer": { "type": "string" },
-            "audience": { "type": "string" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "audience": { "type": "string" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -454,10 +424,8 @@
               "type": "object",
               "properties": {
                 "required": { "type": "boolean" },
-                "min_version": { "type": "string" }
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "min_version": { "type": "string" },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
             },
@@ -465,16 +433,12 @@
               "type": "object",
               "properties": {
                 "required": { "type": "boolean" },
-                "algorithm": { "type": "string" }
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "algorithm": { "type": "string" },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -499,22 +463,16 @@
                   "enum": ["canonical", "digest"]
                 },
                 "digest_algorithm": { "type": "string" },
-                "digest_value": { "type": "string" }
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "digest_value": { "type": "string" },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "Security requirements"
@@ -539,16 +497,12 @@
               "properties": {
                 "enabled": { "type": "boolean" },
                 "strip_html": { "type": "boolean" },
-                "max_input_length": { "type": "integer", "minimum": 1 }
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "max_input_length": { "type": "integer", "minimum": 1 },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -560,10 +514,8 @@
               "type": "string",
               "enum": ["text", "json", "markdown", "html"]
             },
-            "streaming": { "type": "boolean" }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            "streaming": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -582,16 +534,12 @@
                   "enum": ["fixed", "exponential", "linear"]
                 },
                 "initial_delay_ms": { "type": "integer", "minimum": 0 },
-                "max_delay_ms": { "type": "integer", "minimum": 0 }
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "max_delay_ms": { "type": "integer", "minimum": 0 },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -613,22 +561,16 @@
                 "default": {
                   "description": "Default value when action is use_default"
                 },
-                "message": { "type": "string" }
-              },
-              "patternProperties": {
-                "^x_[a-z][a-z0-9_]*$": true
+                "message": { "type": "string" },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
-            }
-          },
-          "patternProperties": {
-            "^x_[a-z][a-z0-9_]*$": true
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "Runtime behavior configuration"
@@ -643,10 +585,8 @@
             "properties": {
               "name": { "type": "string" },
               "email": { "type": "string", "format": "email" },
-              "url": { "type": "string", "format": "uri" }
-            },
-            "patternProperties": {
-              "^x_[a-z][a-z0-9_]*$": true
+              "url": { "type": "string", "format": "uri" },
+              "extensions": { "$ref": "#/$defs/extensions" }
             },
             "additionalProperties": false
           }
@@ -660,10 +600,8 @@
             "type": "string",
             "pattern": "^[a-z0-9][a-z0-9-]*$"
           }
-        }
-      },
-      "patternProperties": {
-        "^x_[a-z][a-z0-9_]*$": true
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false,
       "description": "Additional metadata"
@@ -672,9 +610,7 @@
       "type": "array",
       "items": { "type": "string" },
       "description": "Profile identifiers (URIs or registered names)"
-    }
-  },
-  "patternProperties": {
-    "^x_[a-z][a-z0-9_]*$": true
+    },
+    "extensions": { "$ref": "#/$defs/extensions" }
   }
 }

@@ -3,6 +3,19 @@
   "$id": "https://adl-spec.org/profiles/portfolio/1.0/schema.json",
   "title": "ADL Portfolio Profile",
   "description": "JSON Schema for ADL documents declaring the portfolio profile (urn:adl:profile:portfolio:1.0). Extends the base ADL schema via allOf composition.",
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Vendor-namespaced extensions. Keys are reverse-domain identifiers."
+    }
+  },
   "allOf": [
     { "$ref": "https://adl-spec.org/0.1/schema.json" }
   ],
@@ -33,7 +46,8 @@
         "peers": {
           "type": "array",
           "items": { "type": "string" }
-        }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -43,7 +57,8 @@
         "domain_id": { "type": "string" },
         "subdomain": { "type": "string" },
         "bounded_context": { "type": "string" },
-        "role": { "type": "string" }
+        "role": { "type": "string" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     }

@@ -3,6 +3,19 @@
   "$id": "https://adl-spec.org/profiles/governance/1.0/schema.json",
   "title": "ADL Governance Profile",
   "description": "JSON Schema for ADL documents declaring the governance profile (urn:adl:profile:governance:1.0). Extends the base ADL schema via allOf composition.",
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Vendor-namespaced extensions. Keys are reverse-domain identifiers."
+    }
+  },
   "allOf": [
     { "$ref": "https://adl-spec.org/0.1/schema.json" }
   ],
@@ -43,7 +56,8 @@
               "status": {
                 "type": "string",
                 "enum": ["implemented", "partial", "planned", "not_applicable"]
-              }
+              },
+              "extensions": { "$ref": "#/$defs/extensions" }
             },
             "additionalProperties": false
           }
@@ -52,10 +66,12 @@
           "type": "object",
           "properties": {
             "last_audit": { "type": "string", "format": "date-time" },
-            "next_audit": { "type": "string", "format": "date-time" }
+            "next_audit": { "type": "string", "format": "date-time" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -78,7 +94,8 @@
         "classified_at": {
           "type": "string",
           "format": "date-time"
-        }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -95,7 +112,8 @@
         },
         "assessed_by": { "type": "string" },
         "assessed_at": { "type": "string", "format": "date-time" },
-        "rationale": { "type": "string" }
+        "rationale": { "type": "string" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -119,7 +137,8 @@
         "intervention_model": {
           "type": "string",
           "enum": ["approve_reject", "plan_editing", "monitor_only"]
-        }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -128,7 +147,8 @@
       "required": ["policy_documented"],
       "properties": {
         "policy_documented": { "type": "boolean" },
-        "last_tested": { "type": "string", "format": "date-time" }
+        "last_tested": { "type": "string", "format": "date-time" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -146,7 +166,8 @@
           "type": "string",
           "enum": ["automated_benchmark", "red_team", "third_party_audit", "sandbox", "internal_review"]
         },
-        "expires_at": { "type": "string", "format": "date-time" }
+        "expires_at": { "type": "string", "format": "date-time" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -174,7 +195,8 @@
           "type": "string",
           "format": "uri"
         },
-        "disclosure_version": { "type": "string" }
+        "disclosure_version": { "type": "string" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -185,7 +207,8 @@
         "frequency": { "type": "string" },
         "last_review": { "type": "string", "format": "date-time" },
         "next_review": { "type": "string", "format": "date-time" },
-        "review_board": { "type": "string" }
+        "review_board": { "type": "string" },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
@@ -211,11 +234,13 @@
                     "type": "string",
                     "enum": ["human_only", "agent", "human_in_loop"]
                   },
-                  "rationale": { "type": "string" }
+                  "rationale": { "type": "string" },
+                  "extensions": { "$ref": "#/$defs/extensions" }
                 },
                 "additionalProperties": false
               }
-            }
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -230,7 +255,8 @@
             "approval_type": {
               "type": "string",
               "enum": ["any", "all", "quorum"]
-            }
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -239,7 +265,8 @@
           "properties": {
             "enabled": { "type": "boolean" },
             "retention_days": { "type": "integer", "minimum": 0 },
-            "destination": { "type": "string", "format": "uri" }
+            "destination": { "type": "string", "format": "uri" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
@@ -262,7 +289,8 @@
                 "allowed_transitions": {
                   "type": "array",
                   "items": { "type": "string" }
-                }
+                },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
             },
@@ -279,13 +307,16 @@
                 },
                 "approved_by": { "type": "string" },
                 "approved_at": { "type": "string", "format": "date-time" },
-                "reason": { "type": "string" }
+                "reason": { "type": "string" },
+                "extensions": { "$ref": "#/$defs/extensions" }
               },
               "additionalProperties": false
-            }
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     },
