@@ -3,6 +3,7 @@
 **Date:** 2026-03-14
 **Status:** Draft
 **ADL Version:** 0.1.0
+**Affects:** versions/0.1.0/spec.md, versions/0.1.0/spec-manifest.yaml, versions/0.1.0/schema.json, versions/0.1.0/schema-strict.json, profiles/governance/1.0/schema.json, profiles/portfolio/1.0/schema.json, profiles/registry/1.0/schema.json
 
 ## Summary
 

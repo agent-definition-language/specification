@@ -123,26 +123,45 @@ An ADL document **MUST NOT** contain members not defined by this specification, 
 ### 4.3 Extension Mechanism
 
 - **Profiles:** Add domain-specific requirements and members; declared in `profiles`. See Section 13.
-- **Extension members:** Custom data without a full profile. Names **MUST** be prefixed with `x_` followed by a namespace identifier (e.g., `x_acme_internal_id`).
+- **Extensions object:** Custom vendor data without a full profile. An `extensions` member **MAY** appear at any object level within an ADL document. Within `extensions`, vendor data is grouped under reverse-domain namespace keys.
 
-Implementations **MUST** preserve extension members when processing but **MAY** ignore their contents. Implementations **MUST NOT** reject documents containing unknown `x_`-prefixed members.
+Vendor namespace keys **MUST** use reverse-domain notation with at least two dot-separated segments (e.g., `com.acme`, `io.anthropic`, `org.example.research`). Keys **MUST** conform to the `vendor-key` production in Appendix D. Single-segment keys (e.g., `acme`) and uppercase keys (e.g., `COM.ACME`) are invalid.
 
-Extension members (prefixed with `x_`) **MAY** appear in any object within an ADL document, including nested objects such as `lifecycle`, `provider`, `model`, `permissions`, and `security`. Extension member names **MUST** match the pattern `x_` followed by a namespace identifier using only lowercase letters, digits, and underscores (e.g., `x_acme_internal_id`). Extension member names **MUST** conform to the `ext-member-name` production in Appendix D.
+Implementations **MUST** preserve `extensions` members when round-tripping ADL documents. Implementations **MAY** ignore the contents of `extensions`. Implementations **MUST NOT** reject documents containing `extensions` with unknown vendor namespaces.
+
+The member name `extensions` is **RESERVED** at every object level in an ADL document.
 
 Example:
 
 ```json
 {
+  "adl_spec": "0.1.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
-  "adl_spec": "0.1.0",
   "description": "Processes and routes invoices.",
-  "data_classification": { "sensitivity": "confidential" },
-  "x_acme_internal_id": "inv-proc-007",
-  "x_acme_cost_center": "engineering",
+  "data_classification": {
+    "sensitivity": "confidential",
+    "extensions": {
+      "com.acme": {
+        "data_tier": "gold",
+        "retention_override_approved": true
+      }
+    }
+  },
   "model": {
     "name": "acme-large-2024",
-    "x_acme_model_tier": "premium"
+    "extensions": {
+      "com.acme": {
+        "model_tier": "premium",
+        "cost_per_1k_tokens": 0.03
+      }
+    }
+  },
+  "extensions": {
+    "com.acme": {
+      "internal_id": "inv-proc-007",
+      "cost_center": "engineering"
+    }
   }
 }
 ```
@@ -916,7 +935,7 @@ Profiles extend the base ADL schema using the JSON Schema 2020-12 `allOf` compos
 
 1. References the base ADL schema via `allOf` with `$ref`.
 2. Declares the profile's additional top-level members in its own `properties`.
-3. Adds `unevaluatedProperties: false` to close the composed schema, ensuring only base ADL members, profile-defined members, and `x_`-prefixed extension members are accepted.
+3. Adds `unevaluatedProperties: false` to close the composed schema, ensuring only base ADL members, profile-defined members, and `extensions` members are accepted.
 
 The base ADL schema (Appendix A) does not restrict unknown top-level properties — it declares `properties` and `patternProperties` but omits `additionalProperties` and `unevaluatedProperties`. This allows profile schemas to add members via composition without conflict. For documents that do not declare any profiles, validators **SHOULD** use the strict schema (`schema-strict.json`), which adds `unevaluatedProperties: false` to reject unknown top-level members.
 
@@ -932,7 +951,7 @@ Profile schemas **MUST NOT** redefine core ADL members with incompatible types. 
 
 When a document declares multiple profiles, the document **MUST** satisfy all declared profile requirements. Validators compose profile schemas using `allOf` — each profile's schema is included as an element. JSON Schema `allOf` uses "strictest wins" semantics: if any profile requires a member, the composed result requires it.
 
-Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. The IANA profile registry designated expert review (see Section 13.4) prevents cross-profile field naming conflicts.
+Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. The IANA profile registry designated expert review (see Section 13.5) prevents cross-profile field naming conflicts.
 
 ### 13.3 Profile Dependencies
 
@@ -957,7 +976,33 @@ A dependent profile **MAY** tighten constraints from its parent (e.g., make an o
 
 If a dependent profile needs a parent field to not be required, this indicates a design issue. Resolutions include: refactoring the parent into a base profile with looser constraints, changing the relationship from dependency to sibling, or revising the parent profile in a new major version.
 
-### 13.4 Profile Registration
+### 13.4 Vendor Profiles
+
+A **vendor profile** is a profile published by an organization to declare vendor-specific extensions with schema validation. Vendor profiles use the same `allOf` composition mechanism as standard profiles (Section 13.1) but target the `extensions` namespace rather than defining new top-level members.
+
+Vendor profiles use URI identifiers controlled by the vendor (e.g., `https://acme.com/adl/extensions/v1`). The `urn:adl:profile:*` namespace is reserved for standard (registered) profiles. Vendor profiles **MUST NOT** use this namespace.
+
+A vendor profile **MAY** add schema constraints to the `extensions` object at any level, validating that its reverse-domain namespace contains the expected structure. The profile schema references the base ADL schema via `allOf` and declares `properties` for `extensions` within the relevant objects.
+
+A vendor profile **MAY** declare a dependency on a standard profile and add schema constraints to `extensions` within that profile's objects. The vendor profile composes its dependency via `allOf` and adds `extensions` constraints inside the profile-defined objects. This enables vendors to extend profile-defined objects without redefining them.
+
+Vendor profiles are subject to the following constraints:
+
+- Vendor profiles **MUST NOT** redefine core ADL members or standard profile members with incompatible types.
+- Vendor profiles **MUST** only add schema constraints within their own reverse-domain namespace under `extensions`.
+- A vendor profile's `extensions` schema applies only when the vendor profile is declared in the document's `profiles` array.
+- Documents **MAY** include `extensions` data for a vendor without declaring the vendor's profile. In this case, the data is preserved but unvalidated — implementations treat it as opaque.
+- Multiple vendor profiles compose independently. Each vendor's `extensions` constraints apply only within its own namespace.
+
+Vendor profiles do **NOT** require IANA registration. The reverse-domain namespace provides collision prevention through DNS ownership. This contrasts with standard profiles, which use the `urn:adl:profile:*` namespace and require designated expert review (Section 13.5).
+
+Vendors **SHOULD**:
+
+- Publish their profile schema at a stable, dereferenceable URI.
+- Version their profile schemas (e.g., `/v1/`, `/v2/`).
+- Document the semantics of their extension fields.
+
+### 13.5 Profile Registration
 
 Profile identifiers **SHOULD** be registered to prevent naming conflicts. The registration authority (e.g., IANA profile registry) **MUST** employ designated expert review to ensure:
 
@@ -967,7 +1012,7 @@ Profile identifiers **SHOULD** be registered to prevent naming conflicts. The re
 
 If a member becomes cross-cutting (needed by multiple profiles), the registration authority **MAY** recommend promoting it to the core ADL specification.
 
-### 13.5 Example
+### 13.6 Example
 
 ```json
 {
@@ -1033,7 +1078,7 @@ Implementations **MAY** perform additional validation based on declared profiles
 
 ### 14.3 Unknown Members
 
-Implementations **MUST** preserve unrecognized members when round-tripping. Implementations **MUST NOT** reject documents containing unknown `x_`-prefixed members. Implementations **MAY** warn on unknown non-extension, non-profile members.
+Implementations **MUST** preserve unrecognized members when round-tripping. Implementations **MUST NOT** reject documents containing `extensions` with unknown vendor namespaces. Implementations **MAY** warn on unknown non-extension, non-profile members.
 
 ---
 
@@ -1439,10 +1484,10 @@ semver          = 1*DIGIT "." 1*DIGIT "." 1*DIGIT
 tool-name       = lc-alpha *( lc-alpha / DIGIT / "_" )
 lc-alpha        = %x61-7A          ; a-z (lowercase letters only)
 
-; Extension member name (Section 4.3)
-; "x_" prefix followed by a namespace identifier
-ext-member-name = "x_" ns-id
-ns-id           = 1*( lc-alpha / DIGIT / "_" )
+; Vendor extension namespace key (Section 4.3)
+; Reverse-domain notation, minimum two segments
+vendor-key     = domain-segment 1*("." domain-segment)
+domain-segment = lc-alpha *(lc-alpha / DIGIT / "-")
 
 ; Template variable (Sections 7.2, 8.3)
 ; Used in system_prompt templates and prompt templates
@@ -1477,7 +1522,7 @@ literal-char    = %x21-29 / %x2B-7E
 |---|---|---|
 | `semver` | 5.1, 5.5 | `adl_spec` and `version` values |
 | `tool-name` | 8.1 | Tool `name` values |
-| `ext-member-name` | 4.3 | Custom extension member names |
+| `vendor-key` | 4.3 | Vendor extension namespace keys |
 | `template-var` | 7.2, 8.3 | `{{variable}}` references in templates |
 | `tag` | 12.5 | `metadata.tags` array items |
 | `pattern` | 4.4, 9.2–9.5 | Permission domain pattern strings |
