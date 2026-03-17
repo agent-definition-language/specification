@@ -1,57 +1,21 @@
 # ADL Specification Version Manifest
-# Single source of truth for version state and metadata
-#
-# This file controls:
-# - Which version is shown as "latest" on the documentation site
-# - Which version is shown as "next" (current draft)
-# - Version status (draft, released, deprecated, rc)
-# - Release dates and deprecation notes
+# Metadata for version tracking — the Docusaurus spec plugin handles site versioning.
 
 # The current official release shown by default at /spec/
-latest: null  # No official release yet
+latest: "0.1.0"
 
-# The draft version shown at /spec/next/
-next: "0.1.0"
+# The working draft shown at /spec/next/
+next: "draft"
 
 # All versions with their metadata
 versions:
+  - id: "draft"
+    status: draft
+    label: "0.2.0 (Draft)"
+    ietf_draft: "draft-nederveld-adl-02"
+
   - id: "0.1.0"
-    status: draft  # draft | rc | released | deprecated
-    title: "ADL 0.1.0"
-    description: "Initial draft specification"
-    # released_at: 2025-06-01  # Uncomment when released
-    # superseded_by: null
-    # note: null
-
-# Version status definitions:
-# - draft: Work in progress, may change significantly
-# - rc: Release candidate, feature-complete but undergoing final review
-# - released: Official stable release
-# - deprecated: No longer recommended, superseded by newer version
-
-# ============================================================================
-# VERSIONING WORKFLOW
-# ============================================================================
-#
-# When ready to release 0.1.0:
-# 1. Update this manifest:
-#    latest: "0.1.0"
-#    versions:
-#      - id: "0.1.0"
-#        status: released
-#        released_at: "2025-XX-XX"
-#
-# 2. Run Docusaurus versioning:
-#    cd site && npm run docusaurus docs:version 0.1.0
-#
-# 3. Create 0.2.0 directory for next development:
-#    cp -r versions/0.1.0 versions/0.2.0
-#
-# 4. Update manifest:
-#    next: "0.2.0"
-#    versions:
-#      - id: "0.2.0"
-#        status: draft
-#      - id: "0.1.0"
-#        status: released
-# ============================================================================
+    status: released
+    label: "0.1.0"
+    released_at: "2026-02-18"
+    ietf_draft: "draft-nederveld-adl-01"

@@ -3,6 +3,19 @@
   "$id": "https://adl-spec.org/profiles/registry/1.0/schema.json",
   "title": "ADL Registry Profile",
   "description": "JSON Schema for ADL documents declaring the registry profile (urn:adl:profile:registry:1.0). Extends the base ADL schema via allOf composition.",
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Vendor-namespaced extensions. Keys are reverse-domain identifiers."
+    }
+  },
   "allOf": [
     { "$ref": "https://adl-spec.org/0.1/schema.json" }
   ],
@@ -32,7 +45,8 @@
                 "minLength": 1
               },
               "subdomain": { "type": "string" },
-              "capability": { "type": "string" }
+              "capability": { "type": "string" },
+              "extensions": { "$ref": "#/$defs/extensions" }
             },
             "additionalProperties": false
           }
@@ -48,10 +62,12 @@
               "type": "array",
               "items": { "type": "string", "format": "uri" }
             },
-            "primary": { "type": "string", "format": "uri" }
+            "primary": { "type": "string", "format": "uri" },
+            "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
-        }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
       },
       "additionalProperties": false
     }
