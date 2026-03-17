@@ -1,7 +1,8 @@
 ---
 id: specification
+slug: /
 title: "Agent Definition Language Specification"
-description: "The complete ADL v0.1.0 specification — defining agent identity, permissions, lifecycle, compliance, and governance in a machine-readable format."
+description: "The complete ADL v0.2.0 specification — defining agent identity, permissions, lifecycle, compliance, and governance in a machine-readable format."
 keywords: [adl, specification, agent definition language, ai agent, agentic ai, agentic, ai governance, ai safety, ai compliance, agent permissions, agent lifecycle, multi-agent, trustworthy ai, responsible ai]
 toc_max_heading_level: 3
 hide_table_of_contents: false
@@ -9,7 +10,7 @@ hide_table_of_contents: false
 
 # Agent Definition Language (ADL) Specification
 
-**Version:** 0.1.0-draft
+**Version:** 0.2.0-draft
 **Status:** Draft
 **Patent Status:** Patent Pending (US Provisional Application No. 63/985,186, filed 2026-02-18)
 
@@ -135,7 +136,7 @@ Example:
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.2.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
   "description": "Processes and routes invoices.",
@@ -194,13 +195,13 @@ Specifies the ADL specification version the document conforms to.
 - **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). The format **MUST** conform to the `semver` production in Appendix D.
 - Implementations **MUST** reject documents with an unsupported `adl_spec` version.
 - Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
-- Pre-release suffixes (e.g., `"0.1.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
+- Pre-release suffixes (e.g., `"0.2.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
 
-Example: `"adl_spec": "0.1.0"`
+Example: `"adl_spec": "0.2.0"`
 
 ### 5.2 $schema
 
-Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.1: `https://adl-spec.org/0.1/schema.json`.
+Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.2: `https://adl-spec.org/0.2/schema.json`.
 
 ### 5.3 Name
 
@@ -967,7 +968,7 @@ At the schema level, a dependent profile composes its parent via `allOf`:
 ```json
 {
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.1/schema.json" },
+    { "$ref": "https://adl-spec.org/0.2/schema.json" },
     { "$ref": "https://adl-spec.org/profiles/governance/1.0/schema.json" }
   ],
   "properties": {
@@ -1023,7 +1024,7 @@ If a member becomes cross-cutting (needed by multiple standard profiles), the re
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.2.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
   "description": "Processes invoices with governance and financial compliance.",
@@ -1447,7 +1448,7 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 
 ## Appendix A. JSON Schema
 
-The normative JSON Schema for ADL is available at `https://adl-spec.org/0.1/schema.json` (JSON Schema Draft 2020-12). A minimal required-fields schema is provided in [schema.json](./schema.json) in this directory.
+The normative JSON Schema for ADL is available at `https://adl-spec.org/0.2/schema.json` (JSON Schema Draft 2020-12). A minimal required-fields schema is provided in [schema.json](./schema.json) in this directory.
 
 ---
 

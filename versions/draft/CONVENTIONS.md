@@ -1,6 +1,6 @@
 # Spec authoring conventions
 
-So that `versions/0.1.0-draft/spec.md` stays **programmatically transformable** into body-specific output (IETF RFC, ISO, Linux Foundation), follow these conventions when editing the spec.
+So that `versions/0.2.0-draft/spec.md` stays **programmatically transformable** into body-specific output (IETF RFC, ISO, Linux Foundation), follow these conventions when editing the spec.
 
 ## Section headings
 
@@ -34,4 +34,4 @@ So that `versions/0.1.0-draft/spec.md` stays **programmatically transformable** 
 
 ## Manifest sync
 
-- When adding or renumbering a section, update `versions/0.1.0-draft/spec-manifest.yaml` so the `sections` list and optional `subsections` match the spec. The manifest is the source of section order and IDs for generation.
+- When adding or renumbering a section, update `versions/0.2.0-draft/spec-manifest.yaml` so the `sections` list and optional `subsections` match the spec. The manifest is the source of section order and IDs for generation.
