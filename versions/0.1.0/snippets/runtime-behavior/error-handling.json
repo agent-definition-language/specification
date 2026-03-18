@@ -1,0 +1,6 @@
+{
+  "error_handling": {
+    "on_tool_error": "retry",
+    "max_retries": 2
+  }
+}

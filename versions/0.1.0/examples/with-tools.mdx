@@ -1,0 +1,64 @@
+---
+id: with-tools
+title: Agent with Tools
+sidebar_position: 3
+description: A calculator agent demonstrating ADL tool definitions with parameters and return types.
+keywords: [adl, tools, example, function calling, agentic ai, ai agent tools, mcp, tool use, agent capabilities]
+---
+
+import CodeTabs from '@site/src/components/CodeTabs';
+import calculatorYaml from './with-tools.yaml';
+import modelYaml from '../snippets/with-tools/model.yaml';
+import metadataYaml from '../snippets/with-tools/metadata.yaml';
+
+# Agent with Tools Example
+
+This example demonstrates an agent with tool definitions - a calculator that can perform math operations.
+
+:::tip Tool Design
+Tools should be atomic, well-documented, and have clear parameter schemas. Mark read-only tools appropriately to enable safer execution.
+:::
+
+## Document
+
+<CodeTabs yaml={calculatorYaml} title="calculator.adl" />
+
+## Key Features
+
+### Model Configuration
+
+<CodeTabs yaml={modelYaml} />
+
+This declares that the agent requires a model with function calling capability.
+
+### Tool Definitions
+
+Each tool includes:
+
+| Field | Purpose |
+|-------|---------|
+| `name` | Unique identifier for the tool (must match `^[a-z][a-z0-9_]*$`) |
+| `description` | Human-readable description of what the tool does |
+| `parameters` | JSON Schema defining the input parameters |
+| `returns` | JSON Schema defining the return value |
+| `read_only` | Indicates the tool doesn't modify state |
+| `idempotent` | Indicates the tool can be safely retried |
+
+### Metadata
+
+<CodeTabs yaml={metadataYaml} />
+
+Provides additional context about the agent for discovery and licensing.
+
+## Notes
+
+:::note Implementation Guidance
+- Tool names must be unique within the document
+- The `parameters` and `returns` fields use JSON Schema
+- `read_only` tools are generally safer and can be executed without confirmation
+- `idempotent` tools can be safely retried on failure
+:::
+
+## Next Steps
+
+Ready to build a production-ready agent? See [Production Agent](./production) for a complete example with identity, permissions, security, and more.

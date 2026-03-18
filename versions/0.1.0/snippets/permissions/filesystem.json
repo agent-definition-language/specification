@@ -1,0 +1,14 @@
+{
+  "filesystem": {
+    "allowed_paths": [
+      {
+        "path": "/data/papers/**",
+        "access": "read"
+      },
+      {
+        "path": "/data/notes/**",
+        "access": "read_write"
+      }
+    ]
+  }
+}
