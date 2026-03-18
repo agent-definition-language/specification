@@ -2,7 +2,7 @@
 # Metadata for version tracking — the Docusaurus spec plugin handles site versioning.
 
 # The current official release shown by default at /spec/
-latest: "0.1.0"
+latest: "0.2.0"
 
 # The working draft shown at /spec/next/
 next: "draft"
@@ -11,7 +11,13 @@ next: "draft"
 versions:
   - id: "draft"
     status: draft
-    label: "0.2.0 (Draft)"
+    label: "0.3.0 (Draft)"
+    ietf_draft: "draft-nederveld-adl-03"
+
+  - id: "0.2.0"
+    status: released
+    label: "0.2.0"
+    released_at: "2026-03-18"
     ietf_draft: "draft-nederveld-adl-02"
 
   - id: "0.1.0"

@@ -1,0 +1,20 @@
+{
+  "name": "search_papers",
+  "description": "Search for academic papers",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer",
+        "default": 10
+      }
+    },
+    "required": [
+      "query"
+    ]
+  },
+  "read_only": true
+}
