@@ -1,0 +1,9 @@
+{
+  "cryptographic_identity": {
+    "did": "did:web:acme.ai:agents:research-assistant",
+    "public_key": {
+      "algorithm": "Ed25519",
+      "value": "base64-encoded-public-key"
+    }
+  }
+}

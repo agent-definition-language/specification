@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/0.2/schema-strict.json",
+  "title": "ADL Document (Strict)",
+  "description": "Strict ADL schema that rejects unknown top-level properties. Use for documents that do not declare any profiles. Profile schemas provide their own closed validation via allOf composition with the base schema.",
+  "allOf": [
+    { "$ref": "https://adl-spec.org/0.2/schema.json" }
+  ],
+  "unevaluatedProperties": false
+}

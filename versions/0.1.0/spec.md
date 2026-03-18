@@ -1,16 +1,13 @@
 ---
 id: specification
 slug: /
-title: "Agent Definition Language Specification"
-description: "The complete ADL v0.3.0 specification — defining agent identity, permissions, lifecycle, compliance, and governance in a machine-readable format."
-keywords: [adl, specification, agent definition language, ai agent, agentic ai, agentic, ai governance, ai safety, ai compliance, agent permissions, agent lifecycle, multi-agent, trustworthy ai, responsible ai]
-toc_max_heading_level: 3
-hide_table_of_contents: false
+title: Agent Definition Language Specification
+sidebar_position: 1
 ---
 
 # Agent Definition Language (ADL) Specification
 
-**Version:** 0.3.0-draft
+**Version:** 0.1.0-draft
 **Status:** Draft
 **Patent Status:** Patent Pending (US Provisional Application No. 63/985,186, filed 2026-02-18)
 
@@ -37,22 +34,7 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 - **Machine-readable:** ADL documents are validated against JSON Schema and can be processed programmatically.
 - **Human-friendly:** Clear naming conventions and structures that are easy to read and author.
 
-### 1.3 Design Model
-
-An ADL document functions as a **passport** for an AI agent. It carries the declarations that a counterparty — peer agent, gateway, orchestrator, registry, or human operator — needs to make a trust decision: identity, capabilities, permissions, security posture, and governance signals.
-
-The passport model establishes two principles:
-
-1. **Self-contained trust signals.** An ADL document **MUST** contain enough information for a counterparty to evaluate whether to interact with the agent, without requiring access to external systems.
-
-2. **Separation of declaration from operations.** Operational detail that changes independently of the agent's declared behavior — escalation contacts, audit schedules, evaluation reports, deployment logs — belongs in external records (e.g., a governance record in a registry), not in the passport. Profiles **MAY** define linking members (e.g., `governance_record_ref`) that reference such records by stable URI.
-
-This separation ensures that:
-- The passport remains compact for agent-to-agent and agent-to-gateway interactions.
-- Operational changes (personnel rotation, policy updates) do not require re-issuing the passport.
-- Internal operational detail is not exposed to external counterparties.
-
-### 1.4 Relationship to Other Specifications
+### 1.3 Relationship to Other Specifications
 
 ADL builds upon and interoperates with:
 
@@ -73,21 +55,17 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHALL NOT**, **
 
 ## 3. Terminology
 
-The terms "AI agent", "AI system", "autonomy", and "automation" are used in this document consistent with their definitions in [ISO-22989]. Where this specification narrows an ISO/IEC 22989 term, the narrower definition below takes precedence.
-
 | Term | Definition |
 |------|------------|
 | **ADL document** | A JSON object that conforms to this specification. |
-| **agent** | An AI agent [ISO-22989] further scoped as an AI system [ISO-22989] that operates within boundaries declared by an ADL document. An agent senses and responds to its environment and takes actions to achieve its goals, subject to the permissions and constraints expressed in its ADL document. |
-| **AI system** | An engineered system that generates outputs such as content, forecasts, recommendations, or decisions for a given set of human-defined objectives [ISO-22989]. |
-| **model** | The AI model (e.g., large language model) that powers an agent's reasoning. In [ISO-22989] terms, a model is the learned computational artifact within an AI system. |
-| **tool** | A function or capability that an agent can invoke to perform an action or retrieve information (equivalent to "function" in function-calling and "tool" in [MCP]). |
+| **agent** | An AI system capable of autonomous operation within defined boundaries, described by an ADL document. |
+| **tool** | A function or capability that an agent can invoke (equivalent to "function" in function-calling). |
 | **resource** | A data source that an agent can read from (e.g., vector store, knowledge base, file system). |
 | **prompt** | A predefined prompt template that an agent can use. |
 | **profile** | A set of additional requirements and members that extend the core ADL specification for specific domains. |
-| **permission domain** | A category of system access (network, filesystem, etc.) that defines operational boundaries for an agent. |
+| **permission domain** | A category of system access (network, filesystem, etc.) that defines operational boundaries. |
 | **runtime** | The system or environment that executes an agent based on its ADL definition. |
-| **autonomy** | The characteristic of a system that is capable of modifying its intended domain of use or goal without external intervention, control, or oversight [ISO-22989]. ADL expresses the degree of permitted autonomy through the `autonomy` member and governance profile tiers. |
+| **model** | The LLM or other AI model that powers the agent's reasoning. |
 
 ---
 
@@ -124,45 +102,26 @@ An ADL document **MUST NOT** contain members not defined by this specification, 
 ### 4.3 Extension Mechanism
 
 - **Profiles:** Add domain-specific requirements and members; declared in `profiles`. See Section 13.
-- **Extensions object:** Custom vendor data without a full profile. An `extensions` member **MAY** appear at any object level within an ADL document. Within `extensions`, vendor data is grouped under reverse-domain namespace keys.
+- **Extension members:** Custom data without a full profile. Names **MUST** be prefixed with `x_` followed by a namespace identifier (e.g., `x_acme_internal_id`).
 
-Vendor namespace keys **MUST** use reverse-domain notation with at least two dot-separated segments (e.g., `com.acme`, `io.anthropic`, `org.example.research`). Keys **MUST** conform to the `vendor-key` production in Appendix D. Single-segment keys (e.g., `acme`) and uppercase keys (e.g., `COM.ACME`) are invalid.
+Implementations **MUST** preserve extension members when processing but **MAY** ignore their contents. Implementations **MUST NOT** reject documents containing unknown `x_`-prefixed members.
 
-Implementations **MUST** preserve `extensions` members when round-tripping ADL documents. Implementations **MAY** ignore the contents of `extensions`. Implementations **MUST NOT** reject documents containing `extensions` with unknown vendor namespaces.
-
-The member name `extensions` is reserved at every object level in an ADL document. Implementations **MUST NOT** define non-extension semantics for the `extensions` member.
+Extension members (prefixed with `x_`) **MAY** appear in any object within an ADL document, including nested objects such as `lifecycle`, `provider`, `model`, `permissions`, and `security`. Extension member names **MUST** match the pattern `x_` followed by a namespace identifier using only lowercase letters, digits, and underscores (e.g., `x_acme_internal_id`). Extension member names **MUST** conform to the `ext-member-name` production in Appendix D.
 
 Example:
 
 ```json
 {
-  "adl_spec": "0.2.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
+  "adl_spec": "0.1.0",
   "description": "Processes and routes invoices.",
-  "data_classification": {
-    "sensitivity": "confidential",
-    "extensions": {
-      "com.acme": {
-        "data_tier": "gold",
-        "retention_override_approved": true
-      }
-    }
-  },
+  "data_classification": { "sensitivity": "confidential" },
+  "x_acme_internal_id": "inv-proc-007",
+  "x_acme_cost_center": "engineering",
   "model": {
     "name": "acme-large-2024",
-    "extensions": {
-      "com.acme": {
-        "model_tier": "premium",
-        "cost_per_1k_tokens": 0.03
-      }
-    }
-  },
-  "extensions": {
-    "com.acme": {
-      "internal_id": "inv-proc-007",
-      "cost_center": "engineering"
-    }
+    "x_acme_model_tier": "premium"
   }
 }
 ```
@@ -195,13 +154,13 @@ Specifies the ADL specification version the document conforms to.
 - **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). The format **MUST** conform to the `semver` production in Appendix D.
 - Implementations **MUST** reject documents with an unsupported `adl_spec` version.
 - Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
-- Pre-release suffixes (e.g., `"0.2.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
+- Pre-release suffixes (e.g., `"0.1.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
 
-Example: `"adl_spec": "0.2.0"`
+Example: `"adl_spec": "0.1.0"`
 
 ### 5.2 $schema
 
-Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.2: `https://adl-spec.org/0.2/schema.json`.
+Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.1: `https://adl-spec.org/0.1/schema.json`.
 
 ### 5.3 Name
 
@@ -926,105 +885,15 @@ Array of strings. **SHOULD** be lowercase, alphanumeric and hyphens only. Tags *
 
 ## 13. Profiles
 
-The `profiles` member declares which profiles the document conforms to. **OPTIONAL.** Value **MUST** be an array of profile identifiers (URIs or registered names). When a profile is declared: the document **MUST** satisfy all profile requirements, **MAY** use profile-defined members, and validators **SHOULD** check profile-specific rules.
+The `profiles` member declares which profiles the document conforms to. **OPTIONAL.** Value **MUST** be an array of profile identifiers (URIs or registered names). When a profile is declared: the document **MUST** satisfy all profile requirements, **MAY** use profile-defined members, and validators **SHOULD** check profile-specific rules. Profiles **MUST NOT** redefine core ADL members; they **MAY** add top-level members, add members to existing objects, define validation rules, or require specific values for optional members.
 
-ADL defines two categories of profiles:
+**Standard profiles (examples):** Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial. Additional profiles may be registered (e.g., IANA profile registry).
 
-- **Standard profiles** define domain-specific top-level members and validation rules. Standard profiles use the `urn:adl:profile:*` namespace and **SHOULD** be registered with the IANA profile registry (Section 13.5) to prevent naming conflicts. Examples: Governance (`urn:adl:profile:governance:1.0`), Healthcare, Financial.
-- **Vendor profiles** declare vendor-specific extensions with schema validation, targeting the `extensions` namespace rather than defining new top-level members. Vendor profiles use URI identifiers controlled by the vendor (e.g., `https://acme.com/adl/extensions/v1`) and do not require registration — the reverse-domain namespace provides collision prevention through DNS ownership. See Section 13.4.
-
-Both categories use the same `allOf` composition mechanism (Section 13.1) and **MAY** appear together in a document's `profiles` array.
-
-### 13.1 Profile Schema Composition
-
-Profiles extend the base ADL schema using the JSON Schema 2020-12 `allOf` composition mechanism. Each profile publishes a JSON Schema that:
-
-1. References the base ADL schema via `allOf` with `$ref`.
-2. Declares the profile's additional top-level members in its own `properties`.
-3. Adds `unevaluatedProperties: false` to close the composed schema, ensuring only base ADL members, profile-defined members, and `extensions` members are accepted.
-
-The base ADL schema (Appendix A) does not restrict unknown top-level properties — it declares `properties` and `patternProperties` but omits `additionalProperties` and `unevaluatedProperties`. This allows profile schemas to add members via composition without conflict. For documents that do not declare any profiles, validators **SHOULD** use the strict schema (`schema-strict.json`), which adds `unevaluatedProperties: false` to reject unknown top-level members.
-
-Profile schemas **MUST NOT** redefine core ADL members with incompatible types. Profiles **MAY**:
-
-- Add top-level members.
-- Add members to existing objects (e.g., extending `data_classification` with domain-specific sub-objects).
-- Define validation rules.
-- Require specific values for optional core members.
-- Use conditional validation (`if`/`then`) to enforce tier-based or context-dependent requirements.
-
-### 13.2 Multi-Profile Composition
-
-When a document declares multiple profiles, the document **MUST** satisfy all declared profile requirements. Validators compose profile schemas using `allOf` — each profile's schema is included as an element. JSON Schema `allOf` uses "strictest wins" semantics: if any profile requires a member, the composed result requires it.
-
-Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. For standard profiles, the IANA profile registry designated expert review (see Section 13.5) prevents cross-profile field naming conflicts. Vendor profiles avoid conflicts through their reverse-domain namespace isolation.
-
-### 13.3 Profile Dependencies
-
-A profile **MAY** declare dependencies on other profiles. When a profile declares a dependency, documents using that profile **MUST** also satisfy the dependency profile's requirements. The `profiles` array **MUST** include all transitive dependencies.
-
-At the schema level, a dependent profile composes its parent via `allOf`:
+Example:
 
 ```json
 {
-  "allOf": [
-    { "$ref": "https://adl-spec.org/0.2/schema.json" },
-    { "$ref": "https://adl-spec.org/profiles/governance/1.0/schema.json" }
-  ],
-  "properties": {
-    "hipaa_data_handling": { "type": "object" }
-  },
-  "unevaluatedProperties": false
-}
-```
-
-A dependent profile **MAY** tighten constraints from its parent (e.g., make an optional parent field required, narrow an enum). A dependent profile **MUST NOT** loosen constraints from its parent (e.g., make a required parent field optional). This follows from `allOf` semantics — the parent's constraints remain in force.
-
-If a dependent profile needs a parent field to not be required, this indicates a design issue. Resolutions include: refactoring the parent into a base profile with looser constraints, changing the relationship from dependency to sibling, or revising the parent profile in a new major version.
-
-### 13.4 Vendor Profiles
-
-A **vendor profile** is a profile published by an organization to declare vendor-specific extensions with schema validation. Vendor profiles use the same `allOf` composition mechanism as standard profiles (Section 13.1) but target the `extensions` namespace rather than defining new top-level members. See Section 13 for an overview of the standard/vendor profile taxonomy.
-
-Vendor profiles use URI identifiers controlled by the vendor (e.g., `https://acme.com/adl/extensions/v1`). The `urn:adl:profile:*` namespace is reserved for standard profiles. Vendor profiles **MUST NOT** use this namespace.
-
-A vendor profile **MAY** add schema constraints to the `extensions` object at any level, validating that its reverse-domain namespace contains the expected structure. The profile schema references the base ADL schema via `allOf` and declares `properties` for `extensions` within the relevant objects.
-
-A vendor profile **MAY** declare a dependency on a standard profile and add schema constraints to `extensions` within that profile's objects. The vendor profile composes its dependency via `allOf` and adds `extensions` constraints inside the profile-defined objects. This enables vendors to extend profile-defined objects without redefining them.
-
-Vendor profiles are subject to the following constraints:
-
-- Vendor profiles **MUST NOT** redefine core ADL members or standard profile members with incompatible types.
-- Vendor profiles **MUST** only add schema constraints within their own reverse-domain namespace under `extensions`.
-- A vendor profile's `extensions` schema applies only when the vendor profile is declared in the document's `profiles` array.
-- Documents **MAY** include `extensions` data for a vendor without declaring the vendor's profile. In this case, the data is preserved but unvalidated — implementations treat it as opaque.
-- Multiple vendor profiles compose independently. Each vendor's `extensions` constraints apply only within its own namespace.
-
-Vendor profiles do not require IANA registration. The reverse-domain namespace provides collision prevention through DNS ownership.
-
-Vendors **SHOULD**:
-
-- Publish their profile schema at a stable, dereferenceable URI.
-- Version their profile schemas (e.g., `/v1/`, `/v2/`).
-- Document the semantics of their extension fields.
-
-### 13.5 Standard Profile Registration
-
-Standard profile identifiers **SHOULD** be registered to prevent naming conflicts. Only standard profiles — those using the `urn:adl:profile:*` namespace — are subject to registration. Vendor profiles rely on reverse-domain namespace isolation and do not require registration (see Section 13.4).
-
-The registration authority (e.g., IANA profile registry) **MUST** employ designated expert review to ensure:
-
-1. New standard profiles do not redefine members from existing profiles with incompatible semantics.
-2. New standard profiles do not introduce field names that conflict with existing profiles.
-3. Dependencies between profiles are explicitly declared and acyclic.
-
-If a member becomes cross-cutting (needed by multiple standard profiles), the registration authority **MAY** recommend promoting it to the core ADL specification.
-
-### 13.6 Example
-
-```json
-{
-  "adl_spec": "0.2.0",
+  "adl_spec": "0.1.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
   "description": "Processes invoices with governance and financial compliance.",
@@ -1086,7 +955,7 @@ Implementations **MAY** perform additional validation based on declared profiles
 
 ### 14.3 Unknown Members
 
-Implementations **MUST** preserve unrecognized members when round-tripping. Implementations **MUST NOT** reject documents containing `extensions` with unknown vendor namespaces. Implementations **MAY** warn on unknown non-extension, non-profile members.
+Implementations **MUST** preserve unrecognized members when round-tripping. Implementations **MUST NOT** reject documents containing unknown `x_`-prefixed members. Implementations **MAY** warn on unknown non-extension, non-profile members.
 
 ---
 
@@ -1434,21 +1303,17 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 ### 19.2 Informative References
 
 - **[A2A]** A2A Protocol Working Group, "Agent-to-Agent Protocol Specification", <https://a2a-protocol.org/specification>.
-- **[CLTC-AGENTIC]** Center for Long-Term Cybersecurity (CLTC), UC Berkeley, "An Agentic AI Risk Management Standards Profile Based on NIST AI 600-1", February 2026, <https://cltc.berkeley.edu/publication/an-agentic-ai-risk-management-standards-profile/>.
-- **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Generative AI — Agentic AI Companion", January 2026, <https://aiwp.aist.go.jp/pdf/Model_AI_Governance_Framework_for_Generative_AI_Agentic_AI.pdf>.
 - **[JSON-SCHEMA]** Wright, A., et al., "JSON Schema: A Media Type for Describing JSON Documents", <https://json-schema.org/draft/2020-12/json-schema-core>.
 - **[MCP]** Anthropic, "Model Context Protocol Specification", <https://modelcontextprotocol.io/specification>.
 - **[OPENAPI]** OpenAPI Initiative, "OpenAPI Specification", Version 3.1, <https://spec.openapis.org/oas/v3.1.0>.
 - **[W3C.DID]** Sporny, M., et al., "Decentralized Identifiers (DIDs) v1.0", W3C Recommendation, <https://www.w3.org/TR/did-core/>.
 - **[W3C.VC]** Sporny, M., et al., "Verifiable Credentials Data Model v1.1", W3C Recommendation, <https://www.w3.org/TR/vc-data-model/>.
-- **[ISO-22989]** ISO/IEC JTC 1/SC 42, "Information technology — Artificial intelligence — Artificial intelligence concepts and terminology", ISO/IEC 22989:2022, <https://www.iso.org/standard/74296.html>.
-- **[AI-PROTOCOLS]** Rosenberg, J., "Framework, Use Cases and Requirements for AI Agent Protocols", Internet-Draft draft-rosenberg-ai-protocols-00, 2025, <https://datatracker.ietf.org/doc/html/draft-rosenberg-ai-protocols-00>.
 
 ---
 
 ## Appendix A. JSON Schema
 
-The normative JSON Schema for ADL is available at `https://adl-spec.org/0.2/schema.json` (JSON Schema Draft 2020-12). A minimal required-fields schema is provided in [schema.json](./schema.json) in this directory.
+The normative JSON Schema for ADL is available at `https://adl-spec.org/0.1/schema.json` (JSON Schema Draft 2020-12). A minimal required-fields schema is provided in [schema.json](./schema.json) in this directory.
 
 ---
 
@@ -1492,10 +1357,10 @@ semver          = 1*DIGIT "." 1*DIGIT "." 1*DIGIT
 tool-name       = lc-alpha *( lc-alpha / DIGIT / "_" )
 lc-alpha        = %x61-7A          ; a-z (lowercase letters only)
 
-; Vendor extension namespace key (Section 4.3)
-; Reverse-domain notation, minimum two segments
-vendor-key     = domain-segment 1*("." domain-segment)
-domain-segment = lc-alpha *(lc-alpha / DIGIT / "-")
+; Extension member name (Section 4.3)
+; "x_" prefix followed by a namespace identifier
+ext-member-name = "x_" ns-id
+ns-id           = 1*( lc-alpha / DIGIT / "_" )
 
 ; Template variable (Sections 7.2, 8.3)
 ; Used in system_prompt templates and prompt templates
@@ -1530,7 +1395,7 @@ literal-char    = %x21-29 / %x2B-7E
 |---|---|---|
 | `semver` | 5.1, 5.5 | `adl_spec` and `version` values |
 | `tool-name` | 8.1 | Tool `name` values |
-| `vendor-key` | 4.3 | Vendor extension namespace keys |
+| `ext-member-name` | 4.3 | Custom extension member names |
 | `template-var` | 7.2, 8.3 | `{{variable}}` references in templates |
 | `tag` | 12.5 | `metadata.tags` array items |
 | `pattern` | 4.4, 9.2–9.5 | Permission domain pattern strings |

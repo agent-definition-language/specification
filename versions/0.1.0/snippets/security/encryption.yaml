@@ -1,0 +1,4 @@
+encryption:
+  in_transit:
+    required: true
+    min_version: "1.2"

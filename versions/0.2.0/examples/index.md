@@ -38,7 +38,7 @@ New to ADL? Start with the [Minimal Example](./minimal) to understand the requir
 The minimal valid ADL document:
 
 ```yaml title="minimal.adl.yaml"
-adl_spec: "0.3.0"
+adl_spec: "0.2.0"
 name: Hello Agent
 description: A simple greeting agent.
 version: "1.0.0"

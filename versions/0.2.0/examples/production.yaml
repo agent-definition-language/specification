@@ -1,5 +1,5 @@
 $schema: https://adl-spec.org/0.2/schema.json
-adl_spec: "0.3.0"
+adl_spec: "0.2.0"
 name: Research Assistant
 description: An AI assistant that helps researchers find, summarize, and analyze academic papers.
 version: "2.1.0"

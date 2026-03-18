@@ -31,14 +31,14 @@ New to ADL? Start with the [Minimal Example](./minimal) to understand the requir
 - **Required members:** `adl_spec`, `name`, `description`, `version`, `data_classification`
 - **Versioning:** `adl_spec` and `version` use semantic versioning (`MAJOR.MINOR.PATCH`)
 - **Timestamps:** ISO 8601 with timezone (e.g., `2026-02-15T14:30:00Z`)
-- **Extensions:** Use the `extensions` object with vendor-namespaced keys
+- **Extensions:** Custom members use `x_` prefix (e.g., `x_acme_internal_id`)
 
 ## Quick Reference
 
 The minimal valid ADL document:
 
 ```yaml title="minimal.adl.yaml"
-adl_spec: "0.3.0"
+adl_spec: "0.1.0"
 name: Hello Agent
 description: A simple greeting agent.
 version: "1.0.0"
@@ -50,13 +50,3 @@ data_classification:
 :::info File Extension
 ADL documents use the `.adl.yaml`, `.adl.json`, or `.adl` file extension. The media type is `application/adl+json`.
 :::
-
-## Contributing Examples
-
-New examples are welcome! To contribute:
-
-1. Ensure the example conforms to the target spec version
-2. Add clear comments explaining the example's purpose
-3. Submit a PR with the example
-
-See the [Contributing Guide](/contributing) for more information.

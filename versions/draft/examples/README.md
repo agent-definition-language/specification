@@ -37,7 +37,7 @@ This section contains example Agent Definition Language (ADL) documents. They il
 The minimal valid ADL document:
 
 ```yaml title="minimal.adl.yaml"
-adl_spec: "0.2.0"
+adl_spec: "0.3.0"
 name: Hello Agent
 description: A simple greeting agent.
 version: "1.0.0"
