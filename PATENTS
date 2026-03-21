@@ -1,0 +1,79 @@
+Patent Non-Assertion Covenant for the Agent Definition Language Specification
+
+Effective Date: March 21, 2026
+
+1. COVENANT
+
+   Ironstead Group, LLC ("Covenanter") irrevocably covenants, on behalf of
+   itself and its successors, assigns, and affiliates, that it will not assert
+   any Patent Claims against any person or entity for making, having made,
+   using, offering to sell, selling, importing, or otherwise distributing a
+   Conforming Implementation of the ADL Specification.
+
+2. DEFINITIONS
+
+   "Patent Claims" means all patent claims owned or controlled by the
+   Covenanter, now or in the future, that would be necessarily infringed by
+   a Conforming Implementation of the ADL Specification. This includes, but
+   is not limited to, claims arising from:
+
+     - U.S. Provisional Patent Application No. 63/985,186
+       (filed February 18, 2026)
+
+     - Any non-provisional application, continuation, continuation-in-part,
+       divisional, reissue, reexamination, or foreign counterpart thereof.
+
+   "ADL Specification" means the Agent Definition Language specification as
+   published in this repository under the Apache License 2.0, including any
+   version released after the Effective Date of this covenant.
+
+   "Conforming Implementation" means any implementation that conforms to a
+   published version of the ADL Specification, including but not limited to
+   parsers, validators, generators, registries, editors, and runtime systems
+   that produce, consume, or process ADL documents. An implementation need
+   not be derived from or based on any particular source code.
+
+3. SCOPE
+
+   This covenant applies to all Conforming Implementations regardless of:
+
+     (a) the programming language in which they are written;
+     (b) the license under which they are distributed;
+     (c) whether they are derived from code in this repository; or
+     (d) whether the implementor has any relationship with the Covenanter.
+
+4. IRREVOCABILITY
+
+   This covenant is irrevocable. It may not be amended, withdrawn, or
+   terminated by the Covenanter, its successors, or its assigns. The
+   covenant runs with the Patent Claims and is binding on any person or
+   entity that acquires ownership or control of the Patent Claims.
+
+5. NO FURTHER CONDITIONS
+
+   This covenant imposes no conditions on the beneficiaries. There is no
+   requirement to use a particular license, to provide attribution, or to
+   grant reciprocal patent rights. The Apache License 2.0 under which the
+   ADL Specification is published contains its own terms; this covenant is
+   independent of and in addition to those terms.
+
+6. RELATIONSHIP TO APACHE LICENSE 2.0
+
+   The patent license granted under Section 3 of the Apache License 2.0
+   applies to the specific copyrighted works in this repository. This
+   covenant is broader: it covers any Conforming Implementation, including
+   clean-room implementations that do not incorporate any code or text
+   from this repository. Where both apply, the broader grant controls.
+
+7. DEFENSIVE SUSPENSION
+
+   None. This covenant contains no defensive termination clause. Even if
+   a beneficiary of this covenant asserts patent claims against the
+   Covenanter, the Covenanter's obligations under this covenant remain
+   in full force. The patent retaliation clause in Section 3 of the
+   Apache License 2.0 applies independently to the licensed works in
+   this repository; it does not affect this covenant.
+
+---
+
+Ironstead Group, LLC
