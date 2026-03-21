@@ -4,91 +4,74 @@ The **Agent Definition Language (ADL)** is a vendor-neutral, machine-readable sp
 
 **Documentation:** [adl-spec.org](https://adl-spec.org)
 
-## Why ADL?
-
-Protocols like [MCP](https://modelcontextprotocol.io/) describe how agents connect to tools. [A2A](https://google.github.io/A2A/) describes how agents communicate. Neither answers the governance questions enterprises need before deploying agents: **who is this agent, what is it allowed to do, and who authorized it?**
-
-ADL fills that gap as the governance layer above communication and tooling protocols:
-
-- **Deny-by-default permissions** with auditable boundaries for network, data, and execution
-- **Compliance mappings** for NIST 800-53, SOC 2, ISO 27001, and the EU AI Act
-- **Lifecycle management** with status tracking, sunset dates, and successor chains
-- **Interoperability** — generates A2A Agent Cards and MCP configurations from a single source of truth
-
-Without a standard like ADL, every organization invents its own way to describe and constrain agents, making cross-vendor interoperability, auditing, and regulatory compliance harder than it needs to be.
-
-## Design goals
-
-- **Vendor-neutral:** Describe agents without binding to a specific provider or runtime.
-- **Machine-readable:** Enable tooling for validation, code generation, and orchestration.
-- **Human-friendly:** Support YAML and JSON for authoring and review.
-- **Extensible:** Allow custom extensions (`x_*` fields) and domain-specific profiles.
-- **Standards-ready:** Structure the spec for submission to multiple standards organizations.
-
 ## Specification
 
-- **0.1.0 (current draft):** [versions/0.1.0/spec.md](versions/0.1.0/spec.md)
-- **JSON Schema:** [versions/0.1.0/schema.json](versions/0.1.0/schema.json)
+| Version | Spec | Schema | IETF Draft |
+|---------|------|--------|------------|
+| **0.2.0** (latest) | [spec.md](versions/0.2.0/spec.md) | [schema.json](versions/0.2.0/schema.json) | `draft-nederveld-adl-02` |
+| 0.1.0 | [spec.md](versions/0.1.0/spec.md) | [schema.json](versions/0.1.0/schema.json) | `draft-nederveld-adl-01` |
 
-The Markdown in `versions/` is the source of truth for the draft specification until a standards body publishes an official standard.
+The Markdown in `versions/` is the source of truth for the draft specification until a standards body publishes an official standard. For the full standards strategy, see the [roadmap](standardization/roadmap.md).
 
-## Examples
+## Quick start
 
-Example ADL documents are in [versions/0.1.0/examples/](versions/0.1.0/examples/). Minimal valid document (YAML):
-
-```yaml
-adl_spec: "0.1.0"
-name: My Agent
-description: An agent defined with ADL.
-version: "1.0.0"
-
-data_classification:
-  sensitivity: public
-```
-
-## CLI
-
-The [`@adl-spec/cli`](https://www.npmjs.com/package/@adl-spec/cli) package provides validation and tooling for ADL documents. The CLI requires [Bun](https://bun.sh/) to be installed.
+Validate an ADL document with the CLI ([Bun](https://bun.sh/) required):
 
 ```bash
 bunx @adl-spec/cli validate my-agent.yaml
 ```
 
-Source: [packages/adl-cli/](packages/adl-cli/)
+## Packages
 
-## Standardization
+All packages are published under the `@adl-spec` scope on npm.
 
-ADL has been submitted to the **IETF** as Internet-Draft `draft-nederveld-adl-01` (Standards Track, individual submission) with an IANA media-type registration provision.
+| Package | Description |
+|---------|-------------|
+| [`@adl-spec/core`](packages/adl-core/) | SDK — parsing, validation, and schema utilities |
+| [`@adl-spec/generator`](packages/adl-generator/) | Code generation from ADL passports (vanilla TS, Claude SDK) |
+| [`@adl-spec/cli`](packages/adl-cli/) | CLI tooling — validate, generate, inspect |
+| [`@adl-spec/agent`](packages/adl-agent/) | ADL Explainer AI agent |
 
-For the full standards strategy, see the [roadmap](standardization/roadmap.md).
+## Profiles
+
+Domain-specific profiles extend the core spec for regulated industries. See [adl-spec.org](https://adl-spec.org/profiles/) for full documentation.
+
+| Profile | Path |
+|---------|------|
+| Governance | [profiles/governance/](profiles/governance/) |
+| Registry | [profiles/registry/](profiles/registry/) |
+| Healthcare | [profiles/healthcare/](profiles/healthcare/) |
+| Financial | [profiles/financial/](profiles/financial/) |
+| Portfolio | [profiles/portfolio/](profiles/portfolio/) |
 
 ## Repository structure
 
 | Path | Purpose |
 |------|---------|
-| [versions/](versions/) | Versioned specification (e.g., `0.1.0/spec.md`). |
-| [packages/](packages/) | Tooling (`adl-cli`). |
-| [site/](site/) | Documentation site ([adl-spec.org](https://adl-spec.org)). |
-| [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial). |
-| [standardization/](standardization/) | Roadmap, IETF drafts, and per-standards-body notes. |
-| [proposals/](proposals/) | Spec and process proposals. |
-| [.github/](.github/) | CI workflows, issue and PR templates. |
+| [versions/](versions/) | Versioned specifications and schemas |
+| [packages/](packages/) | SDK, CLI, code generator, and agent tooling |
+| [profiles/](profiles/) | Domain-specific profiles |
+| [site/](site/) | Documentation site ([adl-spec.org](https://adl-spec.org)) |
+| [standardization/](standardization/) | IETF drafts and standards-body roadmap |
+| [proposals/](proposals/) | Spec and process proposals |
+| [.github/](.github/) | CI workflows, issue and PR templates |
 
 ## Participation
 
 - **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Governance:** See [GOVERNANCE.md](GOVERNANCE.md).
 - **Code of conduct:** See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
+- **Implementations:** See [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md).
 
 Use [issues](https://github.com/Ironstead-Group/agent-definition-language/issues) and [pull requests](https://github.com/Ironstead-Group/agent-definition-language/pulls) for spec changes, standardization work, and examples.
 
-## Implementations
-
-Tools and libraries that implement or consume ADL are listed in [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md). If you build one, we welcome a pull request to add it.
-
 ## Intellectual Property
 
-ADL is the subject of US Provisional Patent Application No. 63/985,186 (filed February 18, 2026), assigned to Ironstead Group, LLC. The specification is published under the Apache License 2.0 to enable open implementation and adoption. Any standards submission will include appropriate IPR disclosures per the relevant standards body's policies.
+ADL is the subject of US Provisional Patent Application No. 63/985,186 (filed February 18, 2026), assigned to Ironstead Group, LLC. An irrevocable [Patent Non-Assertion Covenant](PATENTS) guarantees that any conforming implementation — including clean-room implementations — may be freely made, used, and distributed without risk of patent assertion. This covenant binds all successors and assigns and contains no defensive termination clause.
+
+The specification is published under the Apache License 2.0 to enable open implementation and adoption. Any standards submission will include appropriate IPR disclosures per the relevant standards body's policies.
+
+See [NOTICE](NOTICE) for full attribution and patent details.
 
 ## License
 
