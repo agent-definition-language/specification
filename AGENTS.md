@@ -20,6 +20,17 @@
 - `site/` — Docusaurus documentation site
 - `.github/` — issue/PR templates, CI workflow
 
+## Package commands
+
+All commands run from repo root:
+
+```bash
+bun run build        # Build packages (core → generator → cli)
+bun run typecheck    # Typecheck all packages
+bun run test         # Test all packages
+bun run check        # Full CI check (build + typecheck + test)
+```
+
 ## Site commands
 
 All commands run from `site/`:
