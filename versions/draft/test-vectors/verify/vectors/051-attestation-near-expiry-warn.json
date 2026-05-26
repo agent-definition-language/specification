@@ -59,10 +59,10 @@
         "attestation": {
           "type": "self",
           "issued_at": "2026-04-01T00:00:00.000Z",
-          "expires_at": "2026-05-16T07:02:04.340Z",
+          "expires_at": "2026-06-05T08:17:32.322Z",
           "signature": {
             "algorithm": "Ed25519",
-            "value": "fbzReIlVDwt23Ogw-GIxYptbTuZZCdbfxyXfs0JM0lAbp-vzAvldbqX7FqZsc9JH8rPL5gagOK3_E-0wPKrVDA",
+            "value": "-VR_YKthkwc4YCJ7513ogWe4BHVe4g3tyxVaNcX6w67kcn7POzI6oFtbENiSrfyUnQ75DWbU8JK5HqKHTRmHCQ",
             "signed_content": "canonical"
           }
         }
