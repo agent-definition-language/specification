@@ -11,6 +11,8 @@ ADL should use the OpenAPI adoption pattern deliberately: make the first experie
 
 Current GitHub signals show MCP server repositories are concentrated in **Python** and **TypeScript**, with **JavaScript**, **Go**, and **Shell/Rust** forming the next tier. A2A protocol repositories show the same Python/TypeScript lead, followed by **Go**, **JavaScript**, and **Rust**. The narrower `google-adk` + `a2a-protocol` intersection is small but overwhelmingly Python. Based on this, ADL should focus generator and extractor work on Python and TypeScript first, then Go, JavaScript, and Rust, while keeping Java as the first enterprise-language watchlist target.
 
+For framework plugins, ADL should prioritize ecosystems where an extractor can reliably discover agents, tools, schemas, auth, model configuration, and orchestration structure. The first plugin targets should be **Google ADK**, **LangGraph/LangChain**, **CrewAI**, **OpenAI Agents SDK**, and **Hermes Agent**, with **LlamaIndex**, **Microsoft Semantic Kernel / Microsoft Agent Framework**, **Pydantic AI**, **Mastra**, **Agno**, **Haystack**, and **AutoGen/AG2** on the next tier.
+
 ## Motivation
 
 The documentation generator is a strategic adoption surface. OpenAPI grew quickly because its documentation generators made the specification valuable immediately to teams that did not yet care about the specification itself. ADL can use the same adoption motion for agents: a useful rendered view of an agent, its tools, capabilities, identity, security posture, and A2A/MCP interoperability points is easier to adopt than a raw schema-first specification.
@@ -70,6 +72,30 @@ The narrower `topic:google-adk topic:a2a-protocol` GitHub Search API query retur
 
 This intersection should be treated as directional rather than definitive because it depends on repository topic hygiene. It still strongly supports Python as the first ADK+A2A target.
 
+Framework and harness metadata collected from GitHub repository APIs on 2026-05-26:
+
+| Framework / Harness | Repository | Stars | Primary Language | Plugin Priority |
+|---------------------|------------|-------|------------------|-----------------|
+| Hermes Agent | `NousResearch/hermes-agent` | 167,808 | Python | P0 research spike |
+| AutoGen | `microsoft/autogen` | 58,407 | Python | Watch / migration-sensitive |
+| CrewAI | `crewAIInc/crewAI` | 52,200 | Python | P0 |
+| LlamaIndex | `run-llama/llama_index` | 49,670 | Python | P1 |
+| Agno | `agno-agi/agno` | 40,361 | Python | P1 |
+| LangGraph | `langchain-ai/langgraph` | 32,990 | Python | P0 |
+| Semantic Kernel | `microsoft/semantic-kernel` | 27,983 | C# | P1 / enterprise |
+| OpenAI Agents SDK | `openai/openai-agents-python` | 26,660 | Python | P0 |
+| Haystack | `deepset-ai/haystack` | 25,373 | MDX / Python | P1 |
+| Vercel AI SDK | `vercel/ai` | 24,470 | TypeScript | P2 / app surface |
+| Mastra | `mastra-ai/mastra` | 24,312 | TypeScript | P1 |
+| Google ADK | `google/adk-python` | 19,851 | Python | P0 |
+| Pydantic AI | `pydantic/pydantic-ai` | 17,307 | Python | P1 |
+| Google ADK Samples | `google/adk-samples` | 9,457 | Python | P0 reference corpus |
+| Claude Agent SDK | `anthropics/claude-agent-sdk-python` | 7,051 | Python | P2 |
+| Strands Agents | `strands-agents/sdk-python` | 5,940 | Python | P2 |
+| AG2 | `ag2ai/ag2` | 4,601 | Python | P2 / AutoGen successor watch |
+
+Stars are only a coarse demand signal. Plugin priority also accounts for ADL fit: structured agent definitions, explicit tool schemas, A2A/MCP relevance, enterprise relevance, and whether extraction can be done without brittle source parsing.
+
 ## Details
 
 ### 1. Adoption Model
@@ -125,7 +151,36 @@ Extraction should produce a reviewable ADL document with provenance annotations 
 
 These extensions keep the bootstrap path practical while preserving ADL's role as a design-time contract.
 
-### 4. Recommended Target Order
+### 4. Framework Plugin Backlog
+
+ADL should support plugins at two levels:
+
+- **Extractor plugins:** read framework code/config/runtime metadata and emit ADL.
+- **Renderer plugins:** render framework-specific sections in generated docs, such as LangGraph nodes, CrewAI crews, ADK agents, or OpenAI Agents handoffs.
+
+Recommended plugin priority:
+
+| Priority | Plugin | Why It Matters | Likely ADL Mapping |
+|----------|--------|----------------|--------------------|
+| P0 | Google ADK | Directly tied to A2A and heavily Python; strategically important for ADK+A2A agents. | Agents, tools, model config, instructions, deployment/runtime metadata, A2A integration. |
+| P0 | LangGraph / LangChain | Strong production orchestration signal; graph structure maps well to ADL capabilities, workflows, and dependencies. | Graph nodes/edges, tools, state, model bindings, retrievers, external integrations. |
+| P0 | CrewAI | Large community and clear crew/role/task abstractions. | Agents, roles, tasks, tools, process, collaboration topology. |
+| P0 | OpenAI Agents SDK | Official SDK, lightweight, likely high growth; handoffs and tools are structured. | Agents, tools, handoffs, guardrails, model settings, tracing metadata. |
+| P0 research spike | Hermes Agent | Very large and fast-growing Python agent harness; strategically relevant because it exposes self-improving skills, persistent memory, channels, model backends, and coding-agent style operation. | Agent identity, model backends, skills, tools, memories, channels, permissions, runtime config, generated-skill provenance. |
+| P1 | LlamaIndex | Major RAG and document-agent ecosystem; important for knowledge-heavy agents. | Query engines, tools, indexes, retrievers, data sources, workflows. |
+| P1 | Microsoft Semantic Kernel / Agent Framework | Enterprise and .NET relevance; important for standards credibility. | Plugins/functions, skills, planners, memory, services, auth. |
+| P1 | Pydantic AI | Strong schema discipline; likely high-quality extraction because types are explicit. | Agent definitions, typed tools, structured outputs, validators. |
+| P1 | Mastra | TypeScript-native agent framework with strong fit for JS/TS users. | Agents, tools, workflows, memory, evals, deployment metadata. |
+| P1 | Agno | High GitHub signal and agent-platform orientation. | Agents, tools, teams, knowledge, memory, model config. |
+| P1 | Haystack | Mature pipeline/RAG framework; useful for enterprise document and search agents. | Pipelines, components, tools, retrievers, generators, routers. |
+| P2 | AutoGen / AG2 | Very large historical footprint, but migration and project direction need care. | Conversable agents, group chats, tools, termination/handoff policies. |
+| P2 | Vercel AI SDK | Important TypeScript app surface, but less agent-contract-specific than orchestration frameworks. | Tools, model providers, UI-facing tool calls, app integration metadata. |
+| P2 | Claude Agent SDK / Claude Code SDK | Important harness ecosystem, especially for coding agents; extraction surface still narrower. | Tools, permissions, model settings, session/harness metadata. |
+| P2 | Strands Agents | Emerging Python framework; useful if AWS/enterprise adoption grows. | Agents, tools, model config, guardrails. |
+
+The first plugin tranche should be **Google ADK**, **LangGraph/LangChain**, **CrewAI**, and **OpenAI Agents SDK**, plus **A2A agent-card ingestion** and **MCP server ingestion** as protocol-level plugins. **Hermes Agent should receive an immediate research spike**: its adoption signal is too large to ignore, but its self-improving runtime/skill-library model means ADL extraction may need to inspect runtime state, generated skills, and memory/config artifacts rather than only static source declarations. If those surfaces are stable, promote Hermes to the P0 implementation tranche.
+
+### 5. Recommended Target Order
 
 | Priority | Language | Rationale |
 |----------|----------|-----------|
@@ -135,11 +190,11 @@ These extensions keep the bootstrap path practical while preserving ADL's role a
 | P1 | JavaScript | Third in MCP and fourth in A2A; mostly overlaps TypeScript but matters for plain Node examples and lower-friction adoption. |
 | P1 | Rust | Near-tied fifth in MCP and tied fourth/fifth in A2A; important for high-performance gateways, security-sensitive infrastructure, and protocol tooling. |
 
-### 5. Enterprise Watchlist
+### 6. Enterprise Watchlist
 
 Java should stay on the roadmap even though it is not top five across both main signals. The A2A project publishes an official Java SDK, and Java is likely to matter for enterprise adoption, regulated industries, and standards-body credibility. It should be considered the first P2 target unless customer or contributor demand pulls it forward.
 
-### 6. Generator Scope by Phase
+### 7. Generator Scope by Phase
 
 **Phase 1: Renderer + Python/TypeScript Docs**
 
@@ -149,12 +204,15 @@ Java should stay on the roadmap even though it is not top five across both main 
 - Include A2A agent-card and task-schema documentation examples for both languages.
 - Build shared conformance fixtures so generated docs can be validated against the same ADL examples.
 - Show the source ADL and validation/conformance status in the rendered output.
+- Define the plugin API for extractors and renderers.
 
 **Phase 2: Python/TypeScript Code-to-ADL**
 
 - Add MCP server extractors for Python and TypeScript.
 - Add Google ADK Python extraction.
 - Add A2A agent-card ingestion.
+- Add LangGraph/LangChain, CrewAI, and OpenAI Agents SDK extractor prototypes.
+- Run a Hermes Agent extraction spike focused on config, model backends, channels, skill library, memory metadata, and generated-skill provenance.
 - Emit review-needed annotations for inferred ADL fields.
 - Round-trip extracted ADL through the renderer and validator.
 
@@ -164,13 +222,14 @@ Java should stay on the roadmap even though it is not top five across both main 
 - Add JavaScript as a low-friction sibling of TypeScript, reusing templates where practical.
 - Add Rust for infrastructure, security, and protocol implementers.
 - Add extractors only where framework metadata is structured enough to avoid brittle parsing.
+- Add LlamaIndex, Pydantic AI, Mastra, Semantic Kernel, Agno, and Haystack plugins as structured metadata surfaces are confirmed.
 
 **Phase 4: Java**
 
 - Add Java once ADL's core generator behavior stabilizes and enterprise integration examples are ready.
 - Align examples with the official A2A Java SDK and common Java service patterns.
 
-### 7. Practical Generator Implications
+### 8. Practical Generator Implications
 
 The generator should separate language-neutral ADL semantics from language-specific rendering:
 
@@ -179,6 +238,7 @@ The generator should separate language-neutral ADL semantics from language-speci
 - Prefer examples that can round-trip through the same ADL document and produce comparable output across Python and TypeScript first.
 - Treat extracted ADL as a draft contract until a human or CI policy marks it reviewed.
 - Preserve a distinction between declared, discovered, and inferred fields in generated output.
+- Keep framework plugins independent from language targets. For example, a LangGraph plugin may start in Python but later support TypeScript if the framework surface warrants it.
 - Avoid treating Shell, HTML, and Jupyter Notebook as primary generator targets. They are useful supporting formats, but they do not represent durable SDK/runtime targets.
 
 ## Alternatives
@@ -190,6 +250,7 @@ The generator should separate language-neutral ADL semantics from language-speci
 5. **Support every common language immediately.** Rejected because generator quality depends on examples, tests, and idiomatic templates, not just emitting files.
 6. **Documentation rendering only.** Attractive for fast adoption, but it repeats OpenAPI's failure mode where the specification is seen only as documentation. Rejected unless the rendered output consistently exposes source ADL, validation, and contract semantics.
 7. **Code-to-ADL first.** Useful for bootstrapping existing projects, but risky before the renderer and validation story are strong enough to help users understand and review the generated ADL. Better as Phase 2.
+8. **Rank framework plugins by GitHub stars only.** Rejected because ADL extraction needs structured declarations and strategic protocol fit. A smaller framework with explicit typed tools may be a better first plugin than a larger framework that requires brittle source inference.
 
 ## Recommendation
 
@@ -197,8 +258,16 @@ Adopt this product sequence:
 
 1. **Render ADL** into static HTML, Markdown/MDX, and Docusaurus-ready pages.
 2. **Generate docs from ADL** for Python and TypeScript agent ecosystems.
-3. **Extract ADL from code** for Python and TypeScript MCP servers, Google ADK agents, and A2A agent cards.
+3. **Extract ADL from code** for Python and TypeScript MCP servers, Google ADK agents, A2A agent cards, LangGraph/LangChain, CrewAI, and OpenAI Agents SDK; run the Hermes Agent extraction spike in the same phase.
 4. **Expand generator and extractor targets** to Go, JavaScript, and Rust.
+
+Adopt this framework plugin sequence:
+
+1. **Protocol plugins:** MCP server ingestion and A2A agent-card ingestion.
+2. **P0 framework plugins:** Google ADK, LangGraph/LangChain, CrewAI, OpenAI Agents SDK.
+3. **P0 research spike:** Hermes Agent, promoted to P0 if stable extraction surfaces are confirmed.
+4. **P1 framework plugins:** LlamaIndex, Semantic Kernel / Microsoft Agent Framework, Pydantic AI, Mastra, Agno, Haystack.
+5. **P2 watchlist plugins:** AutoGen/AG2, Vercel AI SDK, Claude Agent SDK / Claude Code SDK, Strands Agents.
 
 Adopt this language sequence:
 
@@ -221,6 +290,9 @@ This ordering optimizes for the overlap between MCP servers, A2A implementations
 5. What is the minimum renderer feature set required before code-to-ADL extraction is useful to users?
 6. Which fields should be allowed as inferred output, and which ADL fields should require explicit human confirmation?
 7. Should generated ADL provenance annotations be standardized as `x-adl-*` extensions or kept internal to the generator?
+8. Should ADL define a stable plugin API before the first extractor ships, or keep the first plugins internal until the mapping stabilizes?
+9. Should framework plugins emit framework-specific `x-*` extensions, or should ADL add first-class workflow/graph/task primitives for common patterns?
+10. Should Hermes-style self-improving skills be represented as ordinary tools/capabilities, or should ADL define a separate generated-skill provenance pattern?
 
 ## References
 
@@ -233,3 +305,18 @@ This ordering optimizes for the overlap between MCP servers, A2A implementations
 - Google ADK Python repository: https://github.com/google/adk-python
 - Google ADK samples repository: https://github.com/google/adk-samples
 - GitHub Search API query used for the narrow ADK+A2A intersection: `topic:google-adk topic:a2a-protocol`
+- Hermes Agent repository: https://github.com/NousResearch/hermes-agent
+- LangGraph repository: https://github.com/langchain-ai/langgraph
+- CrewAI repository: https://github.com/crewAIInc/crewAI
+- OpenAI Agents SDK repository: https://github.com/openai/openai-agents-python
+- LlamaIndex repository: https://github.com/run-llama/llama_index
+- Microsoft Semantic Kernel repository: https://github.com/microsoft/semantic-kernel
+- Pydantic AI repository: https://github.com/pydantic/pydantic-ai
+- Mastra repository: https://github.com/mastra-ai/mastra
+- Agno repository: https://github.com/agno-agi/agno
+- Haystack repository: https://github.com/deepset-ai/haystack
+- AutoGen repository: https://github.com/microsoft/autogen
+- AG2 repository: https://github.com/ag2ai/ag2
+- Vercel AI SDK repository: https://github.com/vercel/ai
+- Claude Agent SDK Python repository: https://github.com/anthropics/claude-agent-sdk-python
+- Strands Agents SDK Python repository: https://github.com/strands-agents/sdk-python
