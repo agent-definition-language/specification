@@ -1,0 +1,128 @@
+{
+  "id": "030-key-mismatch-inline-vs-did",
+  "description": "Inline public_key does not match the key resolved from the DID Document. MUST block at §10.3.4.",
+  "spec_sections": [
+    "10.3.1.4"
+  ],
+  "input": {
+    "passport": {
+      "adl_spec": "0.2.0",
+      "name": "Personal Assistant",
+      "description": "Consumer agent for verification test vectors",
+      "version": "1.0.0",
+      "id": "https://test.example/agents/personal-assistant",
+      "data_classification": {
+        "sensitivity": "internal"
+      },
+      "lifecycle": {
+        "status": "active",
+        "effective_date": "2026-04-01T00:00:00.000Z"
+      },
+      "provider": {
+        "name": "Test Org",
+        "url": "https://test.example",
+        "contact": "test@test.example"
+      },
+      "cryptographic_identity": {
+        "did": "did:web:test.example:agents:personal-assistant",
+        "public_key": {
+          "algorithm": "Ed25519",
+          "value": "OxP9noTzMJyWX72NdF4f7VCp/pTjmLggVuNJ1YSGj3g="
+        }
+      },
+      "permissions": {
+        "network": {
+          "allowed_hosts": [
+            "api.test.example"
+          ],
+          "allowed_protocols": [
+            "https"
+          ],
+          "deny_private": false
+        },
+        "resource_limits": {
+          "max_memory_mb": 1024,
+          "max_duration_sec": 120
+        }
+      },
+      "security": {
+        "authentication": {
+          "type": "api_key",
+          "required": true
+        },
+        "encryption": {
+          "in_transit": {
+            "required": true,
+            "min_version": "1.2"
+          }
+        },
+        "attestation": {
+          "type": "self",
+          "issued_at": "2026-04-01T00:00:00.000Z",
+          "expires_at": "2027-04-01T00:00:00.000Z",
+          "signature": {
+            "algorithm": "Ed25519",
+            "value": "5ogk0uKYVLpdPrjZKe2j2QqJefGWdht5Pk0Wpu6OakXF5v0QJJqw4eeYW81RBcT4VVyxD2rHm-Hqd4Jdu74uDQ",
+            "signed_content": "canonical"
+          }
+        }
+      },
+      "metadata": {
+        "license": "MIT",
+        "tags": [
+          "consumer",
+          "test"
+        ]
+      }
+    },
+    "retrieval": {
+      "channel": "header",
+      "authority": "localhost:3000"
+    },
+    "did_resolution_responses": {
+      "https://test.example/agents/personal-assistant/did.json": {
+        "status": 200,
+        "body": {
+          "id": "did:web:test.example:agents:personal-assistant",
+          "verificationMethod": [
+            {
+              "id": "did:web:test.example:agents:personal-assistant#key-1",
+              "type": "Ed25519VerificationKey2020",
+              "controller": "did:web:test.example:agents:personal-assistant",
+              "publicKeyBase64": "jduAD+8BNAYs0pFF3LGqUeizH5r2i+VofodFQLojEHE="
+            }
+          ],
+          "assertionMethod": [
+            "did:web:test.example:agents:personal-assistant#key-1"
+          ]
+        }
+      }
+    }
+  },
+  "config": {
+    "mode": "enforce",
+    "requireSignature": true,
+    "requireDidResolution": true,
+    "requireProviderCoherence": false,
+    "trustOnFirstUse": true,
+    "didLocalOverrides": {},
+    "providerAllowlist": []
+  },
+  "expected": {
+    "verified": false,
+    "public_key_source": "none",
+    "blocked_at_section": "10.3.1.4",
+    "step_outcomes": [
+      {
+        "section": "10.3.1.3",
+        "passed": true,
+        "severity": "block"
+      },
+      {
+        "section": "10.3.1.4",
+        "passed": false,
+        "severity": "block"
+      }
+    ]
+  }
+}

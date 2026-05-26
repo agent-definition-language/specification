@@ -113,7 +113,7 @@ An ADL document **MUST** be a single JSON object.
 - `name` (Section 5.3)
 - `description` (Section 5.4)
 - `version` (Section 5.5)
-- `data_classification` (Section 10.4)
+- `data_classification` (Section 10.1)
 
 **Optional members:**
 
@@ -427,7 +427,7 @@ Example:
 
 ### 8.1 Tools
 
-Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`, `data_classification` (Section 10.4). Tool names **MUST** be unique, **MUST** match `^[a-z][a-z0-9_]*$`, and **MUST** conform to the `tool-name` production in Appendix D. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
+Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`, `data_classification` (Section 10.1). Tool names **MUST** be unique, **MUST** match `^[a-z][a-z0-9_]*$`, and **MUST** conform to the `tool-name` production in Appendix D. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
 
 The `examples` member, when present, **MUST** be an array of example objects. Each example object **MAY** contain:
 
@@ -488,7 +488,7 @@ Example:
 
 ### 8.2 Resources
 
-Array of resource objects (data sources the agent can access). **OPTIONAL.** Each resource **MUST** contain `name` (string, REQUIRED) and `type` (string, REQUIRED). `type` **MUST** be one of: `vector_store`, `knowledge_base`, `file`, `api`, `database`. Each resource **MAY** contain: `description`, `uri`, `mime_types`, `schema`, `annotations`, `data_classification` (Section 10.4). Resource names **MUST** be unique.
+Array of resource objects (data sources the agent can access). **OPTIONAL.** Each resource **MUST** contain `name` (string, REQUIRED) and `type` (string, REQUIRED). `type` **MUST** be one of: `vector_store`, `knowledge_base`, `file`, `api`, `database`. Each resource **MAY** contain: `description`, `uri`, `mime_types`, `schema`, `annotations`, `data_classification` (Section 10.1). Resource names **MUST** be unique.
 
 The `mime_types` member, when present, **MUST** be an array of strings. Each value **MUST** be a valid MIME type (e.g., `"application/json"`, `"text/plain"`).
 
@@ -639,46 +639,11 @@ Example (complete permissions object):
 
 The `security` member defines security requirements. **OPTIONAL.** When present, value **MUST** be an object that **MAY** contain `authentication`, `encryption`, and `attestation`.
 
-### 10.1 Authentication
+Section 10 spans two ADL layers. The **declarative** members defined here in ADL Core — `data_classification` (§10.1), `attestation` (§10.2), the credential schemes (§10.3.3), and the scope declarations (§10.4.1–§10.4.2) — describe what an agent handles and what it advertises. The **procedural** members — passport verification (§10.3.1), presentation proof (§10.3.2), and authorization enforcement (§10.4.3–§10.4.8) — define what a counterparty **MUST** do with those declarations and are specified in the companion [**ADL Trust Protocol**](/protocol). The procedural sections retain their §10 numbers in the Trust Protocol so that conformance vectors and verification-outcome identifiers remain stable across the split.
 
-May contain: `type` (one of `none`, `api_key`, `oauth2`, `oidc`, `mtls`), `required` (bool). Type-specific members (e.g., OAuth2: `scopes`, `token_endpoint`; OIDC: `issuer`, `audience`) **MAY** be present.
+Section 10 is ordered to follow the dependency stack of the security model. Data Classification (§10.1) declares what the agent handles. Attestation (§10.2) signs the passport. Authentication (§10.3) defines how parties prove identity at runtime — agent-to-agent via passport verification (§10.3.1) and presentation proof (§10.3.2), and human or external services via OAuth 2.1, OIDC, mTLS, or API keys (§10.3.3). Authorization (§10.4) covers scope-based AuthZ. Encryption (§10.5) covers channel security.
 
-### 10.2 Encryption
-
-May contain: `in_transit` (`required`, `min_version`), `at_rest` (`required`, `algorithm`).
-
-### 10.3 Attestation
-
-May contain: `type` (one of `self`, `third_party`, `verifiable_credential`), `issuer`, `issued_at`, `expires_at` (ISO 8601), `signature` (object). Implementations **SHOULD** warn when `expires_at` is in the past or within 30 days.
-
-**Signature object:** When present, **MUST** contain `algorithm`, `value` (Base64url-encoded), `signed_content` (`"canonical"` or `"digest"`). When `signed_content` is `"digest"`, **MUST** also include `digest_algorithm` and `digest_value`. Supported algorithms include Ed25519 (RECOMMENDED), Ed448, ES256/384/512, RS256, PS256 (RSA ≥ 2048). Verification: remove signature, serialize with JCS [RFC8785], verify digest if applicable, resolve public key from `cryptographic_identity`, verify signature.
-
-Example:
-
-```json
-{
-  "security": {
-    "authentication": {
-      "type": "oauth2",
-      "required": true,
-      "scopes": ["invoices:read", "invoices:write"],
-      "token_endpoint": "https://auth.acme.example.com/oauth/token"
-    },
-    "encryption": {
-      "in_transit": { "required": true, "min_version": "TLS1.3" },
-      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
-    },
-    "attestation": {
-      "type": "third_party",
-      "issuer": "https://trust.acme.example.com",
-      "issued_at": "2026-01-01T00:00:00Z",
-      "expires_at": "2027-01-01T00:00:00Z"
-    }
-  }
-}
-```
-
-### 10.4 Data Classification
+### 10.1 Data Classification
 
 The `data_classification` member declares the sensitivity and categories of data the agent may access, process, or produce. **REQUIRED.** Value **MUST** be an object.
 
@@ -786,6 +751,182 @@ Example (top-level and tool-level data classification demonstrating the high-wat
 ```
 
 The top-level `sensitivity` of `"confidential"` satisfies the high-water mark rule: it equals the highest tool-level value (`"confidential"` for `get_invoice_details`).
+
+### 10.2 Attestation
+
+The `security.attestation` member declares cryptographic attestation of the passport. **OPTIONAL.** When present, value **MUST** be an object that **MAY** contain `type` (one of `self`, `third_party`, `verifiable_credential`), `issuer`, `issued_at`, `expires_at` (ISO 8601), and `signature` (object). Implementations **SHOULD** warn when `expires_at` is in the past or within 30 days.
+
+**Signature object:** When present, **MUST** contain `algorithm`, `value` (Base64url-encoded), `signed_content` (`"canonical"` or `"digest"`). When `signed_content` is `"digest"`, **MUST** also include `digest_algorithm` and `digest_value`. Supported algorithms include Ed25519 (RECOMMENDED), Ed448, ES256/384/512, RS256, PS256 (RSA ≥ 2048). Verification: remove signature, serialize with JCS [RFC8785], verify digest if applicable, resolve public key from `cryptographic_identity`, verify signature.
+
+Example:
+
+```json
+{
+  "security": {
+    "attestation": {
+      "type": "third_party",
+      "issuer": "https://trust.acme.example.com",
+      "issued_at": "2026-01-01T00:00:00Z",
+      "expires_at": "2027-01-01T00:00:00Z"
+    }
+  }
+}
+```
+
+### 10.3 Authentication
+
+ADL defines authentication at two complementary boundaries:
+
+1. **Agent-to-agent.** When one ADL agent calls another, both sides authenticate using cryptographically signed passports (§10.3.1) and per-request presentation proofs (§10.3.2). This path establishes identity for autonomous agent meshes where no shared OAuth 2.1 authorization server exists.
+
+2. **Human or external service to agent.** When a human user, an OAuth 2.1 client, or an external service calls an ADL agent, the agent authenticates that party using standard credential schemes — OAuth 2.1 [RFC9700], OIDC [OPENID-CONNECT], mTLS [RFC8705], or API keys (§10.3.3).
+
+The two paths compose. A human's OAuth 2.1 access token authenticates their session at the agent boundary; the receiving agent then presents its own passport plus proof to upstream agents it calls on the human's behalf. ADL does not replace OAuth 2.1 — it adds the agent-identity layer that OAuth 2.1's resource-server protocol does not specify, and integrates cleanly with OAuth 2.1 at the human and external-service boundary.
+
+The `security.authentication` member of an ADL document is declarative: it advertises which credential scheme (§10.3.3) external clients use to reach the agent. The procedures in §10.3.1 (Passport Verification) and §10.3.2 (Presentation Proof) are procedural rather than declarative — they describe what counterparties **MUST** do when receiving an ADL passport, and apply regardless of whether `security.authentication` is present.
+
+#### 10.3.1 Passport Verification & 10.3.2 Presentation Proof
+
+The agent-to-agent authentication procedures — **passport verification** (§10.3.1) and **presentation proof** (§10.3.2) — are normatively defined in the companion [**ADL Trust Protocol**](/protocol). They specify what a counterparty **MUST** do when receiving and acting on an ADL passport, and what a presenter **MUST** do to bind a passport to a specific request. These procedures retain their original §10.3.1 / §10.3.2 section numbers in the Trust Protocol so that conformance vectors and verification-outcome identifiers remain stable. The credential schemes below (§10.3.3) cover the complementary human and external-service boundary.
+
+#### 10.3.3 Credential Schemes
+
+The `security.authentication` member declares the credential scheme that human users, OAuth 2.1 clients, or external services use when calling the agent. It is the OAuth-2.1-aligned (and OAuth-2.1-adjacent) surface of ADL — the `did:web`-and-passport machinery in §10.3.1 and §10.3.2 covers agent-to-agent identity, while §10.3.3 covers the human-and-external-service boundary.
+
+`security.authentication` is **OPTIONAL**. When present, value **MUST** be an object that **MAY** contain `type` (one of `none`, `api_key`, `oauth2`, `oidc`, `mtls`) and `required` (bool). Type-specific members **MAY** be present.
+
+##### 10.3.3.1 OAuth 2.1 (`type: "oauth2"`)
+
+When `type` is `"oauth2"`, the agent acts as an OAuth 2.1 [RFC9700] resource server. The following members **SHOULD** be declared so clients can integrate without out-of-band configuration:
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `token_endpoint` | string (HTTPS URI) | OAuth 2.1 token endpoint URL |
+| `authorization_endpoint` | string (HTTPS URI) | OAuth 2.1 authorization endpoint URL (for grant types that require user interaction) |
+| `scopes` | array of strings | Scopes the agent recognizes; clients **MUST** request only declared scopes |
+| `grant_types_supported` | array of strings | Subset of `["authorization_code", "client_credentials", "refresh_token"]` (the grant types OAuth 2.1 recommends) |
+| `pkce_required` | boolean | Whether the agent requires PKCE [RFC7636] for the authorization-code grant. **SHOULD** be `true`; OAuth 2.1 mandates PKCE for public clients and **RECOMMENDS** it for confidential clients |
+| `dpop_required` | boolean | Whether the agent requires DPoP [RFC9449] sender-constrained tokens. **SHOULD** be `true` for deployments handling `confidential` or `restricted` data classification (§10.1) |
+
+Agents **SHOULD NOT** issue or accept OAuth 2.0 implicit-grant or password-grant tokens; OAuth 2.1 deprecates both.
+
+##### 10.3.3.2 OpenID Connect (`type: "oidc"`)
+
+When `type` is `"oidc"`, the agent acts as an OpenID Connect relying party for end-user authentication on top of OAuth 2.1. The following members **SHOULD** be declared:
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `issuer` | string (HTTPS URI) | OIDC issuer identifier (the `iss` value in ID tokens) |
+| `audience` | string | The agent's audience identifier (the `aud` value clients **MUST** request) |
+| `scopes` | array of strings | OIDC scopes the agent requires (typically includes `openid`; **MAY** include `profile`, `email`, etc.) |
+| `userinfo_endpoint` | string (HTTPS URI) | UserInfo endpoint (when the agent fetches additional claims) |
+
+OIDC inherits OAuth 2.1's PKCE and DPoP requirements; the same recommendations from §10.3.3.1 apply.
+
+##### 10.3.3.3 Mutual TLS (`type: "mtls"`)
+
+When `type` is `"mtls"`, the agent requires X.509 client certificates per [RFC8705]. The following members **SHOULD** be declared:
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `accepted_issuers` | array of strings | DNs (Distinguished Names) or URIs of CAs the agent accepts |
+| `required_san` | string | Required Subject Alternative Name pattern (e.g., URI form) when applicable |
+
+mTLS is **RECOMMENDED** for service-to-service deployments where a client-credential OAuth 2.1 flow would require unnecessary token-exchange machinery.
+
+##### 10.3.3.4 API Key (`type: "api_key"`)
+
+When `type` is `"api_key"`, the agent accepts a static or rotating shared secret. The following members **SHOULD** be declared:
+
+| Member | Type | Description |
+|--------|------|-------------|
+| `header_name` | string | HTTP header carrying the key (default: `Authorization` with `Bearer` prefix; common alternatives: `X-API-Key`) |
+| `rotation_policy_uri` | string (HTTPS URI) | Reference to the operational rotation policy for the key |
+
+API keys **SHOULD NOT** be used for `confidential` or `restricted` data classification (§10.1) without compensating controls (mTLS at the network layer, IP allowlisting, per-request HMAC). OAuth 2.1 with DPoP is the **RECOMMENDED** alternative.
+
+##### 10.3.3.5 Composition with §10.3.1 / §10.3.2
+
+When an agent that declares `security.authentication` (§10.3.3) calls a peer agent, two authentications happen end-to-end:
+
+1. The **calling client** (human, OAuth 2.1 client, or external service) presents a §10.3.3 credential to authenticate at the agent's request boundary.
+2. The **agent itself** presents its own ADL passport (§10.3.1) plus presentation proof (§10.3.2) to the peer agent it calls upstream.
+
+These are independent authentications. A failed §10.3.3 check **MUST NOT** bypass §10.3.1 verification of any upstream agent the request reaches; conversely, a successful §10.3.1 verification **MUST NOT** be treated as authentication of a non-agent caller. Implementations **MUST** record both authentications in the audit trail when both apply.
+
+Example:
+
+```json
+{
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "token_endpoint": "https://auth.acme.example.com/oauth/token",
+      "authorization_endpoint": "https://auth.acme.example.com/oauth/authorize",
+      "scopes": ["invoices:read", "invoices:write"],
+      "grant_types_supported": ["authorization_code", "client_credentials"],
+      "pkce_required": true,
+      "dpop_required": true
+    }
+  }
+}
+```
+
+### 10.4 Authorization Scopes
+
+Authentication (§10.3) establishes *who* a counterparty is. Authorization (§10.4) establishes *what they may do*. ADL adopts scope-based authorization aligned with OAuth 2.1 [RFC9700]: the agent declares scope requirements at the root level and per-tool, and a counterparty's request is authorized only if its presented scope set covers every scope the targeted resource requires.
+
+Scopes apply uniformly across both authentication paths defined in §10.3:
+
+- **Human or external service to agent** (§10.3.3): scopes are presented in the OAuth 2.1 access token, OIDC ID token, or equivalent credential.
+- **Agent to agent** (§10.3.1 + §10.3.2): scopes are presented in the presentation proof's `scopes` member (§10.3.2.2), bound cryptographically to the request.
+
+The two paths use the same scope vocabulary, the same inheritance and override rules, and the same effective-scope computation. They diverge only in *how* the requesting scope set arrives at the verifier.
+
+#### 10.4.1 Scope Declaration
+
+ADL adds two scope-declaration members:
+
+| Member | Location | Type | Required | Description |
+|--------|----------|------|----------|-------------|
+| `security.scopes` | root | array of strings | OPTIONAL | Default required scopes for the agent. Acts as the agent's scope **ceiling** when the agent itself is making upstream calls (see §10.4.4). |
+| `tools[*].security.scopes` | per tool | array of strings | OPTIONAL | Required scopes to invoke this specific tool. Overrides the root default for this tool. |
+
+Each scope value **MUST** be a non-empty string matching the OAuth 2.1 scope grammar: visible ASCII characters excluding double-quote and backslash, separated where needed by single space characters per [RFC6749] §3.3. The recommended convention is `<resource>:<action>` (e.g., `invoices:read`, `documents:write`), and ADL validators **SHOULD** warn on values that do not follow the convention. Scopes prefixed with `adl:` are reserved for future spec-defined values.
+
+Scope declarations are meaningful when the authentication path supports scope assertion: OAuth 2.1, OIDC, and presentation proofs (§10.3.2). For non-scope-bearing credentials (`api_key`, `mtls`), implementations **MUST** treat scope declarations as advisory unless the credential is augmented out-of-band (e.g., an API key bound to a server-side scope record).
+
+#### 10.4.2 Inheritance and Override
+
+The inheritance rule is **override-on-presence**, not augment:
+
+- If a tool **omits** `tools[*].security.scopes`, the root `security.scopes` applies for that tool.
+- If a tool **declares** `tools[*].security.scopes` (including an empty array), that declaration **completely replaces** the root scope set for that tool.
+- An empty array (`"scopes": []`) at tool level explicitly means "this tool requires no scopes" and **MUST** be treated as a deliberate downgrade, not an oversight.
+
+Validators **SHOULD** warn when a tool's declared scope set introduces values not present in the root `security.scopes`, since this expands the agent's stated capability surface beyond what the root advertises. Validators **MAY** support a strict mode that rejects such expansions.
+
+#### 10.4.3 Authorization Enforcement
+
+The procedures for enforcing these scope declarations — human-to-agent authorization, agent-to-agent authorization (including the passport-ceiling subset check), multi-hop composition, and effective-scope computation — are normatively defined in the companion [**ADL Trust Protocol**](/protocol#104-authorization-enforcement-procedures), retaining their original §10.4.3–§10.4.8 section numbers. Scope *declaration* and *inheritance* (§10.4.1–§10.4.2) are part of ADL Core; their *enforcement* is part of ADL Trust.
+
+### 10.5 Encryption
+
+The `security.encryption` member declares channel and at-rest encryption requirements. **OPTIONAL.** When present, value **MUST** be an object that **MAY** contain `in_transit` (`required`, `min_version`) and `at_rest` (`required`, `algorithm`).
+
+Example:
+
+```json
+{
+  "security": {
+    "encryption": {
+      "in_transit": { "required": true, "min_version": "TLS1.3" },
+      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
+    }
+  }
+}
+```
 
 ---
 
@@ -1322,7 +1463,7 @@ IANA is requested to register the `adl` URN namespace identifier in the "Formal 
 - **Purpose:** The `urn:adl:` namespace provides persistent, location-independent identifiers for ADL agents, profiles, and related artifacts. These identifiers are intended for use in offline catalogs, air-gapped environments, and internal registries where network resolution is unavailable. For connected environments, HTTPS URIs (Section 6.1) are the **RECOMMENDED** identifier format.
 - **Syntax:** URNs in this namespace conform to the following structure: `urn:adl:{type}:{namespace}:{name}:{version}` where `{type}` is one of `agent` or `profile`, `{namespace}` is a lowercase alphanumeric organization identifier, `{name}` is a lowercase alphanumeric resource name with hyphens, and `{version}` is a semantic version string. The formal syntax is defined by the `adl-urn` production in Appendix D.
 - **Assignment:** Sub-namespace assignment under `urn:adl:profile:` is governed by the ADL Profile Registry (Section 17.2). Sub-namespace assignment under `urn:adl:agent:` is at the discretion of the namespace holder; no central registry is required for agent URNs.
-- **Security and Privacy:** URN identifiers in this namespace are opaque strings and carry no inherent security properties. Implementations **MUST NOT** infer ownership, trust, or authorization from a `urn:adl:` identifier alone. Verification of agent identity **MUST** rely on the mechanisms described in Section 6.3 (Cryptographic Identity) and Section 10.3 (Attestation). See Section 18 for comprehensive security considerations.
+- **Security and Privacy:** URN identifiers in this namespace are opaque strings and carry no inherent security properties. Implementations **MUST NOT** infer ownership, trust, or authorization from a `urn:adl:` identifier alone. Verification of agent identity **MUST** rely on the mechanisms described in Section 6.3 (Cryptographic Identity) and Section 10.2 (Attestation). See Section 18 for comprehensive security considerations.
 
 ### 17.4 Well-Known URI
 
@@ -1394,15 +1535,15 @@ Publishers **SHOULD** review ADL documents for personally identifiable informati
 
 ### 18.10 Privilege Escalation
 
-An ADL document that has been modified — whether by a malicious actor during transmission or by a compromised storage or distribution system — could grant an agent permissions or capabilities beyond those that were reviewed and approved for deployment. This risk is the primary motivator for the integrity mechanisms described in Section 10.3.
+An ADL document that has been modified — whether by a malicious actor during transmission or by a compromised storage or distribution system — could grant an agent permissions or capabilities beyond those that were reviewed and approved for deployment. This risk is the primary motivator for the integrity mechanisms described in Section 10.2.
 
-Implementations **SHOULD** verify document integrity (Section 10.3) before enforcing the permissions declared in a document, particularly when documents are retrieved from network locations, shared storage systems, or public registries. Runtimes that cannot verify document integrity **SHOULD** apply compensating controls — such as mandatory human review — before deploying agents that declare elevated permissions or sensitive data access. When a document's `data_classification.sensitivity` is `confidential` or `restricted`, runtimes **SHOULD** require a verified signature or a verified supply chain (e.g., document retrieved from a trusted registry over an authenticated and integrity-protected channel) before provisioning. Organizations **SHOULD** maintain an inventory of approved ADL documents along with their expected signatures or cryptographic digests, and **SHOULD** treat any discrepancy between the recorded and observed document as a potential security incident.
+Implementations **SHOULD** verify document integrity (Section 10.2) before enforcing the permissions declared in a document, particularly when documents are retrieved from network locations, shared storage systems, or public registries. Runtimes that cannot verify document integrity **SHOULD** apply compensating controls — such as mandatory human review — before deploying agents that declare elevated permissions or sensitive data access. When a document's `data_classification.sensitivity` is `confidential` or `restricted`, runtimes **SHOULD** require a verified signature or a verified supply chain (e.g., document retrieved from a trusted registry over an authenticated and integrity-protected channel) before provisioning. Organizations **SHOULD** maintain an inventory of approved ADL documents along with their expected signatures or cryptographic digests, and **SHOULD** treat any discrepancy between the recorded and observed document as a potential security incident.
 
 ### 18.11 Cross-Origin and Supply Chain Concerns
 
 ADL documents may be fetched from remote sources: registries, source control systems, artifact stores, or agent marketplaces. A document tampered with in transit or at the origin could cause a runtime to provision a malicious agent without the operator's knowledge.
 
-ADL documents **SHOULD** be fetched over authenticated, integrity-protected channels (HTTPS with full certificate validation). Implementations **SHOULD** verify document signatures (Section 10.3) when documents are retrieved from remote or third-party sources. Implementations **SHOULD** validate that the signing identity declared in `cryptographic_identity` matches an expected, trusted identity for the document's declared `provider`.
+ADL documents **SHOULD** be fetched over authenticated, integrity-protected channels (HTTPS with full certificate validation). Implementations **SHOULD** verify document signatures (Section 10.2) when documents are retrieved from remote or third-party sources. Implementations **SHOULD** validate that the signing identity declared in `cryptographic_identity` matches an expected, trusted identity for the document's declared `provider`.
 
 Supply chain integrity requires attention at every reference boundary: the ADL document itself, referenced OpenAPI specifications (`openapi_ref`), and external JSON Schemas (`$schema`). Implementations that automatically resolve external references during provisioning **SHOULD** pin or verify all such references. When accepting ADL documents from third-party sources, implementations **SHOULD** apply an allowlist of trusted providers (based on `provider.name` or `id` URI authority), verify attestation signatures from trusted issuers, and treat documents from unverified sources with the same caution applied to untrusted executable code.
 
