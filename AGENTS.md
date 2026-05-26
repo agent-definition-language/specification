@@ -37,18 +37,17 @@ All commands run from `site/`:
 
 ```bash
 cd site && npm install        # Install deps (Node >= 18)
-npm run dev                   # Local dev server
-npm run build                 # Full build: sync-spec → prebuild → docusaurus build
-npm run sync-spec             # Sync versions/ content (examples, snippets) to site
-npm run prebuild              # Convert YAML sources to JSON for site consumption
+npm run dev                   # Local dev server (http://localhost:3000)
+npm run build                 # Production build (static site + llms.txt)
+npm run serve                 # Serve the built site
 npm run typecheck             # TypeScript type checking
 ```
 
+The site uses the Rspack bundler via `future.v4: true` in `docusaurus.config.ts`, which requires `@docusaurus/faster` as a direct dep.
+
 ### Build pipeline
 
-1. **`sync-spec`** reads `versions/manifest.yaml`, copies examples and snippets from `versions/{id}/` to `site/_yaml-sources/{id}/`
-2. **`prebuild`** converts YAML source files to JSON
-3. **`docusaurus build`** generates the static site (includes `llms.txt` generation via plugin)
+Content is consumed directly from `versions/` at build time via the `spec-version-bridge` plugin (`site/src/plugins/spec-version-bridge.ts`) — no separate sync/prebuild step. `docusaurus build` produces the static site, and the `@signalwire/docusaurus-plugin-llms-txt` plugin generates `llms.txt`.
 
 CI (`ci.yml`) runs on pushes/PRs to `main` touching `site/`, `versions/`, or the workflow. It validates the full build and checks `llms.txt` is non-placeholder.
 
