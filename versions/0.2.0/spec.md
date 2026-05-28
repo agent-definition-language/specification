@@ -1,6 +1,7 @@
 ---
 id: specification
 slug: /
+displayed_sidebar: null
 title: "Agent Definition Language Specification"
 description: "The complete ADL v0.2.0 specification — defining agent identity, permissions, lifecycle, compliance, and governance in a machine-readable format."
 keywords: [adl, specification, agent definition language, ai agent, agentic ai, agentic, ai governance, ai safety, ai compliance, agent permissions, agent lifecycle, multi-agent, trustworthy ai, responsible ai]

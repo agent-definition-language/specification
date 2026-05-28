@@ -1,6 +1,7 @@
 ---
 id: specification
 slug: /
+displayed_sidebar: null
 title: Agent Definition Language Specification
 sidebar_position: 1
 ---
