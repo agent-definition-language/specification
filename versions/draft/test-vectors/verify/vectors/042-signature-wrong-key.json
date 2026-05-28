@@ -1,8 +1,8 @@
 {
   "id": "042-signature-wrong-key",
-  "description": "Passport signed by a key that does not match the inline public_key. MUST block at §10.3.1.5 (signature does not verify).",
+  "description": "Passport signed by a key that does not match the inline public_key. MUST block at §1.1.5 (signature does not verify).",
   "spec_sections": [
-    "10.3.1.5"
+    "1.1.5"
   ],
   "input": {
     "passport": {
@@ -92,10 +92,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.5",
+    "blocked_at_section": "1.1.5",
     "step_outcomes": [
       {
-        "section": "10.3.1.5",
+        "section": "1.1.5",
         "passed": false,
         "severity": "block"
       }

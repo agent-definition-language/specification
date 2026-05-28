@@ -2,7 +2,7 @@
   "id": "080-classification-requesting-too-low",
   "description": "Requesting agent's data_classification.sensitivity (public) is lower than the target agent's (confidential). MUST block at §10.3.9.",
   "spec_sections": [
-    "10.3.1.9"
+    "1.1.9"
   ],
   "input": {
     "passport": {
@@ -162,10 +162,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.9",
+    "blocked_at_section": "1.1.9",
     "step_outcomes": [
       {
-        "section": "10.3.1.9",
+        "section": "1.1.9",
         "passed": false,
         "severity": "block"
       }

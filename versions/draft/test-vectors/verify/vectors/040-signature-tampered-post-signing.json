@@ -2,7 +2,7 @@
   "id": "040-signature-tampered-post-signing",
   "description": "Passport modified after signing (added allowed_host). The signature MUST fail verification at §10.3.5.",
   "spec_sections": [
-    "10.3.1.5"
+    "1.1.5"
   ],
   "input": {
     "passport": {
@@ -93,10 +93,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.5",
+    "blocked_at_section": "1.1.5",
     "step_outcomes": [
       {
-        "section": "10.3.1.5",
+        "section": "1.1.5",
         "passed": false,
         "severity": "block"
       }

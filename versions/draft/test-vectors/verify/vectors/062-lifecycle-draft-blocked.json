@@ -1,8 +1,8 @@
 {
   "id": "062-lifecycle-draft-blocked",
-  "description": "Passport with lifecycle.status='draft' MUST be blocked at §10.3.1.7 — production runtimes refuse draft agents.",
+  "description": "Passport with lifecycle.status='draft' MUST be blocked at §1.1.7 — production runtimes refuse draft agents.",
   "spec_sections": [
-    "10.3.1.7"
+    "1.1.7"
   ],
   "input": {
     "passport": {
@@ -92,10 +92,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.7",
+    "blocked_at_section": "1.1.7",
     "step_outcomes": [
       {
-        "section": "10.3.1.7",
+        "section": "1.1.7",
         "passed": false,
         "severity": "block"
       }

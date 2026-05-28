@@ -1,8 +1,8 @@
 {
   "id": "004-retrieval-missing-authority",
-  "description": "Passport retrieved over network without a recorded authority MUST fail §10.3.1.1 — no trust anchor can be established.",
+  "description": "Passport retrieved over network without a recorded authority MUST fail §1.1.1 — no trust anchor can be established.",
   "spec_sections": [
-    "10.3.1.1"
+    "1.1.1"
   ],
   "input": {
     "passport": {
@@ -92,10 +92,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "none",
-    "blocked_at_section": "10.3.1.1",
+    "blocked_at_section": "1.1.1",
     "step_outcomes": [
       {
-        "section": "10.3.1.1",
+        "section": "1.1.1",
         "passed": false,
         "severity": "block"
       }

@@ -16,7 +16,7 @@ The PEP is a **role, not a product.** The verification it runs is exactly the pr
 
 ## Where the PEP can live
 
-The same verification — passport ([§10.3.1](/protocol#1031-passport-verification-procedure)), proof ([§10.3.2](/protocol#1032-presentation-proof)), credential schemes ([§10.3.3](/spec/next#1033-credential-schemes)), scopes ([§10.4](/spec/next#104-authorization-scopes)) — can be hosted in several shapes. They differ not in *what* they verify but in how much of the agent's runtime semantics they can see and enforce alongside the identity check:
+The same verification — passport ([§1.1](/protocol#11-passport-verification-procedure)), proof ([§1.2](/protocol#12-presentation-proof)), credential schemes ([§10.3.3](/spec/next#1033-credential-schemes)), scopes ([§10.4](/spec/next#104-authorization-scopes)) — can be hosted in several shapes. They differ not in *what* they verify but in how much of the agent's runtime semantics they can see and enforce alongside the identity check:
 
 | Host shape | What it is | Agent-native fit | When to reach for it |
 |------------|------------|------------------|----------------------|
@@ -29,7 +29,7 @@ The verification procedure in the lifecycle below is written for the PEP role an
 
 ## What the PEP is, and is not
 
-- **It is** the verifier: it runs passport verification ([§10.3.1](/protocol#1031-passport-verification-procedure)), presentation-proof verification ([§10.3.2](/protocol#1032-presentation-proof)), the delegation/principal checks that ride in the proof ([§10.4.5](/protocol#1045-composition-across-boundaries-multi-hop-authorization)), credential-scheme validation for human callers ([§10.3.3](/spec/next#1033-credential-schemes)), and scope authorization ([§10.4](/spec/next#104-authorization-scopes)). It holds the replay cache ([§10.3.2](/protocol#1032-presentation-proof)), issues step-up nonces, applies the provider allowlist and attestation requirements, and gates on data classification ([§10.3.1.9](/protocol#10319-permission-and-classification-compatibility)).
+- **It is** the verifier: it runs passport verification ([§1.1](/protocol#11-passport-verification-procedure)), presentation-proof verification ([§1.2](/protocol#12-presentation-proof)), the delegation/principal checks that ride in the proof ([§2.3](/protocol#23-composition-across-boundaries-multi-hop-authorization)), credential-scheme validation for human callers ([§10.3.3](/spec/next#1033-credential-schemes)), and scope authorization ([§10.4](/spec/next#104-authorization-scopes)). It holds the replay cache ([§1.2](/protocol#12-presentation-proof)), issues step-up nonces, applies the provider allowlist and attestation requirements, and gates on data classification ([§1.1.9](/protocol#119-permission-and-classification-compatibility)).
 - **It is not** the root of trust. Proofs and delegation links are signed end-to-end by the real principals and agents; the PEP *verifies* that cryptographic chain, it does not *mint* it. The chain remains independently verifiable even if you bypass the PEP. A PEP that starts re-signing or vouching for identities it did not verify has reinvented a central authorization server — the exact thing the [passport + proof model](/spec/next#103-authentication) avoids.
 
 ## Illustrated through a scenario
@@ -54,13 +54,13 @@ A single inbound request from the Procurement Agent — "reserve 500 units of SK
 The PEP terminates TLS and inspects the request. It classifies the caller by what it presents:
 
 - **Human / OAuth client** → `Authorization: Bearer …` (+ `DPoP`): take the [§10.3.3](/spec/next#1033-credential-schemes) credential-scheme path.
-- **Peer agent** → `X-ADL-Passport` + `X-ADL-Proof` headers: take the [§10.3.1](/protocol#1031-passport-verification-procedure) + [§10.3.2](/protocol#1032-presentation-proof) path.
+- **Peer agent** → `X-ADL-Passport` + `X-ADL-Proof` headers: take the [§1.1](/protocol#11-passport-verification-procedure) + [§1.2](/protocol#12-presentation-proof) path.
 
 This is the same "two front doors, one edge" idea as [Exposing Agents](./exposing-agents) — but here the doors are two branches of one PEP.
 
 ### 2. Authenticate (agent path)
 
-The PEP runs the full [§10.3.1](/protocol#1031-passport-verification-procedure) verification on the Procurement Agent's passport — [retrieval integrity](/protocol#10311-retrieval-integrity), [schema](/protocol#10312-schema-validation), [`did:web` resolution](/protocol#10313-identity-resolution), [key cross-check](/protocol#10314-public-key-cross-check), [signature](/protocol#10315-signature-verification), [temporal validity](/protocol#10316-temporal-validity), [lifecycle](/protocol#10317-lifecycle-gating), [provider coherence](/protocol#10318-provideridentity-coherence) — then [§10.3.2 proof verification](/protocol#10326-verification-procedure): the proof must be **bound to the PEP's public URL** (`https://api.northwind.example/...`), within its temporal window, and its `jti` not in the replay cache.
+The PEP runs the full [§1.1](/protocol#11-passport-verification-procedure) verification on the Procurement Agent's passport — [retrieval integrity](/protocol#111-retrieval-integrity), [schema](/protocol#112-schema-validation), [`did:web` resolution](/protocol#113-identity-resolution), [key cross-check](/protocol#114-public-key-cross-check), [signature](/protocol#115-signature-verification), [temporal validity](/protocol#116-temporal-validity), [lifecycle](/protocol#117-lifecycle-gating), [provider coherence](/protocol#118-provideridentity-coherence) — then [§1.2 proof verification](/protocol#126-verification-procedure): the proof must be **bound to the PEP's public URL** (`https://api.northwind.example/...`), within its temporal window, and its `jti` not in the replay cache.
 
 ### 3. Authenticate (human path)
 
@@ -68,26 +68,26 @@ For Dana's console request, the PEP validates the OIDC token and DPoP binding ([
 
 ### 4. Principal and delegation
 
-When the Procurement Agent acts on behalf of a human buyer, the principal and the chain of agents that carried the authority ride in the proof and are verified here. The PEP checks that the exercised scopes are within the principal's grant and narrow monotonically down the chain — the on-edge enforcement of the [§10.4.5 composition rules](/protocol#1045-composition-across-boundaries-multi-hop-authorization). The PEP is where an organization sets its policy for *requiring* a principal chain (regulated/high-value routes) versus accepting agent identity alone (low-stakes routes).
+When the Procurement Agent acts on behalf of a human buyer, the principal and the chain of agents that carried the authority ride in the proof and are verified here. The PEP checks that the exercised scopes are within the principal's grant and narrow monotonically down the chain — the on-edge enforcement of the [§2.3 composition rules](/protocol#23-composition-across-boundaries-multi-hop-authorization). The PEP is where an organization sets its policy for *requiring* a principal chain (regulated/high-value routes) versus accepting agent identity alone (low-stakes routes).
 
 ### 5. Authorize
 
 The PEP computes the effective authority and checks it against the targeted route:
 
-- **Scope** ([§10.4](/spec/next#104-authorization-scopes)): the proof's requested scopes must be within the agent's [ceiling](/protocol#1044-authorization-in-agent-to-agent-flows) and cover the route's required scopes (`inventory:reserve` for the reserve endpoint).
-- **Classification** ([§10.1](/spec/next#101-data-classification) / [§10.3.1.9](/protocol#10319-permission-and-classification-compatibility)): the caller must be cleared for the data the route returns.
-- **Native policy**: rate limits, quotas, IP allowlists, and the [provider allowlist](/protocol#10318-provideridentity-coherence) — Northwind only does business with attested, allowlisted partners.
+- **Scope** ([§10.4](/spec/next#104-authorization-scopes)): the proof's requested scopes must be within the agent's [ceiling](/protocol#22-authorization-in-agent-to-agent-flows) and cover the route's required scopes (`inventory:reserve` for the reserve endpoint).
+- **Classification** ([§10.1](/spec/next#101-data-classification) / [§1.1.9](/protocol#119-permission-and-classification-compatibility)): the caller must be cleared for the data the route returns.
+- **Native policy**: rate limits, quotas, IP allowlists, and the [provider allowlist](/protocol#118-provideridentity-coherence) — Northwind only does business with attested, allowlisted partners.
 
 ### 6. Route over the internal trust domain
 
 Once verified, the PEP forwards the request to the backing agent (`inventory.svc.northwind.internal`). Two consequences worth being explicit about:
 
-- **The proof is not forwarded for re-verification.** It was bound to the PEP's public URL (`https://api.northwind.example/...`), not the internal service URL, so forwarding it verbatim would fail the [request-binding check](/protocol#10326-verification-procedure). The PEP is the verification boundary; the internal hop is a separate trust domain secured by its own means (mTLS, SPIFFE/SVID, network policy).
+- **The proof is not forwarded for re-verification.** It was bound to the PEP's public URL (`https://api.northwind.example/...`), not the internal service URL, so forwarding it verbatim would fail the [request-binding check](/protocol#126-verification-procedure). The PEP is the verification boundary; the internal hop is a separate trust domain secured by its own means (mTLS, SPIFFE/SVID, network policy).
 - **The PEP passes the verified context forward**, typically as signed headers (the authenticated agent id, the principal, the granted scopes, a request id) so the backing agent can make fine-grained decisions and keep its own audit without re-running verification. In a zero-trust internal network, backing agents MAY still require their own proofs — defense in depth.
 
 ### 7. Audit
 
-The PEP emits one provenance record per request — the authenticated identity, the principal and delegation chain, the effective scopes, the route, and the outcome — correlated by request id. Because the PEP is a single chokepoint, this is the cleanest place to satisfy the audit-recording obligation that the [§10.4.5 composition rules](/protocol#1045-composition-across-boundaries-multi-hop-authorization) place on multi-hop authorization.
+The PEP emits one provenance record per request — the authenticated identity, the principal and delegation chain, the effective scopes, the route, and the outcome — correlated by request id. Because the PEP is a single chokepoint, this is the cleanest place to satisfy the audit-recording obligation that the [§2.3 composition rules](/protocol#23-composition-across-boundaries-multi-hop-authorization) place on multi-hop authorization.
 
 ## Why a generic API gateway is the wrong default
 
@@ -106,7 +106,7 @@ So the recommendation hierarchy: keep inbound verification **where the agent sem
 
 ### Proof bound to the wrong URL
 
-A client signs a proof for the backing agent's *internal* URL (or an old endpoint) instead of the PEP's public URL. The [request-binding check](/protocol#10326-verification-procedure) rejects it — the proof's `request.uri` does not match the URL the caller actually hit. The fix is client-side: bind proofs to the public PEP URL.
+A client signs a proof for the backing agent's *internal* URL (or an old endpoint) instead of the PEP's public URL. The [request-binding check](/protocol#126-verification-procedure) rejects it — the proof's `request.uri` does not match the URL the caller actually hit. The fix is client-side: bind proofs to the public PEP URL.
 
 ### Bypass attempt — calling a backing agent directly
 
@@ -114,7 +114,7 @@ An attacker who learns `inventory.svc.northwind.internal` tries to reach it dire
 
 ### Replay against a different PEP node
 
-A captured proof is replayed against a second PEP instance. Without a shared replay cache it could slip through; with one (the recommended deployment), the `jti` is already recorded and the [replay check](/protocol#10326-verification-procedure) rejects it. This is why the replay cache MUST be shared across PEP instances, not per-node.
+A captured proof is replayed against a second PEP instance. Without a shared replay cache it could slip through; with one (the recommended deployment), the `jti` is already recorded and the [replay check](/protocol#126-verification-procedure) rejects it. This is why the replay cache MUST be shared across PEP instances, not per-node.
 
 ### Principal chain required but absent
 
@@ -129,14 +129,14 @@ If the PEP is configured to re-sign requests as itself or to vouch for unverifie
 | PEP operation | Spec section |
 |---------------|--------------|
 | Classify caller (human vs agent) | [§10.3](/spec/next#103-authentication) |
-| Verify peer-agent passport | [§10.3.1](/protocol#1031-passport-verification-procedure) (all steps) |
-| Verify presentation proof (binding, replay, nonce) | [§10.3.2](/protocol#10326-verification-procedure) |
+| Verify peer-agent passport | [§1.1](/protocol#11-passport-verification-procedure) (all steps) |
+| Verify presentation proof (binding, replay, nonce) | [§1.2](/protocol#126-verification-procedure) |
 | Validate human credential (OIDC/OAuth/mTLS) | [§10.3.3](/spec/next#1033-credential-schemes) |
-| Enforce principal / multi-hop composition | [§10.4.5](/protocol#1045-composition-across-boundaries-multi-hop-authorization) |
-| Authorize scopes (ceiling + route requirement) | [§10.4.4](/protocol#1044-authorization-in-agent-to-agent-flows) / [§10.4.3](/protocol#1043-authorization-in-human-to-agent-flows) |
+| Enforce principal / multi-hop composition | [§2.3](/protocol#23-composition-across-boundaries-multi-hop-authorization) |
+| Authorize scopes (ceiling + route requirement) | [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) / [§2.1](/protocol#21-authorization-in-human-to-agent-flows) |
 | Enforce resource / token / spend budgets | [§9.6](/spec/next#96-resource-limits) |
-| Provider allowlist / attestation requirement | [§10.3.1.8](/protocol#10318-provideridentity-coherence) / [§10.2](/spec/next#102-attestation) |
-| Classification gating | [§10.1](/spec/next#101-data-classification) / [§10.3.1.9](/protocol#10319-permission-and-classification-compatibility) |
+| Provider allowlist / attestation requirement | [§1.1.8](/protocol#118-provideridentity-coherence) / [§10.2](/spec/next#102-attestation) |
+| Classification gating | [§10.1](/spec/next#101-data-classification) / [§1.1.9](/protocol#119-permission-and-classification-compatibility) |
 | Discovery of the org's agents | [§6.4](/spec/next#64-discovery) |
 
 ## Related material

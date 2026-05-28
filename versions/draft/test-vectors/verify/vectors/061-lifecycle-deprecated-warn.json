@@ -1,8 +1,8 @@
 {
   "id": "061-lifecycle-deprecated-warn",
-  "description": "Passport with lifecycle.status='deprecated' produces a §10.3.1.7 warn outcome but still verifies overall.",
+  "description": "Passport with lifecycle.status='deprecated' produces a §1.1.7 warn outcome but still verifies overall.",
   "spec_sections": [
-    "10.3.1.7"
+    "1.1.7"
   ],
   "input": {
     "passport": {
@@ -97,7 +97,7 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.7",
+        "section": "1.1.7",
         "passed": true,
         "severity": "warn"
       }

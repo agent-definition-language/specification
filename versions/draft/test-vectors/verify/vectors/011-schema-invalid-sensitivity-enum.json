@@ -2,7 +2,7 @@
   "id": "011-schema-invalid-sensitivity-enum",
   "description": "Passport with non-enum `data_classification.sensitivity` value MUST fail schema validation.",
   "spec_sections": [
-    "10.3.1.2"
+    "1.1.2"
   ],
   "input": {
     "passport": {
@@ -92,10 +92,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "none",
-    "blocked_at_section": "10.3.1.2",
+    "blocked_at_section": "1.1.2",
     "step_outcomes": [
       {
-        "section": "10.3.1.2",
+        "section": "1.1.2",
         "passed": false,
         "severity": "block"
       }

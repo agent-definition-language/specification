@@ -1,8 +1,8 @@
 {
   "id": "051-attestation-near-expiry-warn",
-  "description": "Passport with expires_at within 30 days produces a §10.3.1.6 warn-level outcome (passed=true, severity=warn). Time-relative — regenerate when stale.",
+  "description": "Passport with expires_at within 30 days produces a §1.1.6 warn-level outcome (passed=true, severity=warn). Time-relative — regenerate when stale.",
   "spec_sections": [
-    "10.3.1.6"
+    "1.1.6"
   ],
   "input": {
     "passport": {
@@ -59,10 +59,10 @@
         "attestation": {
           "type": "self",
           "issued_at": "2026-04-01T00:00:00.000Z",
-          "expires_at": "2026-06-05T08:17:32.322Z",
+          "expires_at": "2026-06-07T06:03:04.151Z",
           "signature": {
             "algorithm": "Ed25519",
-            "value": "-VR_YKthkwc4YCJ7513ogWe4BHVe4g3tyxVaNcX6w67kcn7POzI6oFtbENiSrfyUnQ75DWbU8JK5HqKHTRmHCQ",
+            "value": "C_Ue3wmr7V6gpZBaSegaQ-oQ5HIT8Y041sdtjBcL9ZOQlWnSBoJLxGOkRNXYN_tWVRzOaUtbfKdugyxzL46tCQ",
             "signed_content": "canonical"
           }
         }
@@ -95,7 +95,7 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.6",
+        "section": "1.1.6",
         "passed": true,
         "severity": "warn"
       }

@@ -1,8 +1,8 @@
 {
   "id": "003-retrieval-local-file",
-  "description": "Passport loaded from a local file passes §10.3.1.1 with a warn-level outcome (provenance recorded; no transport security).",
+  "description": "Passport loaded from a local file passes §1.1.1 with a warn-level outcome (provenance recorded; no transport security).",
   "spec_sections": [
-    "10.3.1.1"
+    "1.1.1"
   ],
   "input": {
     "passport": {
@@ -94,7 +94,7 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.1",
+        "section": "1.1.1",
         "passed": true,
         "severity": "warn"
       }

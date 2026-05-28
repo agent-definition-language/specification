@@ -16,15 +16,15 @@ convention also indicates which §10.3 step the vector primarily exercises:
 
 | Range  | Section | Focus |
 |--------|---------|-------|
-| 000–009 | happy path / §10.3.1.1 | Valid passports and retrieval channel |
-| 010–019 | §10.3.1.2 | Schema validation failures |
-| 020–029 | §10.3.1.3 | Identity resolution (`did:web`) |
-| 030–039 | §10.3.1.4 | Public key cross-check |
-| 040–049 | §10.3.1.5 | Signature verification |
-| 050–059 | §10.3.1.6 | Temporal validity |
-| 060–069 | §10.3.1.7 | Lifecycle gating |
-| 070–079 | §10.3.1.8 | Provider–identity coherence |
-| 080–089 | §10.3.1.9 | Permission/classification compatibility |
+| 000–009 | happy path / §1.1.1 | Valid passports and retrieval channel |
+| 010–019 | §1.1.2 | Schema validation failures |
+| 020–029 | §1.1.3 | Identity resolution (`did:web`) |
+| 030–039 | §1.1.4 | Public key cross-check |
+| 040–049 | §1.1.5 | Signature verification |
+| 050–059 | §1.1.6 | Temporal validity |
+| 060–069 | §1.1.7 | Lifecycle gating |
+| 070–079 | §1.1.8 | Provider–identity coherence |
+| 080–089 | §1.1.9 | Permission/classification compatibility |
 
 ## Vector schema
 
@@ -37,7 +37,7 @@ convention also indicates which §10.3 step the vector primarily exercises:
   "description": "Self-signed passport with inline key passes verification under TOFU",
 
   // Required: the §10.3 subsection(s) this vector exercises.
-  "spec_sections": ["10.3.1.1", "10.3.1.2", "10.3.1.4", "10.3.1.5", "10.3.1.6", "10.3.1.7"],
+  "spec_sections": ["1.1.1", "1.1.2", "1.1.4", "1.1.5", "1.1.6", "1.1.7"],
 
   // Required: inputs to verifyPassport().
   "input": {
@@ -56,7 +56,7 @@ convention also indicates which §10.3 step the vector primarily exercises:
       "discovery_authority": null
     },
 
-    // Optional: the requesting agent's own passport, for §10.3.1.9 checks.
+    // Optional: the requesting agent's own passport, for §1.1.9 checks.
     "requesting_agent": null,
 
     // Optional: pre-canned responses for did:web resolution. Maps the
@@ -98,13 +98,13 @@ convention also indicates which §10.3 step the vector primarily exercises:
     // Implementations may include additional steps (e.g., warns), but
     // every entry here MUST appear with the specified pass/severity.
     "step_outcomes": [
-      { "section": "10.3.1.1", "passed": true,  "severity": "warn" },
-      { "section": "10.3.1.2", "passed": true,  "severity": "block" },
-      { "section": "10.3.1.3", "passed": true,  "severity": "warn" },
-      { "section": "10.3.1.4", "passed": true,  "severity": "warn" },
-      { "section": "10.3.1.5", "passed": true,  "severity": "block" },
-      { "section": "10.3.1.6", "passed": true,  "severity": "block" },
-      { "section": "10.3.1.7", "passed": true,  "severity": "block" }
+      { "section": "1.1.1", "passed": true,  "severity": "warn" },
+      { "section": "1.1.2", "passed": true,  "severity": "block" },
+      { "section": "1.1.3", "passed": true,  "severity": "warn" },
+      { "section": "1.1.4", "passed": true,  "severity": "warn" },
+      { "section": "1.1.5", "passed": true,  "severity": "block" },
+      { "section": "1.1.6", "passed": true,  "severity": "block" },
+      { "section": "1.1.7", "passed": true,  "severity": "block" }
     ]
   }
 }

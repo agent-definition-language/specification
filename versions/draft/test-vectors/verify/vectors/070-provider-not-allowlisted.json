@@ -2,7 +2,7 @@
   "id": "070-provider-not-allowlisted",
   "description": "requireProviderCoherence=true with a provider_allowlist that does not include the passport's provider host MUST block at §10.3.8.",
   "spec_sections": [
-    "10.3.1.8"
+    "1.1.8"
   ],
   "input": {
     "passport": {
@@ -94,10 +94,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.8",
+    "blocked_at_section": "1.1.8",
     "step_outcomes": [
       {
-        "section": "10.3.1.8",
+        "section": "1.1.8",
         "passed": false,
         "severity": "block"
       }

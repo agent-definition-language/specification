@@ -640,7 +640,7 @@ Example (complete permissions object):
 
 The `security` member defines security requirements. **OPTIONAL.** When present, value **MUST** be an object that **MAY** contain `authentication`, `encryption`, and `attestation`.
 
-Section 10 spans two ADL layers. The **declarative** members defined here in ADL Core — `data_classification` (§10.1), `attestation` (§10.2), the credential schemes (§10.3.3), and the scope declarations (§10.4.1–§10.4.2) — describe what an agent handles and what it advertises. The **procedural** members — passport verification (§10.3.1), presentation proof (§10.3.2), and authorization enforcement (§10.4.3–§10.4.8) — define what a counterparty **MUST** do with those declarations and are specified in the companion [**ADL Trust Protocol**](/protocol). The procedural sections retain their §10 numbers in the Trust Protocol so that conformance vectors and verification-outcome identifiers remain stable across the split.
+Section 10 spans two ADL layers. The **declarative** members defined here in ADL Core — `data_classification` (§10.1), `attestation` (§10.2), the credential schemes (§10.3.3), and the scope declarations (§10.4.1–§10.4.2) — describe what an agent handles and what it advertises. The **procedural** members — passport verification (§10.3.1), presentation proof (§10.3.2), and authorization enforcement (§10.4.3–§10.4.8) — define what a counterparty **MUST** do with those declarations and are specified in the companion [**ADL Trust Protocol**](/protocol), where they are numbered independently as §1 (Authentication) and §2 (Authorization).
 
 Section 10 is ordered to follow the dependency stack of the security model. Data Classification (§10.1) declares what the agent handles. Attestation (§10.2) signs the passport. Authentication (§10.3) defines how parties prove identity at runtime — agent-to-agent via passport verification (§10.3.1) and presentation proof (§10.3.2), and human or external services via OAuth 2.1, OIDC, mTLS, or API keys (§10.3.3). Authorization (§10.4) covers scope-based AuthZ. Encryption (§10.5) covers channel security.
 
@@ -788,7 +788,7 @@ The `security.authentication` member of an ADL document is declarative: it adver
 
 #### 10.3.1 Passport Verification & 10.3.2 Presentation Proof
 
-The agent-to-agent authentication procedures — **passport verification** (§10.3.1) and **presentation proof** (§10.3.2) — are normatively defined in the companion [**ADL Trust Protocol**](/protocol). They specify what a counterparty **MUST** do when receiving and acting on an ADL passport, and what a presenter **MUST** do to bind a passport to a specific request. These procedures retain their original §10.3.1 / §10.3.2 section numbers in the Trust Protocol so that conformance vectors and verification-outcome identifiers remain stable. The credential schemes below (§10.3.3) cover the complementary human and external-service boundary.
+The agent-to-agent authentication procedures — **passport verification** and **presentation proof** — are normatively defined in the companion [**ADL Trust Protocol**](/protocol) as §1.1 and §1.2. They specify what a counterparty **MUST** do when receiving and acting on an ADL passport, and what a presenter **MUST** do to bind a passport to a specific request. The credential schemes below (§10.3.3) cover the complementary human and external-service boundary.
 
 #### 10.3.3 Credential Schemes
 
@@ -910,7 +910,7 @@ Validators **SHOULD** warn when a tool's declared scope set introduces values no
 
 #### 10.4.3 Authorization Enforcement
 
-The procedures for enforcing these scope declarations — human-to-agent authorization, agent-to-agent authorization (including the passport-ceiling subset check), multi-hop composition, and effective-scope computation — are normatively defined in the companion [**ADL Trust Protocol**](/protocol#104-authorization-enforcement-procedures), retaining their original §10.4.3–§10.4.8 section numbers. Scope *declaration* and *inheritance* (§10.4.1–§10.4.2) are part of ADL Core; their *enforcement* is part of ADL Trust.
+The procedures for enforcing these scope declarations — human-to-agent authorization, agent-to-agent authorization (including the passport-ceiling subset check), multi-hop composition, and effective-scope computation — are normatively defined in the companion [**ADL Trust Protocol**](/protocol#2-authorization-enforcement-procedures) as §2.1–§2.6. Scope *declaration* and *inheritance* (§10.4.1–§10.4.2) are part of ADL Core; their *enforcement* is part of ADL Trust.
 
 ### 10.5 Encryption
 

@@ -2,7 +2,7 @@
   "id": "041-signature-missing-when-required",
   "description": "Passport has no signature; requireSignature=true MUST block at §10.3.5.",
   "spec_sections": [
-    "10.3.1.5"
+    "1.1.5"
   ],
   "input": {
     "passport": {
@@ -87,10 +87,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.5",
+    "blocked_at_section": "1.1.5",
     "step_outcomes": [
       {
-        "section": "10.3.1.5",
+        "section": "1.1.5",
         "passed": false,
         "severity": "block"
       }

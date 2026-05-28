@@ -2,8 +2,8 @@
   "id": "002-valid-did-resolved-cross-checked",
   "description": "Passport with did:web identifier resolves to a DID Document whose key matches the inline public key. Verification succeeds with cross_checked key source.",
   "spec_sections": [
-    "10.3.1.3",
-    "10.3.1.4"
+    "1.1.3",
+    "1.1.4"
   ],
   "input": {
     "passport": {
@@ -115,17 +115,17 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.3",
+        "section": "1.1.3",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.4",
+        "section": "1.1.4",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.5",
+        "section": "1.1.5",
         "passed": true,
         "severity": "block"
       }

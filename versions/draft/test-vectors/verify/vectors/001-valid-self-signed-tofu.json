@@ -2,12 +2,12 @@
   "id": "001-valid-self-signed-tofu",
   "description": "Self-signed passport with inline Ed25519 key passes verification under Trust-On-First-Use (no DID resolution).",
   "spec_sections": [
-    "10.3.1.1",
-    "10.3.1.2",
-    "10.3.1.4",
-    "10.3.1.5",
-    "10.3.1.6",
-    "10.3.1.7"
+    "1.1.1",
+    "1.1.2",
+    "1.1.4",
+    "1.1.5",
+    "1.1.6",
+    "1.1.7"
   ],
   "input": {
     "passport": {
@@ -100,32 +100,32 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.1",
+        "section": "1.1.1",
         "passed": true,
         "severity": "warn"
       },
       {
-        "section": "10.3.1.2",
+        "section": "1.1.2",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.4",
+        "section": "1.1.4",
         "passed": true,
         "severity": "warn"
       },
       {
-        "section": "10.3.1.5",
+        "section": "1.1.5",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.6",
+        "section": "1.1.6",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.7",
+        "section": "1.1.7",
         "passed": true,
         "severity": "block"
       }

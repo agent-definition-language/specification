@@ -2,7 +2,7 @@
   "id": "022-did-method-unsupported",
   "description": "Passport declares a non-did:web identifier. The reference implementation only supports did:web; verification MUST block at §10.3.3.",
   "spec_sections": [
-    "10.3.1.3"
+    "1.1.3"
   ],
   "input": {
     "passport": {
@@ -92,10 +92,10 @@
   "expected": {
     "verified": false,
     "public_key_source": "none",
-    "blocked_at_section": "10.3.1.3",
+    "blocked_at_section": "1.1.3",
     "step_outcomes": [
       {
-        "section": "10.3.1.3",
+        "section": "1.1.3",
         "passed": false,
         "severity": "block"
       }

@@ -1,8 +1,8 @@
 {
   "id": "050-attestation-expired",
-  "description": "Passport with expires_at in the past. §10.3.1.2 is structural-only (passes), and §10.3.1.6 catches the expiry. This separation is what allows language ports to share the conformance pack — semantic rules are not baked into per-language schema validators.",
+  "description": "Passport with expires_at in the past. §1.1.2 is structural-only (passes), and §1.1.6 catches the expiry. This separation is what allows language ports to share the conformance pack — semantic rules are not baked into per-language schema validators.",
   "spec_sections": [
-    "10.3.1.6"
+    "1.1.6"
   ],
   "input": {
     "passport": {
@@ -92,20 +92,20 @@
   "expected": {
     "verified": false,
     "public_key_source": "inline_only",
-    "blocked_at_section": "10.3.1.6",
+    "blocked_at_section": "1.1.6",
     "step_outcomes": [
       {
-        "section": "10.3.1.2",
+        "section": "1.1.2",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.5",
+        "section": "1.1.5",
         "passed": true,
         "severity": "block"
       },
       {
-        "section": "10.3.1.6",
+        "section": "1.1.6",
         "passed": false,
         "severity": "block"
       }

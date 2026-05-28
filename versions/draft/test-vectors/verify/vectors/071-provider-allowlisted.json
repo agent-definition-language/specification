@@ -2,7 +2,7 @@
   "id": "071-provider-allowlisted",
   "description": "requireProviderCoherence=true with the passport's provider host on the allowlist MUST pass §10.3.8.",
   "spec_sections": [
-    "10.3.1.8"
+    "1.1.8"
   ],
   "input": {
     "passport": {
@@ -97,7 +97,7 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.8",
+        "section": "1.1.8",
         "passed": true,
         "severity": "block"
       }

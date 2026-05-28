@@ -2,7 +2,7 @@
   "id": "010-schema-missing-required-field",
   "description": "Passport missing the required `version` field MUST fail schema validation at §10.3.2.",
   "spec_sections": [
-    "10.3.1.2"
+    "1.1.2"
   ],
   "input": {
     "passport": {
@@ -91,15 +91,15 @@
   "expected": {
     "verified": false,
     "public_key_source": "none",
-    "blocked_at_section": "10.3.1.2",
+    "blocked_at_section": "1.1.2",
     "step_outcomes": [
       {
-        "section": "10.3.1.1",
+        "section": "1.1.1",
         "passed": true,
         "severity": "warn"
       },
       {
-        "section": "10.3.1.2",
+        "section": "1.1.2",
         "passed": false,
         "severity": "block"
       }

@@ -92,22 +92,22 @@ Future ports SHOULD provide an equivalent runner in their language.
 
 | §10.3 step | Vectors |
 |------------|---------|
-| 10.3.1.1 Retrieval integrity | 003, 004 |
-| 10.3.1.2 Schema validation | 010, 011, 050 |
-| 10.3.1.3 Identity resolution | 002, 020, 021, 022 |
-| 10.3.1.4 Public key cross-check | 002, 030 |
-| 10.3.1.5 Signature verification | 001, 040, 041, 042 |
-| 10.3.1.6 Temporal validity | 050, 051 |
-| 10.3.1.7 Lifecycle gating | 060, 061, 062 |
-| 10.3.1.8 Provider–identity coherence | 070, 071 |
-| 10.3.1.9 Permission/classification compatibility | 080, 081, 082 |
+| 1.1.1 Retrieval integrity | 003, 004 |
+| 1.1.2 Schema validation | 010, 011, 050 |
+| 1.1.3 Identity resolution | 002, 020, 021, 022 |
+| 1.1.4 Public key cross-check | 002, 030 |
+| 1.1.5 Signature verification | 001, 040, 041, 042 |
+| 1.1.6 Temporal validity | 050, 051 |
+| 1.1.7 Lifecycle gating | 060, 061, 062 |
+| 1.1.8 Provider–identity coherence | 070, 071 |
+| 1.1.9 Permission/classification compatibility | 080, 081, 082 |
 
 ## Time-relative vectors
 
 `051-attestation-near-expiry-warn` is **time-relative**: it embeds an
 `expires_at` value computed from "now + 10 days" at generation time, to
-test the §10.3.1.6 30-day warning threshold. Implementations evaluating
-this vector after the embedded date will see §10.3.1.6 fail (block) instead
+test the §1.1.6 30-day warning threshold. Implementations evaluating
+this vector after the embedded date will see §1.1.6 fail (block) instead
 of warn. Regenerate the pack when the warning vector goes stale.
 
 All other vectors are time-stable.
@@ -137,7 +137,7 @@ so that all signatures remain stable.
 `test-keys.json` holds three deterministic Ed25519 keypairs:
 
 - `consumer` — signs the typical consumer passport
-- `enterprise` — signs the enterprise/target passport in §10.3.1.9 vectors
+- `enterprise` — signs the enterprise/target passport in §1.1.9 vectors
 - `imposter` — signs vectors that exercise key mismatch (042) or
   DID-Document-vs-inline divergence (030)
 

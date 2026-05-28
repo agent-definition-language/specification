@@ -2,7 +2,7 @@
   "id": "081-classification-requesting-equal",
   "description": "Requesting agent's classification equals the target's. MUST pass §10.3.9.",
   "spec_sections": [
-    "10.3.1.9"
+    "1.1.9"
   ],
   "input": {
     "passport": {
@@ -165,7 +165,7 @@
     "blocked_at_section": null,
     "step_outcomes": [
       {
-        "section": "10.3.1.9",
+        "section": "1.1.9",
         "passed": true,
         "severity": "block"
       }
