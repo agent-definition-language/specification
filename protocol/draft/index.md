@@ -27,6 +27,6 @@ The split mirrors the two questions governance has to answer about an agent that
 ## Status
 
 - The **[Trust Protocol](/protocol/trust)** is drafted: authentication (§1) and authorization (§2) procedures, with conformance test vectors tracking its section numbers.
-- The **[Runtime Protocol](/protocol/runtime)** is an early draft — its actor, the runtime governor (§1), is framed; the enforcement procedures (§2–§7) are reserved and not yet specified.
+- The **[Runtime Protocol](/protocol/runtime)** is an early draft — the runtime governor (§1) and the enforcement procedures (§2–§7: budgets, iteration, sub-agent admission, oversight, degradation, anomaly) are drafted; the enforcement-evidence format (§1.4 / §7) is reserved.
 
 Each protocol is numbered and versioned independently of ADL Core. Section references outside a protocol's own range refer to the [ADL Core specification](/spec).

@@ -65,6 +65,9 @@ profiles:
           - id: governance-record-ref
             number: "2.10"
             title: governance_record_ref
+          - id: anomaly-baseline
+            number: "2.11"
+            title: anomaly_baseline
       - id: compliance-mapping
         number: "3"
         title: Compliance Mapping

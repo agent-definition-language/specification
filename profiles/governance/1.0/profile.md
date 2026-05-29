@@ -174,11 +174,33 @@ When present, **MUST** be one of:
 
 #### triggers
 
-When present, **MUST** be a non-empty array of strings. Each string describes a condition that **MUST** cause the agent to suspend execution and request human review. Trigger descriptions are declarative — the runtime is responsible for detecting the conditions and suspending execution.
+When present, **MUST** be a non-empty array. Each entry is either a **free-text string** describing a condition (back-compatible) or a **structured predicate object** that a runtime governor can evaluate mechanically.
 
-At Tier 2+, `triggers` **MUST** be present (GOV-13).
+A structured trigger **MUST** contain a `when` object with at least one predicate, and **MAY** contain a `description`. The `when` predicate vocabulary:
 
-Example trigger values: `"Financial commitment exceeding $10,000"`, `"Access to restricted data category"`, `"Decision affecting external-facing communications"`.
+| Predicate                    | Type   | Fires when                                                                                       |
+|------------------------------|--------|--------------------------------------------------------------------------------------------------|
+| cost_usd_over                | number | The session's cost exceeds this many USD.                                                        |
+| data_classification_at_least | string | The agent touches data at or above this sensitivity (`public` < `internal` < `confidential` < `restricted`). |
+| tool                         | string | The named tool is about to be invoked.                                                           |
+| path_matches                 | string | A target path matches this Section 4.4 pattern.                                                  |
+
+A structured trigger with multiple predicates fires when **all** are satisfied. Free-text strings remain valid and are detected by the runtime as before; structured triggers let the governor evaluate the condition without interpreting prose. The evaluation, pause-for-review, and timeout procedure is defined in [Runtime Protocol §5](/protocol/runtime): when a trigger fires the agent **MUST** suspend and request review, and if no reviewer responds within `response_time_minutes` the governor resolves `runtime.degradation.on_oversight_timeout`, defaulting to halt.
+
+At Tier 2+, `triggers` **MUST** be present (GOV-13). A structured trigger's `when` **MUST** contain at least one predicate (GOV-25).
+
+Example trigger values (mixed forms):
+
+```json
+{
+  "triggers": [
+    "Decision affecting external-facing communications",
+    { "description": "Large spend", "when": { "cost_usd_over": 10000 } },
+    { "when": { "data_classification_at_least": "restricted" } },
+    { "when": { "tool": "wire_transfer" } }
+  ]
+}
+```
 
 #### response_time_minutes
 
@@ -459,6 +481,37 @@ Example:
 
 ---
 
+### 2.11 anomaly_baseline
+
+**OPTIONAL.** Declares the agent's expected runtime behavior so a runtime governor can detect deviation. **SHOULD** be present at Tier 2 and **MUST** be present at Tier 3 (GOV-26).
+
+| Member               | Type   | Description                                                                                     |
+|----------------------|--------|-------------------------------------------------------------------------------------------------|
+| expected_tools       | array  | Expected tool-call distribution; each entry has `name` and an OPTIONAL `share` (0–1) of calls.  |
+| cost_per_session_usd | object | Expected per-session cost range: `min` / `max`.                                                 |
+| data_classes         | array  | Data categories the agent typically touches (same vocabulary as `data_classification.categories`). |
+
+The baseline is a *declaration of normal*; the governor compares a live session against it and treats material deviation — an unexpected tool, cost outside the range, an unexpected data class — as an `on_anomaly` cause. The detection and response procedure, and how anomaly evidence binds to the governor's audit trail, is defined in [Runtime Protocol §7](/protocol/runtime).
+
+Because the baseline is self-declared by the agent, it is a *weak* signal on its own; its value is realized when the governor's anomaly evidence is externally verifiable ([Runtime Protocol §1.4](/protocol/runtime)). At Tier 3, `anomaly_baseline` is REQUIRED (GOV-26) so an autonomous agent ships with a declared envelope of normal behavior to measure against.
+
+Example:
+
+```json
+{
+  "anomaly_baseline": {
+    "expected_tools": [
+      { "name": "search_invoices", "share": 0.6 },
+      { "name": "get_invoice_details", "share": 0.3 }
+    ],
+    "cost_per_session_usd": { "min": 0.01, "max": 5.00 },
+    "data_classes": ["financial", "pii"]
+  }
+}
+```
+
+---
+
 ## 3. Compliance Mapping
 
 The Governance Profile provides mappings between ADL/profile sections and common compliance framework controls.
@@ -621,7 +674,7 @@ Implementations validating against this profile **MUST** enforce:
 
 ### 5.1 Tier-Conditional Validation
 
-Tier-conditional rules (GOV-12 through GOV-17) are evaluated using the value of `autonomy.tier`. Validators **MUST** resolve `autonomy.tier` before evaluating tier-conditional rules. If `autonomy` is absent, validation **MUST** fail at GOV-10 before reaching tier-conditional checks.
+Tier-conditional rules (GOV-12 through GOV-17, and GOV-26) are evaluated using the value of `autonomy.tier`. Validators **MUST** resolve `autonomy.tier` before evaluating tier-conditional rules. If `autonomy` is absent, validation **MUST** fail at GOV-10 before reaching tier-conditional checks.
 
 The following table summarizes field requirements by tier:
 
@@ -637,6 +690,7 @@ The following table summarizes field requirements by tier:
 | `disclosure` (with `required: true`) | MAY | **MUST** | **MUST** |
 | `evaluation_attestation` (with `result: passed`) | MAY | MAY | **MUST** |
 | `governance_record_ref` | MAY | MAY | SHOULD |
+| `anomaly_baseline` | MAY | SHOULD | **MUST** |
 
 ### 5.2 Schema Validation
 

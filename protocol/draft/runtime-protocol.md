@@ -11,7 +11,7 @@ hide_table_of_contents: false
 # Runtime Protocol
 
 **Version:** 0.1.0-draft
-**Status:** Draft — §1 (the runtime governor) is framed; the enforcement procedures (§2–§7) are reserved and not yet specified.
+**Status:** Draft — the runtime governor (§1) and the enforcement procedures (§2–§7) are drafted; the enforcement-evidence format (shared by §1.4 and §7) is reserved.
 
 The **Runtime Protocol** defines the normative procedures a *runtime governor* performs to enforce an ADL agent's declared operational limits while the agent executes: budgets, iteration limits, sub-agent admission, human-oversight triggers, degradation, and anomaly detection. It sits in the ADL document family alongside the [ADL Core specification](/spec), which declares what an agent **is** and the limits it advertises, and the [Trust Protocol](/protocol/trust), which defines what a *counterparty* does to verify and authorize it; it is one document in ADL's open protocol layer. Where the Trust Protocol acts **once, at admission**, the Runtime Protocol acts **continuously, after admission**: it is the layer that gives an agent's declared operational limits force at runtime.
 
@@ -85,33 +85,83 @@ Cost accounting — mapping token counts and tool calls to `cost_usd` — is gov
 
 ## 3 Iteration Control
 
-Enforcement of iteration and tool-call limits and loop detection — `max_iterations`, `max_tool_calls_per_session`, and `loop_detection` (detection window and `on_detected` behavior). Fills in the declarative member proposed for ADL Core §11.3.
+This section defines how the governor enforces the iteration limits declared in [ADL Core §11.3](/spec/next#113-tool-invocation): `max_iterations`, `max_tool_calls_per_session`, and `loop_detection`.
 
-**Status:** Not yet specified.
+The governor's PDP (§1.2) **MUST** maintain, per session (§1.3), a count of reason→act iterations and a count of tool invocations, and **MUST** retain a sliding window of the most recent steps when `loop_detection` is declared. Before the PEP admits a step, the PDP **MUST**:
+
+1. **Count.** Increment the projected iteration and tool-call counts for the step.
+2. **Check hard limits.** If the projected count would exceed `max_iterations` or `max_tool_calls_per_session`, the limit is reached.
+3. **Detect loops.** When `loop_detection` is declared, examine the last `window` steps; if the step would repeat a prior step's signature (same tool and equivalent arguments) beyond a governor-defined repetition threshold, a loop is detected. How signatures are computed is governor-specific and **MUST** be documented when claiming R2+ on loop detection.
+4. **Decide and enforce.** On a reached limit or detected loop, resolve the degradation response (§6): for a detected loop, `loop_detection.on_detected` if present, otherwise `runtime.degradation.on_iteration_limit`; for a hard limit, `runtime.degradation.on_iteration_limit`. Absent either, **fail closed** (halt).
+5. **Record.** Record the boundary or loop event in the audit trail (§1.4).
+
+**Conformance.** At **R1** the governor counts iterations and tool calls and flags loops without blocking. At **R2** it **MUST** block on a reached limit or detected loop and apply §6. At **R3** loop and limit events feed the anomaly substrate (§7).
 
 ## 4 Sub-Agent Admission
 
-Admission of delegated sub-agents against `permissions.sub_agents` (`allowed` / `denied` and attenuation hints), composing with the Trust Protocol's delegation-chain verification.
+This section defines how the governor admits delegated sub-agents against the [ADL Core §9.7](/spec/next#97-sub-agents) `permissions.sub_agents` declaration (`allowed` / `denied`, `max_depth`, `attenuation`).
 
-**Status:** Not yet specified.
+When the agent attempts to delegate to a sub-agent, the governor's PDP (§1.2) **MUST**, before the PEP admits the delegation:
+
+1. **Match identity.** Resolve the prospective sub-agent's identifier and evaluate it against `allowed` and `denied` per §4.4 patterns. `denied` overrides `allowed`; an identifier matching no `allowed` pattern is **not** permitted (deny-by-default).
+2. **Check depth.** Reject the delegation if it would exceed `max_depth` relative to the root of the current delegation chain.
+3. **Check attenuation.** When `attenuation.scopes_subset` is set, the sub-agent's passport `security.scopes` **MUST** be a subset of this agent's ceiling; when `attenuation.budget_subset` is set, its `budget` caps **MUST** be ≤ this agent's. This composes with — and does not replace — the Trust Protocol's delegation-chain verification, which establishes the sub-agent's identity and the chain's integrity.
+4. **Decide and enforce.** If any check fails, the delegation is denied; the PEP resolves `runtime.degradation.on_sub_agent_denied` (§6), defaulting to fail-closed (do not spawn).
+5. **Record.** Record the admission decision (sub-agent identity, matched rule, attenuation result) in the audit trail (§1.4).
+
+**Conformance.** At **R1** the governor records prospective delegations and what the decision *would* be; it does not block. At **R2** it **MUST** enforce admission and apply §6 on denial. At **R3** delegation patterns feed the anomaly substrate (§7).
 
 ## 5 Oversight Triggers
 
-Evaluation of `human_oversight.triggers` — including the structured predicate form (cost threshold, data classification, tool name, partial-path pattern) proposed for Governance Profile 1.1 — and the pause-for-review and timeout behavior they impose.
+This section defines how the governor evaluates the human-oversight triggers declared in the [Governance Profile](/profiles/governance/specification) (`human_oversight.triggers`), including the structured predicate form, and the pause/timeout behavior they impose.
 
-**Status:** Not yet specified.
+For each declared trigger, the governor's PDP (§1.2) **MUST**, before the PEP admits a step:
+
+1. **Evaluate predicates.** For a structured trigger, evaluate its `when` predicates against the step and session state: `cost_usd_over` against the §2 cost counter, `data_classification_at_least` against the step's data classification, `tool` against the tool about to be invoked, and `path_matches` against the target path (§4.4 patterns). The trigger fires when **all** its predicates hold. Free-text triggers are evaluated by governor-specific detection.
+2. **Pause on fire.** When a trigger fires, the PEP **MUST** pause execution (degradation action `pause`, §6) and request human review through the declared `intervention_model`.
+3. **Time out.** If no reviewer responds within `human_oversight.response_time_minutes`, the governor resolves `runtime.degradation.on_oversight_timeout` (§6), defaulting to fail-closed (halt). The agent **MUST NOT** proceed unreviewed.
+4. **Resume.** Execution resumes only on explicit approval per the `intervention_model` (`approve_reject` or `plan_editing`); `monitor_only` does not gate execution.
+5. **Record.** Record the trigger firing, the review outcome, and any timeout in the audit trail (§1.4).
+
+Structured triggers let the governor evaluate oversight conditions mechanically. Free-text triggers require governor-specific interpretation and are best treated as R1 signals unless the governor can detect them reliably.
+
+**Conformance.** At **R1** the governor records trigger evaluations without pausing. At **R2** it **MUST** pause on a fired trigger and enforce the response-time timeout. At **R3** trigger firings feed the anomaly substrate (§7).
 
 ## 6 Degradation
 
-Behavior when a limit is reached or an error occurs, driven by `runtime.degradation` keyed by cause (`on_budget_exhausted`, `on_iteration_limit`, `on_oversight_timeout`, `on_tool_error`, …). Default-on-absence is **fail-closed**.
+This section defines how the governor responds when a limit fires or a fault occurs. Responses are declared in [ADL Core §11.5](/spec/next#115-degradation) as `runtime.degradation`, a map from *cause* (`on_budget_exhausted`, `on_iteration_limit`, `on_sub_agent_denied`, `on_oversight_timeout`, `on_tool_error`, `on_anomaly`, …) to a *response* whose `action` is one of `halt`, `pause`, `fallback`, or `continue`.
 
-**Status:** Not yet specified.
+This is the shared response procedure that §2–§5 and §7 invoke. When a cause fires, the governor's PEP (§1.2) **MUST** resolve the response as follows:
+
+1. **Look up the cause.** If `runtime.degradation` declares a response for the fired cause, apply it (step 3).
+2. **Fail closed on absence.** If no response is declared for the cause, the governor **MUST** halt the session. Absence of a degradation response is **not** consent to continue — this default is the core of "teeth at runtime": a limit with no declared handling stops the agent rather than waving it through.
+3. **Apply the action.**
+   - `halt` — terminate the session; no further steps execute.
+   - `pause` — suspend execution and escalate for human oversight (§5); resume only on explicit approval.
+   - `fallback` — substitute the declared `value` / `message` for the blocked step and continue.
+   - `continue` — proceed despite the cause. This is **fail-open** and **MUST** be explicit; the governor **MUST** record every `continue` in the audit trail (§1.4) together with the cause it overrode.
+4. **Record.** Every degradation event — the cause, the resolved action, and whether the fail-closed default applied — is recorded in the audit trail (§1.4).
+
+The Core `runtime.error_handling.fallback_behavior` member (§11.4) is treated as the `on_tool_error` cause; when both are present, `runtime.degradation.on_tool_error` governs.
+
+**Conformance.** At **R1** the governor records which cause fired and what response *would* apply, but does not alter execution. At **R2** and above it **MUST** apply the resolved response, including the fail-closed default.
 
 ## 7 Anomaly Detection
 
-Monitoring against a declared `anomaly_baseline` — expected tool-call distribution, cost-per-session range, and the data classes the agent typically touches — and the governor's response when a session deviates.
+This section defines how the governor monitors a session against the agent's declared [`anomaly_baseline`](/profiles/governance/specification) (Governance Profile) — expected tool-call distribution, per-session cost range, and the data classes the agent typically touches — and how it responds to deviation.
 
-**Status:** Not yet specified.
+The governor's PDP (§1.2) **MUST**, over the course of a session, compare observed behavior against the declared baseline:
+
+1. **Track.** Accumulate the session's tool-call distribution, cost (reusing the §2 counters), and the data classes touched.
+2. **Compare.** Flag deviation when the session invokes a tool outside `expected_tools`, its cost falls outside `cost_per_session_usd`, or it touches a data class outside `data_classes`. How far a session may drift before it is "material" is governor-defined and **MUST** be documented when claiming R3.
+3. **Respond.** On material deviation, the governor resolves `runtime.degradation.on_anomaly` (§6), defaulting to fail-closed (halt). Because anomaly is a softer signal than a hard limit, a `pause` (escalate to §5 oversight) is often the appropriate declared response.
+4. **Evidence.** The governor **MUST** record the deviation in the audit trail (§1.4). This is the audit substrate §1.4 refers to: the **enforcement evidence** that lets a counterparty distinguish a governor that *actually* monitors (R3) from one that merely claims it. The concrete evidence format — what an anomaly/enforcement record attests, and how it binds to the admitted passport and session — is specified here once the §1.4 mechanism is settled, and remains **reserved** in this draft.
+
+Because the baseline is self-declared by the agent, anomaly detection against it is only as strong as the baseline is honest; its governance value depends on the evidence in step 4 being externally verifiable (§1.4).
+
+**Conformance.** Anomaly detection is **R3**. At **R1**/**R2** a governor **MAY** record baseline deviation but is not required to act on it; at **R3** it **MUST** monitor against a declared baseline and apply §6 on material deviation.
+
+**Status:** The detection procedure is framed; the enforcement-evidence format (shared with §1.4) is reserved.
 
 ## Conformance Tiers
 

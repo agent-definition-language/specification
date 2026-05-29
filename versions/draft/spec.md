@@ -656,6 +656,21 @@ Example (complete permissions object):
 }
 ```
 
+### 9.7 Sub-Agents
+
+The `sub_agents` member declares which other agents this agent may delegate to. **OPTIONAL.** When present, **MUST** be an object. Deny-by-default applies (§9.1): when `sub_agents` is present, a prospective sub-agent is permitted only if its identifier matches `allowed` and not `denied`. It **MAY** contain:
+
+| Member      | Type    | Description                                                                                          |
+|-------------|---------|------------------------------------------------------------------------------------------------------|
+| allowed     | array   | Agent-identifier patterns this agent MAY delegate to. Patterns follow §4.4.                          |
+| denied      | array   | Agent-identifier patterns this agent MUST NOT delegate to. `denied` overrides `allowed` (§9.1).      |
+| max_depth   | integer | Maximum delegation depth rooted at this agent.                                                       |
+| attenuation | object  | Constraints a sub-agent MUST satisfy; MAY contain `scopes_subset` (bool) and `budget_subset` (bool). |
+
+`attenuation.scopes_subset: true` requires a sub-agent's `security.scopes` to be a subset of this agent's ceiling; `budget_subset: true` requires its `permissions.resource_limits.budget` caps to be less than or equal to this agent's. These compose with the delegation-chain verification defined in the [Trust Protocol](/protocol/trust).
+
+These are declarations; the admission procedure a runtime governor applies when this agent attempts to delegate is defined in the [Runtime Protocol](/protocol/runtime). A delegation that no rule permits is denied; the governor resolves `runtime.degradation.on_sub_agent_denied` (§11.5), defaulting to fail-closed.
+
 ---
 
 ## 10. Security
@@ -979,7 +994,7 @@ The `format` member, when present, **MUST** be a string specifying the default o
 
 ### 11.3 Tool Invocation
 
-May contain: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`.
+May contain: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`, `max_iterations`, `max_tool_calls_per_session`, `loop_detection`.
 
 The `retry_policy` member, when present, **MUST** be an object describing retry behavior for tool invocations. It **MAY** contain:
 
@@ -989,6 +1004,18 @@ The `retry_policy` member, when present, **MUST** be an object describing retry 
 | backoff_strategy | string | OPTIONAL | One of: `"fixed"`, `"exponential"`, `"linear"` |
 | initial_delay_ms | number | OPTIONAL | Initial delay between retries in milliseconds   |
 | max_delay_ms     | number | OPTIONAL | Maximum delay between retries in milliseconds   |
+
+The `max_iterations`, `max_tool_calls_per_session`, and `loop_detection` members bound an agent's reasoning loop:
+
+| Member                     | Type    | Description                                                          |
+|----------------------------|---------|----------------------------------------------------------------------|
+| max_iterations             | integer | Maximum reason→act iterations the agent may take in one session.     |
+| max_tool_calls_per_session | integer | Maximum total tool invocations in one session.                       |
+| loop_detection             | object  | Detection of repetitive behavior; see below.                         |
+
+`loop_detection`, when present, **MUST** be an object that **MAY** contain `window` (integer; number of most-recent steps examined for repetition) and `on_detected` (a degradation response object per §11.5, applied when a loop is detected and overriding `degradation.on_iteration_limit` for the loop case).
+
+These are declarations; the procedure a runtime governor applies — counting iterations and tool calls, detecting loops, and the fail-closed default — is defined in the [Runtime Protocol](/protocol/runtime). When a limit or loop fires with no specific response declared, the governor resolves `runtime.degradation.on_iteration_limit` (§11.5), defaulting to fail-closed.
 
 ### 11.4 Error Handling
 
@@ -1039,6 +1066,23 @@ Example:
   }
 }
 ```
+
+### 11.5 Degradation
+
+The `degradation` member declares how the agent behaves when an operational limit is reached or a fault occurs. **OPTIONAL.** When present, **MUST** be an object whose keys are *cause* identifiers matching `^on_[a-z0-9_]+$` and whose values are *response* objects. Recognized causes include `on_budget_exhausted` (§9.6), `on_iteration_limit` (§11.3), `on_sub_agent_denied` (§9.7), `on_oversight_timeout` (Governance Profile), `on_tool_error`, and `on_anomaly`.
+
+Each response object **MUST** contain `action` and **MAY** contain the rest:
+
+| Member  | Type    | Required | Description                                                        |
+|---------|---------|----------|--------------------------------------------------------------------|
+| action  | string  | REQUIRED | One of: `"halt"`, `"pause"`, `"fallback"`, `"continue"`.            |
+| value   | any     | OPTIONAL | Value to return when `action` is `"fallback"`.                     |
+| message | string  | OPTIONAL | User-facing message.                                               |
+| notify  | boolean | OPTIONAL | Whether to emit an out-of-band notification when this cause fires. |
+
+`degradation` generalizes the per-tool `runtime.error_handling.fallback_behavior` (§11.4), which is retained for backward compatibility and is equivalent to `degradation.on_tool_error`; when both address that cause, `degradation` takes precedence.
+
+These are declarations. The procedure a runtime governor applies — and the **fail-closed default** when a cause fires with no declared response — is defined in the [Runtime Protocol](/protocol/runtime). Absence of a degradation response does not mean "continue": a conforming governor halts.
 
 ---
 
@@ -1247,6 +1291,11 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-28 | Top-level `data_classification.sensitivity` MUST be >= the highest `sensitivity` in any tool or resource `data_classification` (high-water mark) |
 | VAL-29 | Every `permissions.resource_limits.budget` cap MUST be a number greater than `0` |
 | VAL-30 | Within any `budget` dimension, `per_session` MUST be <= `per_day` when both are present |
+| VAL-31 | Each `runtime.degradation` response `action` MUST be one of `halt`, `pause`, `fallback`, `continue` |
+| VAL-32 | `runtime.tool_invocation.max_iterations` and `max_tool_calls_per_session`, when present, MUST be integers >= 1 |
+| VAL-33 | `runtime.tool_invocation.loop_detection.window`, when present, MUST be an integer >= 2 |
+| VAL-34 | `permissions.sub_agents.allowed` and `denied` patterns MUST conform to Section 4.4 pattern syntax |
+| VAL-35 | `permissions.sub_agents.max_depth`, when present, MUST be an integer >= 1 |
 
 Implementations **MAY** perform additional validation based on declared profiles.
 

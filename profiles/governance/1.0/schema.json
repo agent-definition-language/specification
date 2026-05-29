@@ -128,7 +128,33 @@
         "triggers": {
           "type": "array",
           "minItems": 1,
-          "items": { "type": "string" }
+          "items": {
+            "anyOf": [
+              { "type": "string" },
+              {
+                "type": "object",
+                "required": ["when"],
+                "properties": {
+                  "description": { "type": "string" },
+                  "when": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "properties": {
+                      "cost_usd_over": { "type": "number", "exclusiveMinimum": 0 },
+                      "data_classification_at_least": {
+                        "type": "string",
+                        "enum": ["public", "internal", "confidential", "restricted"]
+                      },
+                      "tool": { "type": "string" },
+                      "path_matches": { "type": "string" }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
         },
         "response_time_minutes": {
           "type": "integer",
@@ -323,6 +349,40 @@
     "governance_record_ref": {
       "type": "string",
       "format": "uri"
+    },
+    "anomaly_baseline": {
+      "type": "object",
+      "properties": {
+        "expected_tools": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "share": { "type": "number", "minimum": 0, "maximum": 1 }
+            },
+            "additionalProperties": false
+          }
+        },
+        "cost_per_session_usd": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "number", "minimum": 0 },
+            "max": { "type": "number", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "data_classes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pii", "phi", "financial", "credentials", "intellectual_property", "regulatory"]
+          }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
     }
   },
   "if": {
@@ -363,7 +423,7 @@
       }
     },
     "then": {
-      "required": ["human_oversight", "incident_response", "disclosure", "evaluation_attestation"],
+      "required": ["human_oversight", "incident_response", "disclosure", "evaluation_attestation", "anomaly_baseline"],
       "properties": {
         "evaluation_attestation": {
           "properties": {
