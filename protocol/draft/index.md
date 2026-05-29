@@ -9,11 +9,13 @@ keywords: [adl, protocol, trust protocol, runtime protocol, passport verificatio
 
 # Protocol
 
-ADL is specified as a **three-document family** built around one signed passport. The [ADL Core specification](/spec) is the *declarative* document: it describes what an agent **is** and the limits it **declares**. The two documents in this section are the *procedural* half — they define what some actor **MUST do** with those declarations, the layer that gives an agent's declarations force.
+ADL is specified as a **family of documents** built around one signed passport. The [ADL Core specification](/spec) is the single *declarative* document: it describes what an agent **is** and the limits it **declares**. Around it sits a **protocol layer** — an open set of *procedural* documents that define what an actor **MUST do** with those declarations, the layer that gives an agent's declarations force.
 
 Core declares; the protocols enforce. A declared limit has force only when a protocol procedure acts on it.
 
-## The two protocols
+## The protocol layer
+
+Two protocols are defined today. The layer is open: further protocols may join it as new enforcement boundaries emerge.
 
 | Document | Actor | When it acts | What it does |
 |----------|-------|--------------|--------------|

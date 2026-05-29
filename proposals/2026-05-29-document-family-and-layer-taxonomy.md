@@ -1,4 +1,4 @@
-# Proposal: Three-Document Family Naming and Section Layer Taxonomy
+# Proposal: Document-Family Naming and Section Layer Taxonomy
 
 **Date:** 2026-05-29
 **Status:** Draft
@@ -8,18 +8,18 @@
 
 ## Summary
 
-The Core/Trust split ([conformance-tiers proposal](./2026-05-26-core-trust-conformance-tiers.md)) recognized that ADL carries two categorically different kinds of content: a declarative description format and the normative procedures a counterparty performs against it. The runtime-governance work (budget envelopes, iteration control, generalized degradation, structured oversight triggers, anomaly baselines) adds a *third* kind — procedures a **runtime governor** performs while an agent executes.
+The Core/Trust split ([conformance-tiers proposal](./2026-05-26-core-trust-conformance-tiers.md)) recognized that ADL carries two categorically different kinds of content: a declarative description format and the normative procedures a counterparty performs against it. The runtime-governance work (budget envelopes, iteration control, generalized degradation, structured oversight triggers, anomaly baselines) adds a further procedural kind — procedures a **runtime governor** performs while an agent executes.
 
-This proposal makes that three-part structure **explicit and machine-readable**, without moving any content or changing any requirement:
+This proposal makes that structure **explicit and machine-readable**, without moving any content or changing any requirement:
 
-1. Six lines in **§1.3 Design Model** name the **three-document family** — ADL Core, the ADL Trust Protocol, and the ADL Runtime Protocol — and state the one distinction that organizes them: *Core declares; the protocols enforce.*
+1. Six lines in **§1.3 Design Model** name the **document family** — ADL Core plus an open protocol layer (the Trust Protocol and Runtime Protocol today) — and state the one distinction that organizes them: *Core declares; the protocols enforce.*
 2. The **spec manifest** gains two orthogonal per-section keys — `nature` (constitutional | operational | structural) and `enforced_by` (core | trust | runtime | none) — so generators (IETF, ISO, AAIF) can render the split, and so each section's placement is recorded rather than inferred.
 
 The manifest is also resynced to the current spec.md, which it had drifted from (see Details).
 
 ## Motivation
 
-### The split needs a third name, and a place to record itself
+### The protocol layer needs naming, and a place to record itself
 
 The conformance-tiers proposal named two documents. The operational-governance members now in flight are neither declarations the agent makes about itself (Core) nor procedures a counterparty runs at admission (Trust) — they are procedures a governor runs *continuously, after admission*, against the agent's own execution. That is a distinct document with a distinct actor (the runtime governor) and a distinct conformance track (R1/R2/R3). Naming it in §1.3 makes the architecture legible the moment the Runtime Protocol stub lands, so each member proposal reads as "fill the named placeholder" rather than "introduce a new concept."
 
@@ -29,7 +29,7 @@ Governance for agentic systems cannot live in declarations alone; a declared lim
 
 ### Two axes, because nature and enforcement are independent
 
-A section's *kind* and its *enforcer* are not the same question. `data_classification` is **constitutional** in nature (a declared posture) yet **core**-enforced (the high-water-mark rule, VAL-28, is a static document invariant — the validation *is* the rule). `lifecycle` is also constitutional but **trust**-enforced (validation only checks the enum; the provisioning gate that gives it force lives in Trust Protocol §1.1.7). Collapsing these into a single "constitutional vs operational" label would lose exactly the distinction the three-document family exists to make. Two columns keep them separable.
+A section's *kind* and its *enforcer* are not the same question. `data_classification` is **constitutional** in nature (a declared posture) yet **core**-enforced (the high-water-mark rule, VAL-28, is a static document invariant — the validation *is* the rule). `lifecycle` is also constitutional but **trust**-enforced (validation only checks the enum; the provisioning gate that gives it force lives in Trust Protocol §1.1.7). Collapsing these into a single "constitutional vs operational" label would lose exactly the distinction the Core/protocol split exists to make. Two columns keep them separable.
 
 ## Details
 
@@ -87,5 +87,5 @@ The manifest had drifted from spec.md and is corrected as part of this change:
 ## References
 
 - [Governance is Changing Meaning in AI](https://www.ironsteadgroup.com/articles/governance-changing-meaning-in-ai) — the declaration-vs-enforcement framing motivating the `enforced_by` axis.
-- [Core/Trust Conformance Tiers and Spec–Protocol Split](./2026-05-26-core-trust-conformance-tiers.md) — the two-document split this extends to three.
+- [Core/Trust Conformance Tiers and Spec–Protocol Split](./2026-05-26-core-trust-conformance-tiers.md) — the two-document split this generalizes into an open protocol layer.
 - `versions/draft/spec.md` §1.3, §10.1 (VAL-28), §14.2 (validation rules), §5.6 (lifecycle); Trust Protocol §1.1.7 (lifecycle gating), §1.1.9 (classification compatibility).
