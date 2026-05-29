@@ -53,6 +53,14 @@ This separation ensures that:
 - Operational changes (personnel rotation, policy updates) do not require re-issuing the passport.
 - Internal operational detail is not exposed to external counterparties.
 
+ADL is specified as a **three-document family** built around this passport:
+
+- **ADL Core** (this document) — the declarative description format: what an agent *is* and the limits it declares.
+- **ADL Trust Protocol** — the normative procedures a *counterparty* performs to verify a passport and authorize agent-to-agent calls.
+- **ADL Runtime Protocol** — the normative procedures a *runtime governor* performs to enforce an agent's declared operational limits during execution.
+
+Core declares; the protocols enforce. A declared limit has force only when a Trust or Runtime procedure acts on it.
+
 ### 1.4 Relationship to Other Specifications
 
 ADL builds upon and interoperates with:
