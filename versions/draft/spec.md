@@ -604,7 +604,17 @@ Command patterns in `allowed_commands` and `denied_commands` **MUST** conform to
 
 ### 9.6 Resource Limits
 
-May contain: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concurrent`.
+May contain: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concurrent`, `budget`.
+
+The `budget` member, when present, **MUST** be an object declaring cumulative consumption ceilings. It **MAY** contain `tokens`, `cost_usd`, and `wall_clock_sec`; each, when present, **MUST** be an object that **MAY** contain `per_session` and `per_day` caps.
+
+| Member | Unit | Description |
+|--------|------|-------------|
+| `budget.tokens.per_session` / `.per_day` | tokens | Maximum model tokens (input + output) consumed in one session / rolling 24-hour window. |
+| `budget.cost_usd.per_session` / `.per_day` | USD | Maximum monetary cost incurred in one session / rolling day. |
+| `budget.wall_clock_sec.per_session` / `.per_day` | seconds | Maximum cumulative wall-clock run time in one session / rolling day. |
+
+Whereas `max_duration_sec` bounds a single execution, `budget.wall_clock_sec` bounds cumulative wall-clock across a session or day; the two compose. Each cap **MUST** be a number greater than `0`, and within a dimension `per_session` **MUST** be less than or equal to `per_day` when both are present. These are declarations; the procedure a runtime governor applies to enforce them is defined in the [Runtime Protocol](/protocol/runtime).
 
 Example (complete permissions object):
 
@@ -635,7 +645,12 @@ Example (complete permissions object):
     "resource_limits": {
       "max_memory_mb": 512,
       "max_cpu_percent": 25,
-      "max_duration_sec": 300
+      "max_duration_sec": 300,
+      "budget": {
+        "tokens": { "per_session": 1000000, "per_day": 10000000 },
+        "cost_usd": { "per_session": 5.00, "per_day": 50.00 },
+        "wall_clock_sec": { "per_session": 1800, "per_day": 14400 }
+      }
     }
   }
 }
@@ -1230,6 +1245,8 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-26 | `data_classification.categories` items MUST be valid category values if present |
 | VAL-27 | `data_classification.retention.min_days` MUST be less than or equal to `max_days` when both are present |
 | VAL-28 | Top-level `data_classification.sensitivity` MUST be >= the highest `sensitivity` in any tool or resource `data_classification` (high-water mark) |
+| VAL-29 | Every `permissions.resource_limits.budget` cap MUST be a number greater than `0` |
+| VAL-30 | Within any `budget` dimension, `per_session` MUST be <= `per_day` when both are present |
 
 Implementations **MAY** perform additional validation based on declared profiles.
 

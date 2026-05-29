@@ -49,6 +49,15 @@
       },
       "description": "Data classification (composable; profiles MAY add domain-specific sub-objects via schema composition)"
     },
+    "budgetDimension": {
+      "type": "object",
+      "properties": {
+        "per_session": { "type": "number", "exclusiveMinimum": 0 },
+        "per_day": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false,
+      "description": "Per-session / per-day cap for one budget dimension"
+    },
     "extensions": {
       "type": "object",
       "patternProperties": {
@@ -389,6 +398,16 @@
             "max_cpu_percent": { "type": "number", "minimum": 0, "maximum": 100 },
             "max_duration_sec": { "type": "number", "minimum": 0 },
             "max_concurrent": { "type": "integer", "minimum": 1 },
+            "budget": {
+              "type": "object",
+              "properties": {
+                "tokens": { "$ref": "#/$defs/budgetDimension" },
+                "cost_usd": { "$ref": "#/$defs/budgetDimension" },
+                "wall_clock_sec": { "$ref": "#/$defs/budgetDimension" }
+              },
+              "additionalProperties": false,
+              "description": "Cumulative token / cost / wall-clock budget, scoped per session and per day (enforced by Runtime Protocol §2)"
+            },
             "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false

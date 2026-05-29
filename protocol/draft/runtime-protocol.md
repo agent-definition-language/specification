@@ -69,9 +69,19 @@ The concrete evidence format — what an enforcement record attests, how it bind
 
 ## 2 Budget Enforcement
 
-Enforcement of `permissions.resource_limits.budget` — token, cost (USD), and wall-clock limits scoped per session and per day. Fills in the declarative member proposed for ADL Core §9.6.
+This section defines how the governor (§1) enforces the budget envelope declared in [ADL Core §9.6](/spec/next#96-resource-limits): `permissions.resource_limits.budget`, capping `tokens`, `cost_usd`, and `wall_clock_sec` per session and per day.
 
-**Status:** Not yet specified.
+The governor's PDP (§1.2) **MUST** maintain cumulative counters for each declared `budget` dimension, scoped per session (§1.3) and per rolling 24-hour day. Before the PEP admits a step that consumes a budgeted resource — a model call (tokens, cost) or any execution (wall-clock) — the PDP **MUST**:
+
+1. **Project usage.** Compute projected cumulative usage as the current counter plus the step's expected consumption, for each declared dimension and scope.
+2. **Compare to caps.** For each declared cap, if projected usage would exceed it, the dimension is **exhausted** for that scope.
+3. **Decide.** If no declared cap would be exceeded, return *permit*. If any would, return *budget-exhausted*, identifying the dimension (`tokens` / `cost_usd` / `wall_clock_sec`) and scope (`per_session` / `per_day`).
+4. **Enforce.** On *budget-exhausted*, the PEP **MUST** apply the degradation response keyed `on_budget_exhausted` (§6), **defaulting to fail-closed** (halt the session) when no response is declared.
+5. **Record.** The governor **MUST** record the boundary event (which cap, which scope, observed versus limit) in its audit trail (§1.4), regardless of tier.
+
+Cost accounting — mapping token counts and tool calls to `cost_usd` — is governor-specific. A governor claiming R2 or above on the `cost_usd` dimension **MUST** document its cost model.
+
+**Conformance.** At **R1** the governor tracks usage against caps and records boundary events but does not block. At **R2** it **MUST** block any step that would exceed a declared cap and apply §6 degradation. At **R3** the boundary events additionally feed the anomaly substrate (§7).
 
 ## 3 Iteration Control
 
