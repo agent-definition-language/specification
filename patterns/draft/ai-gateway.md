@@ -8,7 +8,7 @@ keywords: [adl, pattern, ai gateway, egress, llm gateway, model routing, mcp, to
 
 # Mediating Agent Egress through an AI Gateway
 
-**The pattern:** an organization runs its agents behind an **AI gateway** — Kong AI Gateway, Cloudflare AI Gateway, Portkey, LiteLLM, TrueFoundry, Databricks Mosaic AI Gateway, and the like — that mediates the agents' **outbound** AI traffic: model calls (routed across providers, cached, budgeted), tool and MCP calls, and agent-to-agent calls. Because the gateway is the point where an agent's *reasoning* ("call tool X", "ask the model", "delegate to sub-agent Y") becomes an authenticated *request*, it is the natural place to custody the agent's ADL signing key, construct its presentation proofs ([§1.2](/protocol#12-presentation-proof)) and delegation links, attach its passport ([§1.1](/protocol#11-passport-verification-procedure)), and enforce the resource and data-handling policy the passport declares.
+**The pattern:** an organization runs its agents behind an **AI gateway** — Kong AI Gateway, Cloudflare AI Gateway, Portkey, LiteLLM, TrueFoundry, Databricks Mosaic AI Gateway, and the like — that mediates the agents' **outbound** AI traffic: model calls (routed across providers, cached, budgeted), tool and MCP calls, and agent-to-agent calls. Because the gateway is the point where an agent's *reasoning* ("call tool X", "ask the model", "delegate to sub-agent Y") becomes an authenticated *request*, it is the natural place to custody the agent's ADL signing key, construct its presentation proofs ([§1.2](/protocol/trust#12-presentation-proof)) and delegation links, attach its passport ([§1.1](/protocol/trust#11-passport-verification-procedure)), and enforce the resource and data-handling policy the passport declares.
 
 This is a **deployment pattern**. The AI gateway sits on the agent's **egress** edge, the mirror image of the inbound enforcement edge in [Verifying Inbound Callers (the PEP)](./inbound-verification). One organization will often run both: an inbound PEP verifying callers arriving at its agents, and an AI gateway mediating its agents' outbound traffic.
 
@@ -33,8 +33,8 @@ This is a **deployment pattern**. The AI gateway sits on the agent's **egress** 
 
 The reasoning/LLM layer of an agent should not hold its ADL private key. The AI gateway holds it (KMS/HSM) and, for each outbound call that needs ADL credentials, constructs them on the agent's behalf:
 
-- Attaches the agent's passport ([§1.1](/protocol#11-passport-verification-procedure)).
-- Builds and signs the **presentation proof** ([§1.2](/protocol#12-presentation-proof)) bound to the specific outbound request (method + target URI), claiming the minimum scopes the counterparty requires.
+- Attaches the agent's passport ([§1.1](/protocol/trust#11-passport-verification-procedure)).
+- Builds and signs the **presentation proof** ([§1.2](/protocol/trust#12-presentation-proof)) bound to the specific outbound request (method + target URI), claiming the minimum scopes the counterparty requires.
 - Injects the **principal** (`sub`, the customer) and **mints delegation links** when the agent delegates onward to a sub-agent — the egress gateway is where the signed `act` chain is produced, because it is the holder of the agent's key. (See the multi-hop and delegation models in [Multi-Hop Authentication and Authorization](./multi-hop-authorization).)
 
 This concentrates a powerful capability — the gateway can sign *as* the agent — which is the central tension below.
@@ -43,7 +43,7 @@ This concentrates a powerful capability — the gateway can sign *as* the agent 
 
 When the agent reasons that it needs a tool, the call passes through the gateway, which attaches the right credential **per call**:
 
-- For an ADL-speaking tool/agent: passport + presentation proof ([§1.1](/protocol#11-passport-verification-procedure) / [§1.2](/protocol#12-presentation-proof)).
+- For an ADL-speaking tool/agent: passport + presentation proof ([§1.1](/protocol/trust#11-passport-verification-procedure) / [§1.2](/protocol/trust#12-presentation-proof)).
 - For an OAuth tool/MCP server: the OAuth 2.1 token (or a token-exchanged downstream token), per the credential schemes in [§10.3.3](/spec/next#1033-credential-schemes).
 
 This is the operational answer to "the tools an agent reasons it needs have their own authN/authZ that must be obtained and presented" — the gateway is where obtaining-and-presenting happens, uniformly, instead of in each agent's prompt-driven logic.
@@ -64,7 +64,7 @@ The agent's passport declares its intended model ([§7.1](/spec/next#71-model)).
 The Support Agent decides to ask the Carrier Agent for a delivery status, on Dana's behalf:
 
 1. **Reasoning emits an intent.** The agent's model output is a structured call: "ask carrier.example/tracking for order #4471 status." The reasoning layer holds no key and constructs no credential.
-2. **The gateway resolves and verifies the counterparty.** It discovers / fetches the Carrier Agent's passport and runs [§1.1](/protocol#11-passport-verification-procedure) verification, reading the carrier's declared connection requirements (auth path + per-tool scopes) off the passport.
+2. **The gateway resolves and verifies the counterparty.** It discovers / fetches the Carrier Agent's passport and runs [§1.1](/protocol/trust#11-passport-verification-procedure) verification, reading the carrier's declared connection requirements (auth path + per-tool scopes) off the passport.
 3. **The gateway constructs the credential.** It signs a presentation proof bound to the carrier's `track_order` URL, claims the minimum scope the carrier requires, sets `sub` = Dana (with her grant), and appends any delegation link if the support agent is itself a delegate.
 4. **The gateway enforces egress policy.** Token budget check ([§9.6](/spec/next#96-resource-limits)), data-classification handling on the outbound payload ([§10.1](/spec/next#101-data-classification) — strip customer PII the carrier doesn't need), and the org's egress allowlist (may this agent talk to `carrier.example` at all?).
 5. **The gateway sends the request** with `X-ADL-Passport` + `X-ADL-Proof`. The carrier (or its own inbound PEP) verifies it as in the [inbound-verification](./inbound-verification) pattern.
@@ -85,7 +85,7 @@ Putting the agent's signing key in the gateway is the whole value (no keys in th
 
 ### The gateway is asked to sign beyond the agent's ceiling
 
-The agent's reasoning requests a scope the agent's passport ceiling doesn't include. The gateway refuses to sign — it cannot construct a proof claiming scopes outside the ceiling (the downstream [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) check would reject it anyway, but the egress gateway should catch it first). The agent is told the capability isn't enabled.
+The agent's reasoning requests a scope the agent's passport ceiling doesn't include. The gateway refuses to sign — it cannot construct a proof claiming scopes outside the ceiling (the downstream [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) check would reject it anyway, but the egress gateway should catch it first). The agent is told the capability isn't enabled.
 
 ### Model rerouting drifts from the declared model
 
@@ -103,10 +103,10 @@ The agent reasons its way to calling an external service the org hasn't approved
 
 | Gateway operation | Spec section |
 |-------------------|--------------|
-| Verify the counterparty's passport | [§1.1](/protocol#11-passport-verification-procedure) |
-| Construct + sign the presentation proof | [§1.2](/protocol#12-presentation-proof) |
+| Verify the counterparty's passport | [§1.1](/protocol/trust#11-passport-verification-procedure) |
+| Construct + sign the presentation proof | [§1.2](/protocol/trust#12-presentation-proof) |
 | Attach OAuth credential for OAuth tools/MCP | [§10.3.3](/spec/next#1033-credential-schemes) |
-| Claim scopes within the agent ceiling | [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) |
+| Claim scopes within the agent ceiling | [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) |
 | Enforce token/spend budgets | [§9.6](/spec/next#96-resource-limits) |
 | Enforce data-handling on prompts/completions | [§10.1](/spec/next#101-data-classification) |
 | Route against the declared model | [§7.1](/spec/next#71-model) |

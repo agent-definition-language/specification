@@ -27,7 +27,7 @@ This is the question the personal-agent walkthrough leaves open: if authenticati
 | When authentication happens | Once at setup; channel-bound per message thereafter | Per human session and per agent request |
 | Standing authority | Holds delegated authority and spends it | Validates each caller's authority at the door |
 | Knows its counterparties in advance? | Yes — it set up the connections | No — anyone may show up |
-| Role in [§10.3](/spec/next#103-authentication) | The party *being verified* (presents passport + proof) | The *verifier* (runs [§1.1](/protocol#11-passport-verification-procedure), [§1.2](/protocol#12-presentation-proof), checks [§10.3.3](/spec/next#1033-credential-schemes) credentials) |
+| Role in [§10.3](/spec/next#103-authentication) | The party *being verified* (presents passport + proof) | The *verifier* (runs [§1.1](/protocol/trust#11-passport-verification-procedure), [§1.2](/protocol/trust#12-presentation-proof), checks [§10.3.3](/spec/next#1033-credential-schemes) credentials) |
 
 **Roles are per connection, not per agent.** Meridian is a provider to its callers, but when its own trade-execution agent calls a clearing house or a market-data feed, Meridian is a *client* there — set up once, presenting credentials. The same agent is a provider on its inbound edge and a client on its outbound edge. The personal-agent pattern traced the client edge; this one traces the provider edge of the very same kind of connection.
 
@@ -46,7 +46,7 @@ This is the question the personal-agent walkthrough leaves open: if authenticati
 ## Front door 1: Authenticated website chat (human clients)
 
 **Authentication path:** [§10.3.3](/spec/next#1033-credential-schemes) (OIDC) — **per session, not once at setup**
-**Authorization path:** [§2.1](/protocol#21-authorization-in-human-to-agent-flows) (Human-to-Agent Flows)
+**Authorization path:** [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) (Human-to-Agent Flows)
 
 ### What happens
 
@@ -62,12 +62,12 @@ This is the question the personal-agent walkthrough leaves open: if authenticati
 
 3. Dana opens the chat and asks the portfolio agent: "How did my retirement account do this quarter?" The browser sends the message with her session token (DPoP-bound per [§10.3.3.1](/spec/next#10331-oauth-21-type-oauth2)).
 
-4. The portfolio agent authorizes per [§2.1](/protocol#21-authorization-in-human-to-agent-flows):
+4. The portfolio agent authorizes per [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows):
     - `required = ["portfolio:read"]` for the `get_performance` tool.
     - `presented = ["portfolio:read", "research:read", "trades:execute"]` from Dana's session token.
     - `required ⊆ presented` ✓ — authorized. The agent returns the quarter's performance.
 
-5. Dana then says "sell 100 shares of ACME." This routes to the trade-execution agent, whose `place_order` tool requires `trades:execute` — a **high-stakes** scope. Meridian's policy requires a **step-up** for trade execution even within an authenticated session: the agent issues a re-authentication challenge (MFA re-prompt, or a signed confirmation), per the same step-up pattern as a server-issued nonce ([§1.2.7](/protocol#127-server-issued-nonces) is the agent-to-agent analog). Only after Dana satisfies the challenge does the order go through.
+5. Dana then says "sell 100 shares of ACME." This routes to the trade-execution agent, whose `place_order` tool requires `trades:execute` — a **high-stakes** scope. Meridian's policy requires a **step-up** for trade execution even within an authenticated session: the agent issues a re-authentication challenge (MFA re-prompt, or a signed confirmation), per the same step-up pattern as a server-issued nonce ([§1.2.7](/protocol/trust#127-server-issued-nonces) is the agent-to-agent analog). Only after Dana satisfies the challenge does the order go through.
 
 **The contrast with the personal agent:** Dana is not "set up once." Every session is a fresh OIDC authentication, sessions expire, and high-stakes actions force re-authentication mid-session. Meridian is the resource server; Dana is an unprovisioned-until-she-logs-in caller.
 
@@ -78,8 +78,8 @@ This is the question the personal-agent walkthrough leaves open: if authenticati
 
 ## Front door 2: Well-known discovery + agent-to-agent
 
-**Authentication path:** [§1.1](/protocol#11-passport-verification-procedure) + [§1.2](/protocol#12-presentation-proof) — **per request, not once at setup**
-**Authorization path:** [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) (Agent-to-Agent Flows)
+**Authentication path:** [§1.1](/protocol/trust#11-passport-verification-procedure) + [§1.2](/protocol/trust#12-presentation-proof) — **per request, not once at setup**
+**Authorization path:** [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) (Agent-to-Agent Flows)
 
 A mutual client of both Meridian and a wealth-management platform has authorized the **Wealth Aggregator** agent to pull their Meridian positions into a consolidated view. The aggregator is a peer agent Meridian has never provisioned. Here is how it connects.
 
@@ -103,7 +103,7 @@ A mutual client of both Meridian and a wealth-management platform has authorized
 
    Note: the trade-execution agent is **not** listed for public discovery — Meridian only exposes read-oriented agents to unprovisioned peers. Discovery is a deliberate disclosure decision, not an automatic dump of every agent.
 
-2. The aggregator fetches the portfolio agent's passport and runs the full [§1.1](/protocol#11-passport-verification-procedure) verification (it is verifying *Meridian*, the same way Meridian will shortly verify *it*). It also reads Meridian's declared connection requirements from the passport:
+2. The aggregator fetches the portfolio agent's passport and runs the full [§1.1](/protocol/trust#11-passport-verification-procedure) verification (it is verifying *Meridian*, the same way Meridian will shortly verify *it*). It also reads Meridian's declared connection requirements from the passport:
 
     ```yaml
     security:
@@ -122,14 +122,14 @@ A mutual client of both Meridian and a wealth-management platform has authorized
 
 3. The aggregator calls `POST https://agents.meridian.example/portfolio/tools/get_positions`, presenting:
     - `X-ADL-Passport`: the aggregator's own signed passport.
-    - `X-ADL-Proof`: a fresh presentation proof ([§1.2](/protocol#12-presentation-proof)) bound to this request URI and method, claiming `scopes: ["portfolio:read"]`.
+    - `X-ADL-Proof`: a fresh presentation proof ([§1.2](/protocol/trust#12-presentation-proof)) bound to this request URI and method, claiming `scopes: ["portfolio:read"]`.
 
 4. Meridian — now the **verifier** — authenticates the inbound caller from scratch. **It has no prior relationship with the aggregator; everything it needs arrives in this request:**
-    - [§1.1](/protocol#11-passport-verification-procedure): verify the aggregator's passport (resolve its `did:web`, cross-check key, verify signature, check lifecycle).
-    - [§1.2.6](/protocol#126-verification-procedure): verify the presentation proof (issuer match, temporal validity, request binding, signature, replay).
-    - **Provider allowlist ([§1.1.8](/protocol#118-provideridentity-coherence)):** because Meridian is regulated, it does not accept *any* well-formed passport. It checks the aggregator's `provider` / `id` authority against an allowlist of agents it has agreed to do business with, and requires the passport to carry a third-party attestation ([§10.2](/spec/next#102-attestation)) from an issuer Meridian trusts. An unknown but cryptographically valid agent is rejected here — verification ≠ authorization to transact.
-    - [§2.2](/protocol#22-authorization-in-agent-to-agent-flows): ceiling check (`proof.scopes ⊆ aggregator's passport ceiling`) and required-scope check (`get_positions` requires `portfolio:read` ⊆ `proof.scopes`).
-    - [§1.1.9](/protocol#119-permission-and-classification-compatibility): positions are `confidential` ([§10.1](/spec/next#101-data-classification)); Meridian checks the aggregator's declared `data_classification.sensitivity` is high enough to receive them.
+    - [§1.1](/protocol/trust#11-passport-verification-procedure): verify the aggregator's passport (resolve its `did:web`, cross-check key, verify signature, check lifecycle).
+    - [§1.2.6](/protocol/trust#126-verification-procedure): verify the presentation proof (issuer match, temporal validity, request binding, signature, replay).
+    - **Provider allowlist ([§1.1.8](/protocol/trust#118-provideridentity-coherence)):** because Meridian is regulated, it does not accept *any* well-formed passport. It checks the aggregator's `provider` / `id` authority against an allowlist of agents it has agreed to do business with, and requires the passport to carry a third-party attestation ([§10.2](/spec/next#102-attestation)) from an issuer Meridian trusts. An unknown but cryptographically valid agent is rejected here — verification ≠ authorization to transact.
+    - [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows): ceiling check (`proof.scopes ⊆ aggregator's passport ceiling`) and required-scope check (`get_positions` requires `portfolio:read` ⊆ `proof.scopes`).
+    - [§1.1.9](/protocol/trust#119-permission-and-classification-compatibility): positions are `confidential` ([§10.1](/spec/next#101-data-classification)); Meridian checks the aggregator's declared `data_classification.sensitivity` is high enough to receive them.
 
 5. All checks pass; Meridian returns the positions. **Every one of those checks runs again on the aggregator's next request** — there is no session that "remembers" the aggregator the way Dana's browser session remembers her. Agent-to-agent is stateless per request; the presentation proof is the per-request authenticator.
 
@@ -147,8 +147,8 @@ A Fortune-50 brokerage adds requirements a consumer service wouldn't:
 
 - **Identity proofing.** For humans, KYC happened at account opening; the OIDC login binds to that proofed identity. For agents, Meridian requires a third-party attestation ([§10.2](/spec/next#102-attestation)) and an allowlisted provider authority — a cryptographically valid passport from an unknown party is not enough to transact.
 - **Entitlements as scopes.** What a caller may do (view positions vs. execute trades) is expressed as [§10.4](/spec/next#104-authorization-scopes) scopes, derived from the human's account profile or the agent's negotiated relationship — not from the caller's say-so.
-- **Step-up for high-stakes operations.** Trade execution forces re-authentication (humans) or a server-issued nonce / human-in-the-loop confirmation (agents, [§1.2.7](/protocol#127-server-issued-nonces)), even within an otherwise-authenticated session.
-- **Data classification gating.** Positions and balances are `confidential` ([§10.1](/spec/next#101-data-classification)); Meridian enforces classification compatibility ([§1.1.9](/protocol#119-permission-and-classification-compatibility)) so a caller cleared only for `public` data cannot receive them.
+- **Step-up for high-stakes operations.** Trade execution forces re-authentication (humans) or a server-issued nonce / human-in-the-loop confirmation (agents, [§1.2.7](/protocol/trust#127-server-issued-nonces)), even within an otherwise-authenticated session.
+- **Data classification gating.** Positions and balances are `confidential` ([§10.1](/spec/next#101-data-classification)); Meridian enforces classification compatibility ([§1.1.9](/protocol/trust#119-permission-and-classification-compatibility)) so a caller cleared only for `public` data cannot receive them.
 - **Per-interaction audit.** Every inbound authentication and authorization decision — human or agent — is logged with enough detail to reconstruct who did what, under whose authority, when. The per-request statelessness of the agent path is an audit *advantage*: each request carries its own signed, timestamped proof.
 
 ## Where "once at setup" does and does not apply
@@ -173,7 +173,7 @@ She comes back an hour later and sends another message. The token is past `exp`;
 
 ### The aggregator is verifiable but not on Meridian's allowlist
 
-The aggregator's passport verifies cleanly under [§1.1](/protocol#11-passport-verification-procedure), and its proof is valid under [§1.2](/protocol#12-presentation-proof) — but Meridian has no business relationship with `aggregator.example`. The allowlist / attestation check rejects it. **Verification is not authorization:** proving who you are does not entitle you to transact with a regulated provider. The aggregator gets a structured `403` distinguishing "not verified" from "verified but not authorized."
+The aggregator's passport verifies cleanly under [§1.1](/protocol/trust#11-passport-verification-procedure), and its proof is valid under [§1.2](/protocol/trust#12-presentation-proof) — but Meridian has no business relationship with `aggregator.example`. The allowlist / attestation check rejects it. **Verification is not authorization:** proving who you are does not entitle you to transact with a regulated provider. The aggregator gets a structured `403` distinguishing "not verified" from "verified but not authorized."
 
 ### A peer agent requests `trades:execute` over discovery
 
@@ -181,11 +181,11 @@ The trade-execution agent isn't even listed in the well-known file, and its tool
 
 ### Replayed proof against the portfolio agent
 
-A captured `X-ADL-Proof` replayed at the same endpoint is caught by [§1.2.6.6](/protocol#126-verification-procedure) (the `jti` is already in Meridian's recent-cache); replayed at a different endpoint, by [§1.2.6.4](/protocol#126-verification-procedure) (request-binding mismatch). The provider's per-request verification is exactly what makes replay detectable.
+A captured `X-ADL-Proof` replayed at the same endpoint is caught by [§1.2.6.6](/protocol/trust#126-verification-procedure) (the `jti` is already in Meridian's recent-cache); replayed at a different endpoint, by [§1.2.6.4](/protocol/trust#126-verification-procedure) (request-binding mismatch). The provider's per-request verification is exactly what makes replay detectable.
 
 ### Caller's classification is too low for positions
 
-The aggregator's passport declares `data_classification.sensitivity: internal`, but Meridian classifies positions as `confidential`. [§1.1.9](/protocol#119-permission-and-classification-compatibility) rejects: the caller is not cleared to receive `confidential` data. Meridian returns a classification-mismatch error without leaking the positions.
+The aggregator's passport declares `data_classification.sensitivity: internal`, but Meridian classifies positions as `confidential`. [§1.1.9](/protocol/trust#119-permission-and-classification-compatibility) rejects: the caller is not cleared to receive `confidential` data. Meridian returns a classification-mismatch error without leaking the positions.
 
 ## Spec section index
 
@@ -193,14 +193,14 @@ The aggregator's passport declares `data_classification.sensitivity: internal`, 
 |--------------------|--------------|
 | Publish callable agents | [§6.4](/spec/next#64-discovery) (well-known discovery) |
 | Human client login (per session) | [§10.3.3.1](/spec/next#10331-oauth-21-type-oauth2) (OIDC) |
-| Authorize human request | [§2.1](/protocol#21-authorization-in-human-to-agent-flows) |
-| Step-up for high-stakes human action | [§1.2.7](/protocol#127-server-issued-nonces) (analog) |
-| Verify inbound peer agent (per request) | [§1.1](/protocol#11-passport-verification-procedure) (all steps) |
-| Verify the request binding | [§1.2.6](/protocol#126-verification-procedure) |
+| Authorize human request | [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) |
+| Step-up for high-stakes human action | [§1.2.7](/protocol/trust#127-server-issued-nonces) (analog) |
+| Verify inbound peer agent (per request) | [§1.1](/protocol/trust#11-passport-verification-procedure) (all steps) |
+| Verify the request binding | [§1.2.6](/protocol/trust#126-verification-procedure) |
 | Require caller attestation | [§10.2](/spec/next#102-attestation) (third-party) |
-| Provider allowlist for transacting | [§1.1.8](/protocol#118-provideridentity-coherence) |
-| Authorize peer agent request | [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) (ceiling + required scope) |
-| Classification gating | [§10.1](/spec/next#101-data-classification) + [§1.1.9](/protocol#119-permission-and-classification-compatibility) |
+| Provider allowlist for transacting | [§1.1.8](/protocol/trust#118-provideridentity-coherence) |
+| Authorize peer agent request | [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) (ceiling + required scope) |
+| Classification gating | [§10.1](/spec/next#101-data-classification) + [§1.1.9](/protocol/trust#119-permission-and-classification-compatibility) |
 
 ## Related material
 

@@ -8,13 +8,13 @@ keywords: [adl, pattern, multi-hop, delegation, oauth, dpop, passport, presentat
 
 # Multi-Hop Authentication and Authorization
 
-**The pattern:** an agent acting on a user's behalf calls other agents and services, and each hop must independently authenticate the caller and authorize the specific operation. This is the core capability ADL adds on top of OAuth 2.1: human-to-agent boundaries authenticate with OAuth credentials ([§10.3.3](/spec/next#1033-credential-schemes)), agent-to-agent boundaries authenticate with passports ([§1.1](/protocol#11-passport-verification-procedure)) and presentation proofs ([§1.2](/protocol#12-presentation-proof)), and authorization scopes ([§10.4](/spec/next#104-authorization-scopes)) compose across the chain so that no single hop sees more authority than it needs.
+**The pattern:** an agent acting on a user's behalf calls other agents and services, and each hop must independently authenticate the caller and authorize the specific operation. This is the core capability ADL adds on top of OAuth 2.1: human-to-agent boundaries authenticate with OAuth credentials ([§10.3.3](/spec/next#1033-credential-schemes)), agent-to-agent boundaries authenticate with passports ([§1.1](/protocol/trust#11-passport-verification-procedure)) and presentation proofs ([§1.2](/protocol/trust#12-presentation-proof)), and authorization scopes ([§10.4](/spec/next#104-authorization-scopes)) compose across the chain so that no single hop sees more authority than it needs.
 
 **Illustrated through a scenario:** Alice asks her assistant to book a 5-day vacation to Ibiza in July — she might type it into a web app, DM it to her agent on Discord or Slack, send an iMessage, or email it; the entry point varies but the model is the same. The assistant checks her calendar for open dates, reaches out to travel agents — or, if Alice has a preferred airline, books with that airline directly — and arranges a hotel, searching options first and then escalating to actually book and charge her card. The assistant here is itself an AI agent (often a self-hosted OpenClaw agent) acting on Alice's behalf. The vacation booking is incidental; what matters is the authentication and authorization decision made at each hop. The protocol details behind "checks her calendar" and "reaches out to travel agents" are spelled out hop-by-hop below.
 
 A note on how to read this: the assistant does **not** start out knowing which agents it will call or which scopes those calls require. It starts with one thing — Alice's message and the standing authority she delegated when she set it up. Everything else is discovered as it works: it parses the request, uses the tools it already has, finds the agents it needs, and learns each counterparty's connection requirements *from that counterparty's passport* at the moment it connects. It then works the task to completion on its own; it does not return to Alice between hops. The walkthrough is ordered to follow that real sequence of discovery, not a pre-computed plan.
 
-This walkthrough traces every authentication and authorization decision along the way, with explicit citations to the corresponding spec sections. It is the canonical worked example for the cohesive Authentication structure ([§10.3](/spec/next#103-authentication)) and the cross-flow scope composition rules ([§2.3](/protocol#23-composition-across-boundaries-multi-hop-authorization)).
+This walkthrough traces every authentication and authorization decision along the way, with explicit citations to the corresponding spec sections. It is the canonical worked example for the cohesive Authentication structure ([§10.3](/spec/next#103-authentication)) and the cross-flow scope composition rules ([§2.3](/protocol/trust#23-composition-across-boundaries-multi-hop-authorization)).
 
 ![Infographic of the vacation-booking scenario. At the top, Alice delegates a single authority envelope S_h — calendar:read, travel:search, travel:book, payments:authorize — to her Personal Assistant once via OAuth 2.1; this envelope is the ceiling for everything that follows. A banner states the rule: at each hop the assistant reads the required scopes from the counterparty's passport and claims only that minimum. Six numbered, color-coded steps then trace the journey: (1) the task arrives over an authenticated channel, (2) an OAuth token exchange to a Calendar MCP server claiming calendar:read, (3) public discovery where the assistant verifies each agent's passport and reads the required scopes off it, (4) an ADL passport-plus-proof call to a Flight Agent claiming flights:search, (5) the higher-stakes flight booking that escalates to flights:book plus payments:authorize while staying within the envelope, and (6) the hotel agent claiming hotels:book plus payments:authorize. Three takeaways close it: scopes are pulled not pushed, reduced to the minimum, and every hop authenticates independently so no hop sees the full chain.](./diagrams/multi-hop-authorization.svg)
 
@@ -35,7 +35,7 @@ This walkthrough traces every authentication and authorization decision along th
 
 For the agent-to-agent hops to work at all, each agent has previously established cryptographic identity:
 
-- **Personal Assistant** has an Ed25519 keypair (private key in `assistant.example`'s KMS), a DID Document at `https://assistant.example/agents/personal-bot/did.json`, and a signed passport at `https://assistant.example/agents/personal-bot`. The passport's `cryptographic_identity.public_key.value` matches the DID Document's `assertionMethod` key (the [§1.1.4](/protocol#114-public-key-cross-check) cross-check anchor).
+- **Personal Assistant** has an Ed25519 keypair (private key in `assistant.example`'s KMS), a DID Document at `https://assistant.example/agents/personal-bot/did.json`, and a signed passport at `https://assistant.example/agents/personal-bot`. The passport's `cryptographic_identity.public_key.value` matches the DID Document's `assertionMethod` key (the [§1.1.4](/protocol/trust#114-public-key-cross-check) cross-check anchor).
 - **Flight Booking Agent** and **Hotel Booking Agent** likewise.
 - The well-known discovery endpoint at `https://travel-agents.example/.well-known/adl-agents` lists active travel agents. Each entry includes the agent's `id`, `adl_document` URL, name, version, and lifecycle status.
 
@@ -62,7 +62,7 @@ The rest of this document is that sequence in full detail. The key thing the hop
 ## Hop 1: Alice → Personal Assistant
 
 **Authentication path:** [§10.3.3](/spec/next#1033-credential-schemes) (Credential Schemes) — established once at setup, presented per message by the channel
-**Authorization path:** [§2.1](/protocol#21-authorization-in-human-to-agent-flows) (Human-to-Agent Flows)
+**Authorization path:** [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) (Human-to-Agent Flows)
 
 Alice doesn't necessarily reach her assistant through a web app. People run agents — often an OpenClaw agent they've configured on their own machine — and talk to them over whatever channel they already live in: a Discord DM, a Slack message, a Teams chat, iMessage, email, or a web UI. The authentication model has to work across all of them, and it does, because of one separation: **delegation is established once, at setup; each task message is authenticated by the channel it arrives on.** There is no consent screen popping up mid-conversation on Discord.
 
@@ -119,13 +119,13 @@ The assistant never needs to come back to Alice as long as each step's discovere
 ## Hop 2: Personal Assistant → Calendar MCP Server
 
 **Authentication path:** OAuth 2.1 token exchange ([§10.3.3.1](/spec/next#10331-oauth-21-type-oauth2))
-**Authorization path:** [§2.1](/protocol#21-authorization-in-human-to-agent-flows) (the MCP server is itself an OAuth 2.1 resource server)
+**Authorization path:** [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) (the MCP server is itself an OAuth 2.1 resource server)
 
 ### Why this hop is OAuth, not passport
 
 MCP servers in the wild are typically OAuth 2.1 resource servers. They authenticate via tokens, not via ADL passports. So even though the assistant is an ADL agent, when it calls a non-ADL MCP server, it falls back to OAuth 2.1.
 
-If the calendar MCP did speak ADL, the assistant would use [§1.1](/protocol#11-passport-verification-procedure) + [§1.2](/protocol#12-presentation-proof) + [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) instead — the same machinery as Hops 4–6. The choice of authentication mechanism is a property of the *server*, not the *client*. ADL agents speak OAuth 2.1 to non-ADL servers and ADL passports to ADL servers, gracefully.
+If the calendar MCP did speak ADL, the assistant would use [§1.1](/protocol/trust#11-passport-verification-procedure) + [§1.2](/protocol/trust#12-presentation-proof) + [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) instead — the same machinery as Hops 4–6. The choice of authentication mechanism is a property of the *server*, not the *client*. ADL agents speak OAuth 2.1 to non-ADL servers and ADL passports to ADL servers, gracefully.
 
 ### What happens
 
@@ -144,7 +144,7 @@ If the calendar MCP did speak ADL, the assistant would use [§1.1](/protocol#11-
 
 3. The MCP server's [§10.3.3](/spec/next#1033-credential-schemes) authentication validates the token, the audience, and the DPoP binding.
 
-4. [§2.1](/protocol#21-authorization-in-human-to-agent-flows) authorization at the MCP server:
+4. [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) authorization at the MCP server:
     - `required = ["calendar:read"]` for the `find_open_dates` tool.
     - `presented = ["calendar:read"]` from the exchanged token.
     - `required ⊆ presented` ✓ — authorized.
@@ -161,7 +161,7 @@ If the calendar MCP did speak ADL, the assistant would use [§1.1](/protocol#11-
 ## Hop 3: Personal Assistant → Travel Discovery
 
 **Authentication path:** None — public discovery endpoint
-**Authorization path:** None at retrieval. **[§1.1](/protocol#11-passport-verification-procedure) verification** runs on each discovered passport before they enter the assistant's candidate list.
+**Authorization path:** None at retrieval. **[§1.1](/protocol/trust#11-passport-verification-procedure) verification** runs on each discovered passport before they enter the assistant's candidate list.
 
 ### What happens
 
@@ -186,17 +186,17 @@ If the calendar MCP did speak ADL, the assistant would use [§1.1](/protocol#11-
     }
     ```
 
-3. For each candidate, the assistant fetches the passport (HTTPS GET to `adl_document`) and runs the full [§1.1](/protocol#11-passport-verification-procedure) verification procedure:
+3. For each candidate, the assistant fetches the passport (HTTPS GET to `adl_document`) and runs the full [§1.1](/protocol/trust#11-passport-verification-procedure) verification procedure:
 
-    - **[§1.1.1](/protocol#111-retrieval-integrity) Retrieval Integrity** — TLS validation against the candidate's domain.
-    - **[§1.1.2](/protocol#112-schema-validation) Schema Validation** — passport conforms to the ADL schema.
-    - **[§1.1.3](/protocol#113-identity-resolution) Identity Resolution** — resolve `did:web:acme-flights.example:agents:booking` to its DID Document at `https://acme-flights.example/agents/booking/did.json`.
-    - **[§1.1.4](/protocol#114-public-key-cross-check) Public Key Cross-Check** — passport's inline `cryptographic_identity.public_key.value` matches the DID Document's `assertionMethod` key.
-    - **[§1.1.5](/protocol#115-signature-verification) Signature Verification** — the passport signature verifies against the resolved key.
-    - **[§1.1.6](/protocol#116-temporal-validity) Temporal Validity** — `security.attestation.expires_at` is well in the future.
-    - **[§1.1.7](/protocol#117-lifecycle-gating) Lifecycle Gating** — `lifecycle.status: "active"`. (Budget Air's status is `deprecated`, which the assistant logs but doesn't filter — it's still safe to use, just with a sunset warning. If it were `retired`, the assistant would skip it entirely.)
-    - **[§1.1.8](/protocol#118-provideridentity-coherence) Provider–Identity Coherence** — TLS authority `acme-flights.example` matches `provider.url` host matches the `did:web` domain segment.
-    - **[§1.1.9](/protocol#119-permission-and-classification-compatibility) Permission/Classification Compatibility** — the assistant is invoking the agent shortly, so it pre-checks classification: assistant's `data_classification.sensitivity` (let's say `internal`) is `≥` flight agent's classification (`internal`). ✓
+    - **[§1.1.1](/protocol/trust#111-retrieval-integrity) Retrieval Integrity** — TLS validation against the candidate's domain.
+    - **[§1.1.2](/protocol/trust#112-schema-validation) Schema Validation** — passport conforms to the ADL schema.
+    - **[§1.1.3](/protocol/trust#113-identity-resolution) Identity Resolution** — resolve `did:web:acme-flights.example:agents:booking` to its DID Document at `https://acme-flights.example/agents/booking/did.json`.
+    - **[§1.1.4](/protocol/trust#114-public-key-cross-check) Public Key Cross-Check** — passport's inline `cryptographic_identity.public_key.value` matches the DID Document's `assertionMethod` key.
+    - **[§1.1.5](/protocol/trust#115-signature-verification) Signature Verification** — the passport signature verifies against the resolved key.
+    - **[§1.1.6](/protocol/trust#116-temporal-validity) Temporal Validity** — `security.attestation.expires_at` is well in the future.
+    - **[§1.1.7](/protocol/trust#117-lifecycle-gating) Lifecycle Gating** — `lifecycle.status: "active"`. (Budget Air's status is `deprecated`, which the assistant logs but doesn't filter — it's still safe to use, just with a sunset warning. If it were `retired`, the assistant would skip it entirely.)
+    - **[§1.1.8](/protocol/trust#118-provideridentity-coherence) Provider–Identity Coherence** — TLS authority `acme-flights.example` matches `provider.url` host matches the `did:web` domain segment.
+    - **[§1.1.9](/protocol/trust#119-permission-and-classification-compatibility) Permission/Classification Compatibility** — the assistant is invoking the agent shortly, so it pre-checks classification: assistant's `data_classification.sensitivity` (let's say `internal`) is `≥` flight agent's classification (`internal`). ✓
 
 4. Acme Flight Booking and Luxury Hotels Concierge both pass with no warnings. Budget Air Legacy passes with a `deprecated` warning logged for ops review. The assistant's candidate list is `[Acme Flight Booking, Luxury Hotels Concierge, Budget Air Legacy(warn)]`.
 
@@ -220,7 +220,7 @@ tools:
 
 This tells the assistant three things before it sends a single request:
 
-- **Authentication path:** Acme is an ADL agent and exposes its `did:web` identity, so the assistant will authenticate agent-to-agent ([§1.1](/protocol#11-passport-verification-procedure) + [§1.2](/protocol#12-presentation-proof)) rather than via the human OAuth path. (A counterparty that only spoke OAuth would advertise only `security.authentication`, and the assistant would fall back to the [Hop 2](#hop-2-personal-assistant--calendar-mcp-server) pattern.)
+- **Authentication path:** Acme is an ADL agent and exposes its `did:web` identity, so the assistant will authenticate agent-to-agent ([§1.1](/protocol/trust#11-passport-verification-procedure) + [§1.2](/protocol/trust#12-presentation-proof)) rather than via the human OAuth path. (A counterparty that only spoke OAuth would advertise only `security.authentication`, and the assistant would fall back to the [Hop 2](#hop-2-personal-assistant--calendar-mcp-server) pattern.)
 - **What `search_flights` requires:** `flights:search`.
 - **What `book_flight` requires:** `flights:book` + `payments:authorize`.
 
@@ -228,7 +228,7 @@ The assistant now checks those discovered requirements against Alice's standing 
 
 **Audit record at this hop:**
 - Verification outcome per candidate (verified, public key source, lifecycle warnings)
-- For Budget Air specifically: verified=true, severity=warn at [§1.1.7](/protocol#117-lifecycle-gating)
+- For Budget Air specifically: verified=true, severity=warn at [§1.1.7](/protocol/trust#117-lifecycle-gating)
 - Discovered connection requirements per chosen agent (auth path + per-tool required scopes)
 
 The assistant decides to use Acme Flight Booking and Luxury Hotels Concierge.
@@ -237,8 +237,8 @@ The assistant decides to use Acme Flight Booking and Luxury Hotels Concierge.
 
 ## Hop 4: Personal Assistant → Flight Booking Agent (search)
 
-**Authentication path:** [§1.1](/protocol#11-passport-verification-procedure) (passport already verified in Hop 3, cached) + [§1.2](/protocol#12-presentation-proof) (presentation proof, fresh per request)
-**Authorization path:** [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) (Agent-to-Agent Flows)
+**Authentication path:** [§1.1](/protocol/trust#11-passport-verification-procedure) (passport already verified in Hop 3, cached) + [§1.2](/protocol/trust#12-presentation-proof) (presentation proof, fresh per request)
+**Authorization path:** [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) (Agent-to-Agent Flows)
 
 ### Constructing the proof
 
@@ -253,7 +253,7 @@ assistant ceiling                = {..., flights:search, flights:book, ...}
 required ⊆ map(S_h) ∩ ceiling  ?  YES  → claim exactly `required`
 ```
 
-This is the **reduction pattern** from [§2.3](/protocol#23-composition-across-boundaries-multi-hop-authorization) applied per-counterparty: the requirement is pulled from the counterparty, not pushed by the assistant, and the assistant claims the minimum the counterparty asked for rather than the maximum Alice granted. For *this* search request, that minimum is `flights:search`.
+This is the **reduction pattern** from [§2.3](/protocol/trust#23-composition-across-boundaries-multi-hop-authorization) applied per-counterparty: the requirement is pulled from the counterparty, not pushed by the assistant, and the assistant claims the minimum the counterparty asked for rather than the maximum Alice granted. For *this* search request, that minimum is `flights:search`.
 
 ```json
 {
@@ -275,7 +275,7 @@ This is the **reduction pattern** from [§2.3](/protocol#23-composition-across-b
 }
 ```
 
-The signature covers the JCS-canonical form of the proof minus the `signature` object (per [§1.2.6.5](/protocol#126-verification-procedure)). Since `scopes` is part of the canonical bytes, an attacker who scrapes the proof cannot replay it with an expanded scope set.
+The signature covers the JCS-canonical form of the proof minus the `signature` object (per [§1.2.6.5](/protocol/trust#126-verification-procedure)). Since `scopes` is part of the canonical bytes, an attacker who scrapes the proof cannot replay it with an expanded scope set.
 
 ### Request
 
@@ -291,18 +291,18 @@ Content-Type: application/json
 
 ### Verification at Acme Flight Booking
 
-1. **[§1.1](/protocol#11-passport-verification-procedure) Passport Verification** — already cached from Hop 3 (or re-run fresh if cache expired). All 9 steps pass.
+1. **[§1.1](/protocol/trust#11-passport-verification-procedure) Passport Verification** — already cached from Hop 3 (or re-run fresh if cache expired). All 9 steps pass.
 
-2. **[§1.2.6](/protocol#126-verification-procedure) Proof Verification:**
-    - **[§1.2.6.1](/protocol#126-verification-procedure) Parsing** — proof is valid JSON, all required members present.
-    - **[§1.2.6.2](/protocol#126-verification-procedure) Issuer Match** — proof.iss `https://assistant.example/agents/personal-bot` equals passport.id ✓.
-    - **[§1.2.6.3](/protocol#126-verification-procedure) Temporal Validity** — current time is between `iat - 60s` and `exp + 60s`, and `exp - iat ≤ 5min` ✓.
-    - **[§1.2.6.4](/protocol#126-verification-procedure) Request Binding** — proof.request.method = `POST` matches actual method ✓; proof.request.uri canonicalizes to actual URI ✓.
-    - **[§1.2.6.5](/protocol#126-verification-procedure) Signature Verification** — Ed25519 signature verifies against JCS canonical bytes using the verification key from [§1.1.4](/protocol#114-public-key-cross-check) ✓.
-    - **[§1.2.6.6](/protocol#126-verification-procedure) Replay Prevention** — `jti` not in the verifier's recent-cache ✓; insert it.
-    - **[§1.2.6.7](/protocol#126-verification-procedure) Nonce Verification** — N/A (no server-issued nonce required).
+2. **[§1.2.6](/protocol/trust#126-verification-procedure) Proof Verification:**
+    - **[§1.2.6.1](/protocol/trust#126-verification-procedure) Parsing** — proof is valid JSON, all required members present.
+    - **[§1.2.6.2](/protocol/trust#126-verification-procedure) Issuer Match** — proof.iss `https://assistant.example/agents/personal-bot` equals passport.id ✓.
+    - **[§1.2.6.3](/protocol/trust#126-verification-procedure) Temporal Validity** — current time is between `iat - 60s` and `exp + 60s`, and `exp - iat ≤ 5min` ✓.
+    - **[§1.2.6.4](/protocol/trust#126-verification-procedure) Request Binding** — proof.request.method = `POST` matches actual method ✓; proof.request.uri canonicalizes to actual URI ✓.
+    - **[§1.2.6.5](/protocol/trust#126-verification-procedure) Signature Verification** — Ed25519 signature verifies against JCS canonical bytes using the verification key from [§1.1.4](/protocol/trust#114-public-key-cross-check) ✓.
+    - **[§1.2.6.6](/protocol/trust#126-verification-procedure) Replay Prevention** — `jti` not in the verifier's recent-cache ✓; insert it.
+    - **[§1.2.6.7](/protocol/trust#126-verification-procedure) Nonce Verification** — N/A (no server-issued nonce required).
 
-3. **[§2.2](/protocol#22-authorization-in-agent-to-agent-flows) Authorization (Agent-to-Agent):**
+3. **[§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) Authorization (Agent-to-Agent):**
     - **Step 1:** Authentication done.
     - **Step 2: Establish ceiling.** Calling agent's passport `security.scopes` is `[calendar:read, travel:search, travel:book, payments:authorize, flights:search, flights:book, hotels:search, hotels:book]`. This is the ceiling.
     - **Step 3: Extract requested scopes.** `proof.scopes = ["flights:search"]`.
@@ -323,8 +323,8 @@ Content-Type: application/json
 
 ## Hop 5: Personal Assistant → Flight Booking Agent (book)
 
-**Authentication path:** [§1.1](/protocol#11-passport-verification-procedure) (cached) + [§1.2](/protocol#12-presentation-proof) (fresh per request)
-**Authorization path:** [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) with **escalated scopes**
+**Authentication path:** [§1.1](/protocol/trust#11-passport-verification-procedure) (cached) + [§1.2](/protocol/trust#12-presentation-proof) (fresh per request)
+**Authorization path:** [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) with **escalated scopes**
 
 ### What's different about booking
 
@@ -368,9 +368,9 @@ Note: a different `jti` (replay prevention is per-request), a different request 
 
 ### Verification at Acme Flight Booking
 
-[§1.1](/protocol#11-passport-verification-procedure) cached. [§1.2.6](/protocol#126-verification-procedure) runs fresh on the new proof — all checks pass.
+[§1.1](/protocol/trust#11-passport-verification-procedure) cached. [§1.2.6](/protocol/trust#126-verification-procedure) runs fresh on the new proof — all checks pass.
 
-[§2.2](/protocol#22-authorization-in-agent-to-agent-flows) authorization:
+[§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) authorization:
 - Ceiling check: `[flights:book, payments:authorize] ⊆ ceiling` ✓.
 - Required: `tools[book_flight].security.scopes = [flights:book, payments:authorize]`.
 - Match: `[flights:book, payments:authorize] ⊆ [flights:book, payments:authorize]` ✓.
@@ -381,7 +381,7 @@ The flight agent books the flight, charges the payment method (Alice's card on f
 
 ## Hop 6: Personal Assistant → Hotel Booking Agent
 
-Same pattern as Hops 4 & 5, but against `https://luxury-hotels.example/agents/concierge` with `hotels:search` then `hotels:book + payments:authorize`. The cached [§1.1](/protocol#11-passport-verification-procedure) verification of the hotel agent's passport reused; fresh [§1.2](/protocol#12-presentation-proof) proof per request; [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) ceiling and tool checks identical in shape.
+Same pattern as Hops 4 & 5, but against `https://luxury-hotels.example/agents/concierge` with `hotels:search` then `hotels:book + payments:authorize`. The cached [§1.1](/protocol/trust#11-passport-verification-procedure) verification of the hotel agent's passport reused; fresh [§1.2](/protocol/trust#12-presentation-proof) proof per request; [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) ceiling and tool checks identical in shape.
 
 ---
 
@@ -444,11 +444,11 @@ required ⊆ map(S_h) ∩ ceiling    ?  NO — payments:authorize is outside the
 
 This is a genuine authority gap, and the right place to resolve it is **at delegation time, not mid-task**. The assistant should request an envelope sized to the intent up front: a request to "book a vacation" plainly implies authority to pay, so the assistant requests `payments:authorize` in the original Hop 1 consent. A well-designed assistant catches an under-sized envelope before it starts work — by comparing the parsed intent against the granted scopes the moment Alice's message arrives — and asks for the missing grant once, at the start, rather than discovering it three hops deep.
 
-If the gap is only discovered mid-task (e.g., a counterparty requires a scope the assistant could not have anticipated from the intent), the assistant has two honest options: complete the part of the task it *is* authorized for and report what it could not do, or pause and request the additional grant. It does **not** silently claim authority it wasn't given — the upstream [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) ceiling check (next failure mode) is the backstop that makes sure of that. The design goal is that this is rare: front-loading the delegation to match the intent keeps the agent working autonomously to completion in the common case.
+If the gap is only discovered mid-task (e.g., a counterparty requires a scope the assistant could not have anticipated from the intent), the assistant has two honest options: complete the part of the task it *is* authorized for and report what it could not do, or pause and request the additional grant. It does **not** silently claim authority it wasn't given — the upstream [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) ceiling check (next failure mode) is the backstop that makes sure of that. The design goal is that this is rare: front-loading the delegation to match the intent keeps the agent working autonomously to completion in the common case.
 
 ### The assistant's passport ceiling doesn't include `flights:book`
 
-Maybe the assistant was provisioned without `flights:book` because the operator didn't enable that capability. At Hop 5, the assistant could *try* to issue the proof anyway, but the flight agent's [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) step 4 (ceiling subset check) would reject:
+Maybe the assistant was provisioned without `flights:book` because the operator didn't enable that capability. At Hop 5, the assistant could *try* to issue the proof anyway, but the flight agent's [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) step 4 (ceiling subset check) would reject:
 
 ```
 proof.scopes = [flights:book, payments:authorize]
@@ -457,16 +457,16 @@ ceiling      = [calendar:read, travel:search, ..., flights:search, hotels:search
 [flights:book, payments:authorize] ⊆ ceiling  ?  NO
 ```
 
-The flight agent rejects with a structured error pointing at [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) step 4. The assistant logs the misconfiguration and reports back to Alice that flight booking isn't enabled for this assistant.
+The flight agent rejects with a structured error pointing at [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) step 4. The assistant logs the misconfiguration and reports back to Alice that flight booking isn't enabled for this assistant.
 
 A well-designed assistant catches this BEFORE the request via a passport self-check (the assistant reads its own passport's ceiling), but the upstream check is the security backstop.
 
 ### Flight agent's lifecycle is `retired`
 
-The discovery document at Hop 3 listed Acme Flight Booking as `active`, but between Hop 3 and Hop 4 the agent was retired. When the assistant re-runs [§1.1](/protocol#11-passport-verification-procedure) on the cached passport (or hits a still-cached signed passport whose lifecycle changed in the document at the canonical URL), [§1.1.7](/protocol#117-lifecycle-gating) catches it:
+The discovery document at Hop 3 listed Acme Flight Booking as `active`, but between Hop 3 and Hop 4 the agent was retired. When the assistant re-runs [§1.1](/protocol/trust#11-passport-verification-procedure) on the cached passport (or hits a still-cached signed passport whose lifecycle changed in the document at the canonical URL), [§1.1.7](/protocol/trust#117-lifecycle-gating) catches it:
 
-- If the cached passport says `active` but the canonical URL now says `retired`, the [§1.1.3](/protocol#113-identity-resolution) byte-sequence check catches the divergence (the old passport doesn't match the current canonical version).
-- If the assistant re-fetches and gets the new `retired` passport, [§1.1.7](/protocol#117-lifecycle-gating) hard-blocks.
+- If the cached passport says `active` but the canonical URL now says `retired`, the [§1.1.3](/protocol/trust#113-identity-resolution) byte-sequence check catches the divergence (the old passport doesn't match the current canonical version).
+- If the assistant re-fetches and gets the new `retired` passport, [§1.1.7](/protocol/trust#117-lifecycle-gating) hard-blocks.
 
 Either way, the assistant falls back to the next candidate (Budget Air Legacy, with the deprecated warning) or surfaces the issue to Alice.
 
@@ -474,13 +474,13 @@ Either way, the assistant falls back to the next candidate (Budget Air Legacy, w
 
 Someone captures the `X-ADL-Proof` header from Hop 4 (a search) and replays it at Hop 5 (a book). They want the *book* tool's effect using the *search* tool's proof.
 
-[§1.2.6.4](/protocol#126-verification-procedure) catches this: the replayed proof has `request.uri = .../search_flights` but the actual request URL is `.../book_flight`. URI mismatch → reject.
+[§1.2.6.4](/protocol/trust#126-verification-procedure) catches this: the replayed proof has `request.uri = .../search_flights` but the actual request URL is `.../book_flight`. URI mismatch → reject.
 
-If the attacker also tries to replay the proof at the same URI (a duplicate search), [§1.2.6.6](/protocol#126-verification-procedure) catches it: the `jti` is in the recent-cache → reject.
+If the attacker also tries to replay the proof at the same URI (a duplicate search), [§1.2.6.6](/protocol/trust#126-verification-procedure) catches it: the `jti` is in the recent-cache → reject.
 
-If the attacker has *forged* a proof for the right URI but signed with their own key, [§1.2.6.5](/protocol#126-verification-procedure) catches it: the signature doesn't verify against the assistant's key.
+If the attacker has *forged* a proof for the right URI but signed with their own key, [§1.2.6.5](/protocol/trust#126-verification-procedure) catches it: the signature doesn't verify against the assistant's key.
 
-If the attacker has the assistant's private key, none of this matters — the assistant has been compromised, and operational rotation (rotating the keypair, issuing a new attestation, marking the old as superseded via §5.6 lifecycle) is the answer. The presentation proof addresses replay; private key compromise is out of scope per [§1.2.1](/protocol#121-threat-model).
+If the attacker has the assistant's private key, none of this matters — the assistant has been compromised, and operational rotation (rotating the keypair, issuing a new attestation, marking the old as superseded via §5.6 lifecycle) is the answer. The presentation proof addresses replay; private key compromise is out of scope per [§1.2.1](/protocol/trust#121-threat-model).
 
 ---
 
@@ -493,19 +493,19 @@ For implementers building this scenario:
 | Alice's setup-time delegation (web OAuth or device-code grant) | [§10.3.3.1](/spec/next#10331-oauth-21-type-oauth2) OAuth 2.1 + RFC 8628 |
 | Channel-authenticated message bound to standing delegation | [§10.3.3](/spec/next#1033-credential-schemes) |
 | Channel assurance factored into the authorization decision | [§10.4](/spec/next#104-authorization-scopes) |
-| Authorize Alice's request to assistant | [§2.1](/protocol#21-authorization-in-human-to-agent-flows) |
+| Authorize Alice's request to assistant | [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) |
 | Token exchange to MCP | [§10.3.3.1](/spec/next#10331-oauth-21-type-oauth2) + RFC 8693 |
-| MCP tool authorization | [§2.1](/protocol#21-authorization-in-human-to-agent-flows) |
+| MCP tool authorization | [§2.1](/protocol/trust#21-authorization-in-human-to-agent-flows) |
 | Discovery retrieval | [§6.4](/spec/next#64-discovery) |
-| Per-candidate verification | [§1.1](/protocol#11-passport-verification-procedure) (all 9 steps) |
-| Passport caching | [§1.1](/protocol#11-passport-verification-procedure) (implementation discretion; vector pack covers freshness) |
-| Proof construction | [§1.2](/protocol#12-presentation-proof) (build) |
-| Proof signing | [§10.2](/spec/next#102-attestation) + [§1.2](/protocol#12-presentation-proof) |
-| Proof verification at upstream | [§1.2.6](/protocol#126-verification-procedure) (all 7 sub-steps) |
-| Ceiling check | [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) step 4 |
-| Required-scope check | [§2.2](/protocol#22-authorization-in-agent-to-agent-flows) step 6 |
-| Cross-hop authorization independence | [§2.3](/protocol#23-composition-across-boundaries-multi-hop-authorization) (independent vs. reduction patterns) |
-| Audit recording | [§2.3](/protocol#23-composition-across-boundaries-multi-hop-authorization) (multi-hop record requirement) |
+| Per-candidate verification | [§1.1](/protocol/trust#11-passport-verification-procedure) (all 9 steps) |
+| Passport caching | [§1.1](/protocol/trust#11-passport-verification-procedure) (implementation discretion; vector pack covers freshness) |
+| Proof construction | [§1.2](/protocol/trust#12-presentation-proof) (build) |
+| Proof signing | [§10.2](/spec/next#102-attestation) + [§1.2](/protocol/trust#12-presentation-proof) |
+| Proof verification at upstream | [§1.2.6](/protocol/trust#126-verification-procedure) (all 7 sub-steps) |
+| Ceiling check | [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) step 4 |
+| Required-scope check | [§2.2](/protocol/trust#22-authorization-in-agent-to-agent-flows) step 6 |
+| Cross-hop authorization independence | [§2.3](/protocol/trust#23-composition-across-boundaries-multi-hop-authorization) (independent vs. reduction patterns) |
+| Audit recording | [§2.3](/protocol/trust#23-composition-across-boundaries-multi-hop-authorization) (multi-hop record requirement) |
 
 ## Related material
 

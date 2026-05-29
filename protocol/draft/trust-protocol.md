@@ -1,6 +1,6 @@
 ---
 id: trust-protocol
-slug: /
+slug: /trust
 title: "Trust Protocol"
 description: "The Trust Protocol — normative procedures for passport verification, presentation proof, and authorization enforcement in agent-to-agent trust."
 keywords: [adl, trust protocol, passport verification, presentation proof, agent identity, did:web, authorization, agent-to-agent]
