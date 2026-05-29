@@ -11,7 +11,7 @@ hide_table_of_contents: false
 # Runtime Protocol
 
 **Version:** 0.1.0-draft
-**Status:** Draft — the runtime governor (§1) and the enforcement procedures (§2–§7) are drafted; the enforcement-evidence format (shared by §1.4 and §7) is reserved.
+**Status:** Draft — the runtime governor (§1), the enforcement procedures (§2–§7), and the enforcement-evidence format (§8) are drafted; the completeness/witness tier (§8.8) is reserved.
 
 The **Runtime Protocol** defines the normative procedures a *runtime governor* performs to enforce an ADL agent's declared operational limits while the agent executes: budgets, iteration limits, sub-agent admission, human-oversight triggers, degradation, and anomaly detection. It sits in the ADL document family alongside the [ADL Core specification](/spec), which declares what an agent **is** and the limits it advertises, and the [Trust Protocol](/protocol/trust), which defines what a *counterparty* does to verify and authorize it; it is one document in ADL's open protocol layer. Where the Trust Protocol acts **once, at admission**, the Runtime Protocol acts **continuously, after admission**: it is the layer that gives an agent's declared operational limits force at runtime.
 
@@ -63,9 +63,9 @@ It is addressed by tiered evidence rather than by mandating separation:
 - At **R1 (Observing)**, the governor's contribution is the **audit trail** — a record of the agent's resource use and limit boundaries that a third party can inspect after the fact. This is "document it," not "stop it."
 - At **R2 (Enforcing)** and **R3 (Adaptive)**, a governor's enforcement **SHOULD** be **externally evidenced**: the governor produces verifiable evidence, bound to the admitted passport and session, that lets a counterparty distinguish a governor that *actually* enforced at a tier from one that merely *claimed* it.
 
-The concrete evidence format — what an enforcement record attests, how it binds to the passport and session, and how a counterparty verifies it — is **reserved**, and will be specified alongside §7 (Anomaly Detection), with which it shares an audit substrate.
+The concrete evidence format — what an enforcement record attests, how it binds to the passport and session, and how a counterparty verifies it — is specified in **§8 (Enforcement Evidence)**. That mechanism provides tamper-evidence and freshness but **not** completeness; detecting omission by a self-interested operator is the reserved witness tier (§8.8).
 
-**Status:** §1.1–§1.3 are stable framing. §1.4's evidence mechanism and the per-tier normative requirements are not yet specified.
+**Status:** §1.1–§1.3 are stable framing. §1.4's evidence mechanism is specified in §8; the per-tier normative requirements continue to firm up.
 
 ## 2 Budget Enforcement
 
@@ -155,13 +155,81 @@ The governor's PDP (§1.2) **MUST**, over the course of a session, compare obser
 1. **Track.** Accumulate the session's tool-call distribution, cost (reusing the §2 counters), and the data classes touched.
 2. **Compare.** Flag deviation when the session invokes a tool outside `expected_tools`, its cost falls outside `cost_per_session_usd`, or it touches a data class outside `data_classes`. How far a session may drift before it is "material" is governor-defined and **MUST** be documented when claiming R3.
 3. **Respond.** On material deviation, the governor resolves `runtime.degradation.on_anomaly` (§6), defaulting to fail-closed (halt). Because anomaly is a softer signal than a hard limit, a `pause` (escalate to §5 oversight) is often the appropriate declared response.
-4. **Evidence.** The governor **MUST** record the deviation in the audit trail (§1.4). This is the audit substrate §1.4 refers to: the **enforcement evidence** that lets a counterparty distinguish a governor that *actually* monitors (R3) from one that merely claims it. The concrete evidence format — what an anomaly/enforcement record attests, and how it binds to the admitted passport and session — is specified here once the §1.4 mechanism is settled, and remains **reserved** in this draft.
+4. **Evidence.** The governor **MUST** record the deviation as an enforcement event in the signed record of **§8**, so a counterparty can distinguish a governor that *actually* monitors (R3) from one that merely claims it. An anomaly is the `on_anomaly` cause; the record's tamper-evidence and freshness properties (§8.1) apply, and completeness remains subject to the reserved witness tier (§8.8).
 
-Because the baseline is self-declared by the agent, anomaly detection against it is only as strong as the baseline is honest; its governance value depends on the evidence in step 4 being externally verifiable (§1.4).
+Because the baseline is self-declared by the agent, anomaly detection against it is only as strong as the baseline is honest; its governance value depends on the §8 evidence being externally verifiable.
 
 **Conformance.** Anomaly detection is **R3**. At **R1**/**R2** a governor **MAY** record baseline deviation but is not required to act on it; at **R3** it **MUST** monitor against a declared baseline and apply §6 on material deviation.
 
-**Status:** The detection procedure is framed; the enforcement-evidence format (shared with §1.4) is reserved.
+## 8 Enforcement Evidence
+
+§1.4 requires that, at R2 and above, a governor's enforcement be *externally evidenced* so a counterparty can distinguish a governor that actually enforced from one that merely claims a tier. This section specifies that evidence: a signed, per-session **enforcement record**.
+
+### 8.1 Trust model — what the evidence proves, and what it does not
+
+Because a governor **MAY** be operated by the same party as the agent (§1.1), evidence must be read with a clear understanding of its guarantees:
+
+- **Tamper-evidence (provided).** The record is signed by the governor and its events are hash-chained, so a counterparty can detect any *alteration, reordering, or deletion* of recorded events.
+- **Freshness and interaction-binding (provided).** A counterparty **MAY** seed the record with a nonce (§8.5); a record carrying that nonce could only have been produced after the challenge, so a governor cannot satisfy the counterparty with a stale or pre-fabricated record.
+- **Completeness (NOT provided at this tier).** Signing and chaining cannot prove that an event the governor *never recorded* did not occur. A self-interested operator can still under-report. Detecting omission requires third-party witnessing; that is the reserved higher-assurance tier in §8.8. The evidence in this section is honest about stopping short of it.
+
+### 8.2 The governor's identity
+
+The governor is a first-class identified actor. The record's `governor` field is an identifier — an HTTPS URI or `did:web` — that resolves to a verification key exactly as a passport `id` does (Trust Protocol §1.1.3). The governor's identity **MAY** itself be an ADL passport. A counterparty resolves and pins the governor key the same way it resolves an agent's, reusing the §10.2 attestation and §1.1.5 signature machinery.
+
+### 8.3 Enforcement record structure
+
+An enforcement record **MUST** be a JSON object with the following members:
+
+| Member | Type | Required | Description |
+|--------|------|----------|-------------|
+| `adl_enforcement_record` | string | REQUIRED | Format version. **MUST** be `"1.0"`. |
+| `governor` | string | REQUIRED | The governor's identifier (HTTPS URI or `did:web`), resolved to its key per §8.2. |
+| `subject` | object | REQUIRED | The admitted agent: `id` (the passport `id`) and `passport_digest` (the digest of the JCS-canonical admitted passport bytes, per the §1.3 version pin). |
+| `session` | string | REQUIRED | Identifier of the governed session (§1.3). |
+| `tier` | string | REQUIRED | The tier the governor enforced for this session: `"R1"`, `"R2"`, or `"R3"`. |
+| `window` | object | REQUIRED | `start` / `end` ISO 8601 timestamps spanning the session. |
+| `iat` | string | REQUIRED | ISO 8601 time the record was issued. |
+| `nonce` | string | OPTIONAL | A counterparty-issued nonce (§8.5), when freshness binding is required. |
+| `limits` | object | OPTIONAL | Summary of the declared limits in force (the §2–§7 members the governor enforced). |
+| `events` | array | REQUIRED | Ordered, hash-chained enforcement events (§8.4). MAY be empty when no limit fired. |
+| `outcome` | string | REQUIRED | Session outcome: `"completed"`, `"halted"`, or `"paused"`. |
+| `signature` | object | REQUIRED | Signature over the JCS-canonical record minus `signature`, by the governor's key. Same shape as §10.2 attestation signatures (Ed25519 RECOMMENDED). |
+
+Each `events[]` entry **MUST** contain `seq` (0-based index), `cause` (`on_budget_exhausted`, `on_iteration_limit`, `on_sub_agent_denied`, `on_oversight_timeout`, `on_tool_error`, `on_anomaly`), `action` (the §6 action applied), `at` (ISO 8601), and `prev_hash` (§8.4); it **MAY** contain `detail`.
+
+### 8.4 Event hash-chaining
+
+Events are chained so their order and integrity are self-checking and to provide the anchor points the §8.8 witness tier attests:
+
+- `events[0].prev_hash` **MUST** be the SHA-256, base64url-encoded, of the JCS-canonical record *header* (the record minus `events` and `signature`).
+- `events[i].prev_hash` (i > 0) **MUST** be the SHA-256, base64url-encoded, of the JCS-canonical bytes of `events[i-1]`.
+
+A verifier recomputes the chain; any altered, reordered, or removed event breaks a `prev_hash` link. The governor's `signature` over the full record (including `events`) seals the chain at session end.
+
+### 8.5 Counterparty-seeded binding
+
+A counterparty **MAY** require a fresh record bound to its own challenge, using the nonce mechanism of Trust Protocol §1.2.7: the counterparty issues a nonce (e.g. `WWW-Authenticate: ADL nonce="…"`), and the governor **MUST** include it as the record's `nonce` so it is covered by the signature. A record carrying the counterparty's nonce demonstrably post-dates the challenge, defeating stale or pre-fabricated evidence for that interaction. Deployments handling `restricted` data (§10.1) **SHOULD** require it.
+
+### 8.6 Verification procedure
+
+A counterparty verifying an enforcement record **MUST**:
+
+1. **Schema-validate** the record against `schema-enforcement-record.json`.
+2. **Resolve the governor key** from `governor` per §8.2 (Trust Protocol §1.1.3 identity resolution).
+3. **Verify the signature** over the JCS-canonical record minus `signature` (Trust Protocol §1.1.5).
+4. **Bind to the passport.** Confirm `subject.passport_digest` matches the digest of the passport admitted for the session (§1.3 version pin); a mismatch means the evidence is for a different passport version and **MUST** be rejected.
+5. **Verify the nonce** (when the counterparty issued one): it **MUST** equal the issued value and be within its TTL (§1.2.7 semantics).
+6. **Verify the hash-chain** per §8.4; a broken link **MUST** cause rejection.
+7. **Interpret honestly.** A valid record is tamper-evidence of *what the governor recorded* at the stated tier — not proof of completeness (§8.1). A counterparty **MUST NOT** treat a valid record as proof that no unrecorded violation occurred.
+
+### 8.7 Conveyance
+
+A governor **MAY** convey the record inline to a counterparty on request (the agent-to-agent analog of returning a presentation proof) and **MAY** publish it to the agent's governance record (the `governance_record_ref` of the Governance Profile), where operational evidence is expected to live. The record is self-contained: its signature and `subject.passport_digest` make it verifiable wherever it is obtained.
+
+### 8.8 Completeness and the witness tier (reserved)
+
+Detecting *omission* — not just alteration — requires a third party that sees records independently of the operator. A future higher-assurance tier anchors each record (or its event-chain checkpoints, §8.4) in an append-only, third-party-witnessed transparency log, so a gap in an agent's record sequence is itself detectable. The log protocol, witness model, and the conformance tier that requires it are **reserved**; the record format in §8.3 is designed to anchor into such a log without change.
 
 ## Conformance Tiers
 
@@ -170,12 +238,14 @@ A runtime governor advertises the tier of enforcement it implements. Tiers are c
 | Tier | Name | A governor at this tier… |
 |------|------|--------------------------|
 | **R1** | Observing | Observes and records the agent's resource use, tool calls, and limit boundaries; does not block. Provides the audit trail. |
-| **R2** | Enforcing | Blocks on declared hard limits (budgets §2, iteration caps §3, sub-agent admission §4) and applies `runtime.degradation` (§6), fail-closed on absence. |
-| **R3** | Adaptive | R2 plus continuous anomaly-baseline monitoring (§7) and structured oversight-trigger escalation (§5). |
+| **R2** | Enforcing | Blocks on declared hard limits (budgets §2, iteration caps §3, sub-agent admission §4) and applies `runtime.degradation` (§6), fail-closed on absence; **SHOULD** produce signed enforcement evidence (§8). |
+| **R3** | Adaptive | R2 plus continuous anomaly-baseline monitoring (§7) and structured oversight-trigger escalation (§5); enforcement evidence (§8) is expected. |
 
-**Status:** Tier definitions are provisional; their normative conformance requirements are not yet specified.
+**Status:** Tier definitions are provisional; their normative conformance requirements continue to firm up.
 
 ## References
 
 - [XACML] — OASIS, *eXtensible Access Control Markup Language (XACML) Version 3.0* — the policy decision point / policy enforcement point (PDP/PEP) model adopted in §1.2.
 - [NIST.SP.800-162] — NIST Special Publication 800-162, *Guide to Attribute Based Access Control (ABAC) Definition and Considerations*.
+- [RFC8785] — JSON Canonicalization Scheme (JCS), used to canonicalize an enforcement record before signing/verifying (§8.3–§8.6).
+- [RFC6962] — Certificate Transparency, the witness model the reserved completeness tier (§8.8) draws on.
