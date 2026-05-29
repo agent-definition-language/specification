@@ -1,25 +1,46 @@
 ---
 id: trust-protocol
 slug: /
-title: "ADL Trust Protocol"
-description: "The ADL Trust Protocol — normative procedures for passport verification, presentation proof, and authorization enforcement in agent-to-agent trust."
+title: "Trust Protocol"
+description: "The Trust Protocol — normative procedures for passport verification, presentation proof, and authorization enforcement in agent-to-agent trust."
 keywords: [adl, trust protocol, passport verification, presentation proof, agent identity, did:web, authorization, agent-to-agent]
 toc_max_heading_level: 3
 hide_table_of_contents: false
 ---
 
-# ADL Trust Protocol
+# Trust Protocol
 
 **Version:** 0.1.0-draft
 **Status:** Draft
 
-The **ADL Trust Protocol** defines the normative procedures a counterparty performs to establish trust in an ADL agent: verifying a passport, binding a request to a presentation proof, and authorizing agent-to-agent calls. It is the *protocol* layer that sits on top of the *description* layer defined by the [ADL Core specification](/spec). ADL Core declares what an agent is and which credential schemes and scopes it advertises; ADL Trust defines what a verifier **MUST** do with those declarations.
+The **Trust Protocol** defines the normative procedures a counterparty performs to establish trust in an ADL agent: verifying a passport, binding a request to a presentation proof, and authorizing agent-to-agent calls. It is the *protocol* layer that sits on top of the *description* layer defined by the [ADL Core specification](/spec). ADL Core declares what an agent is and which credential schemes and scopes it advertises; ADL Trust defines what a verifier **MUST** do with those declarations.
 
 The Trust Protocol is numbered independently as a standalone document: Authentication is §1 and Authorization is §2. Section references outside this range — for example §6.4, §9, §10.1, or §10.2 — refer to the [ADL Core specification](/spec). Conformance test vectors and verification-outcome step identifiers track these Trust Protocol section numbers (e.g., §1.1.5, §1.2.6.6).
 
 The declarative members these procedures operate on — `security.attestation` (Core §10.2), the credential schemes (Core §10.3.3), and the scope declarations (Core §10.4.1–§10.4.2) — are defined in [ADL Core](/spec). This document references them but does not redefine them.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.
+
+## The Passport
+
+A **passport** is a compact **identity document** for an agent — smaller than the agent's full [ADL Core](/spec) document — that the agent presents to establish trust with other agents. Where the full ADL Document describes everything about an agent (identity, capabilities, tools, resources, model configuration, permissions, and runtime behavior), the passport carries only what a counterparty needs to answer two questions: *who is this agent?* and *can I trust this document?* The members it carries are defined by [ADL Core](/spec), which is authoritative for their syntax and constraints.
+
+Keeping the passport small matters because it travels on agent-to-agent interactions — attached to a request or dereferenced by URL (§1.2.5) — and is verified on every exchange. A counterparty that needs the agent's complete definition resolves the full ADL Document separately. The passport carries the following members:
+
+| Member | ADL Core | Role in trust |
+|--------|----------|---------------|
+| `adl_spec` | §4 | Spec version; selects the JSON Schema used for validation (§1.1.2). |
+| `id` | §6 | The agent's stable identifier — an HTTPS URI or URN — resolved to an authoritative key (§1.1.3). |
+| `cryptographic_identity.did` | §6.3 | A `did:web` identifier resolved to a DID Document that supplies the verification key (§1.1.3). |
+| `cryptographic_identity.public_key` | §6.3 | Inline public key (`algorithm`, `value`), cross-checked against the resolved key (§1.1.4). |
+| `security.attestation` | §10.2 | Attestation envelope (`type`, `issuer`, `issued_at`, `expires_at`) carrying the signature and its validity window (§1.1.5–§1.1.6). |
+| `security.attestation.signature` | §10.2 | The cryptographic signature over the JCS-canonical document, verified in §1.1.5 (`algorithm`, `value`, `signed_content`). |
+| `lifecycle.status` | §5.6 | `active` / `deprecated` / `retired` / `draft`; gates whether the agent may be provisioned (§1.1.7). |
+| `provider` | §6 | The publisher's identity, checked for coherence with the signing authority (§1.1.8). |
+| `permissions`, `data_classification` | §9, §10.1 | The agent's declared access surface and sensitivity, applied when it is invoked (§1.1.9). |
+| `security.scopes` | §10.4.1 | The agent's standing authorization ceiling for agent-to-agent calls (§2.2). |
+
+A passport is **verifiable** when it carries a resolvable `id` (or `cryptographic_identity.did`) together with a `security.attestation.signature`. An ADL document that lacks these can still be consumed as a description, but cannot be cryptographically verified as a passport — §1.1.3 treats a URN-only, unsigned document as Trust-On-First-Use.
 
 ## 1 Authentication (Agent-to-Agent)
 
