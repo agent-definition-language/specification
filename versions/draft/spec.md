@@ -40,11 +40,11 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 
 ### 1.3 Design Model
 
-An ADL document functions as a **passport** for an AI agent. It carries the declarations that a counterparty — peer agent, gateway, orchestrator, registry, or human operator — needs to make a trust decision: identity, capabilities, permissions, security posture, and governance signals.
+An ADL document **describes** an AI agent — its identity, capabilities, permissions, security posture, and governance signals. From that description an agent distills a **passport**: the compact credential it carries and presents so a counterparty — peer agent, gateway, orchestrator, registry, or human operator — can make a trust decision without first resolving the full document.
 
 The passport model establishes two principles:
 
-1. **Self-contained trust signals.** An ADL document **MUST** contain enough information for a counterparty to evaluate whether to interact with the agent, without requiring access to external systems.
+1. **Self-contained trust signals.** The passport **MUST** carry enough information for a counterparty to evaluate whether to interact with the agent, without requiring access to external systems.
 
 2. **Separation of declaration from operations.** Operational detail that changes independently of the agent's declared behavior — escalation contacts, audit schedules, evaluation reports, deployment logs — belongs in external records (e.g., a governance record in a registry), not in the passport. Profiles **MAY** define linking members (e.g., `governance_record_ref`) that reference such records by stable URI.
 
