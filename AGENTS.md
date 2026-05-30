@@ -1,5 +1,7 @@
 # AGENTS.md
 
+**What this repo is:** ADL (Agent Definition Language) spec + standardization materials (LF AAIF, IETF, ISO). Like OpenAPI/AsyncAPI for agents.
+
 **NEVER**
 - include credits or attribution in commit messages
 
@@ -68,8 +70,6 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
 
-- **What this repo is:** ADL (Agent Definition Language) spec + standardization materials (LF AAIF, IETF, ISO). Like OpenAPI/AsyncAPI for agents.
-
 ## Frozen areas — do not edit
 
 It is **forbidden** to edit frozen areas of the specification. Frozen areas are released, immutable artifacts; changing them rewrites published history and breaks downstream consumers, conformance vectors, and the documentation site's version snapshots.
@@ -84,17 +84,25 @@ A version's status (`draft` / `rc` / `released` / `deprecated`) is defined in `v
 
 ## Layout
 
-- `versions/0.1.0/spec.md` — current draft spec (edit here for spec changes)
-- `versions/0.1.0/spec-manifest.yaml` — section structure for body-specific generation
-- `versions/0.1.0/schema.json` — JSON Schema for ADL documents
-- `versions/0.1.0/snippets/` — code snippets (YAML + JSON pairs) embedded in docs
-- `versions/0.1.0/examples/` — version-scoped example ADL documents
-- `versions/manifest.yaml` — version metadata: latest, next, status
-- `profiles/` — domain-specific profiles (governance, healthcare, financial, portfolio); each versioned independently
-- `standardization/roadmap.md`, `standardization/bodies/` — standardization roadmap and per-body notes
+Spec content is organized by version under `versions/`. The **working draft is `versions/draft/`** — this is where all spec changes go. Numbered directories (`versions/0.1.0/`, `versions/0.2.0/`) are released and frozen (see "Frozen areas").
+
+- `versions/draft/spec.md` — the working-draft spec (edit here for spec changes)
+- `versions/draft/spec-manifest.yaml` — section structure for body-specific generation; keep in sync with `spec.md`
+- `versions/draft/schema.json` — JSON Schema for ADL documents; `schema-strict.json` rejects unknown top-level members
+- `versions/draft/schema-enforcement-record.json` — standalone schema for Runtime Protocol enforcement records
+- `versions/draft/examples/` — version-scoped example ADL documents (`*.yaml` with `*.mdx` doc wrappers); keep `examples/README.md` current
+- `versions/draft/snippets/` — code snippets (YAML + JSON pairs) embedded in docs
+- `versions/draft/test-vectors/` — conformance test vectors
+- `versions/draft/diagrams/` — spec diagrams
+- `versions/manifest.yaml` — version metadata: `latest`, `next`, and per-version `status`
+- `protocol/draft/` — the protocol layer: `trust-protocol.md`, `runtime-protocol.md`, and `index.md` (overview)
+- `profiles/` — domain-specific profiles (governance, healthcare, financial, portfolio, registry); each versioned independently; `profiles/manifest.yaml` holds metadata and status
+- `packages/` — implementations: `adl-core` (verification), `adl-cli`, `adl-generator`, `adl-agent`, `adl-py` (Python port)
+- `standardization/roadmap.md`, `standardization/bodies/`, `standardization/templates/` — standardization roadmap, per-body notes, and boilerplate
 - `proposals/` — one Markdown file per proposal; see `proposals/README.md`
-- `examples/` — top-level ADL YAML/JSON; keep `examples/README.md` index current
-- `site/` — Docusaurus documentation site
+- `patterns/draft/` — non-normative deployment patterns
+- `site/` — Docusaurus documentation site (consumes `versions/` directly at build time)
+- `CONTRIBUTING.md`, `GOVERNANCE.md` — contribution workflow and project governance
 - `.github/` — issue/PR templates, CI workflow
 
 ## Package commands
@@ -130,14 +138,14 @@ CI (`ci.yml`) runs on pushes/PRs to `main` touching `site/`, `versions/`, or the
 
 ## Spec authoring conventions
 
-When editing `versions/0.1.0/spec.md`:
+When editing `versions/draft/spec.md`:
 
 - Section headings: `## N. Title` (top-level), `### N.M Title` (subsections), `## Appendix A. Title` (appendices)
 - Requirements language: RFC 2119 keywords in **bold** — **MUST**, **SHOULD**, **MAY**, etc.
 - Tables: Markdown pipe tables for member definitions, error codes, validation rules
 - Code blocks: fenced with language tag (` ```json `, ` ```yaml `)
 - Cross-references: "Section N" or "Appendix A" (generators replace with body-specific refs)
-- When adding/renumbering sections, update `versions/0.1.0/spec-manifest.yaml` to match
+- When adding/renumbering sections, update `versions/draft/spec-manifest.yaml` to match
 
 ## Conventions
 
@@ -147,10 +155,12 @@ When editing `versions/0.1.0/spec.md`:
 
 ## When acting
 
-- **Spec change:** Edit `versions/0.1.0/spec.md`; update examples if needed; keep `spec-manifest.yaml` in sync.
+- **Spec change:** Edit `versions/draft/spec.md`; update examples if needed; keep `versions/draft/spec-manifest.yaml` in sync.
+- **Schema change:** Update `versions/draft/schema.json` alongside the spec member it defines.
+- **Protocol change:** Edit `protocol/draft/trust-protocol.md` or `protocol/draft/runtime-protocol.md`.
 - **Profile change:** Edit `profiles/<name>/<version>/profile.md`; update profile examples.
 - **New profile:** Create `profiles/<name>/` with README.md, COMPATIBILITY.md, `1.0/profile.md`.
 - **Standardization:** Update `standardization/roadmap.md` or `standardization/bodies/<body>.md`.
 - **New proposal:** Add under `proposals/`; follow format in `proposals/README.md`.
-- **New example:** Add YAML/JSON under `examples/`; add row to `examples/README.md` index.
+- **New example:** Add YAML/JSON under `versions/draft/examples/`; add a row to `versions/draft/examples/README.md`.
 - **PR:** Use `.github/PULL_REQUEST_TEMPLATE.md`; link issues; run `cd site && npm run build` to validate.
