@@ -5,6 +5,18 @@
 
 - **What this repo is:** ADL (Agent Definition Language) spec + standardization materials (LF AAIF, IETF, ISO). Like OpenAPI/AsyncAPI for agents.
 
+## Frozen areas — do not edit
+
+It is **forbidden** to edit frozen areas of the specification. Frozen areas are released, immutable artifacts; changing them rewrites published history and breaks downstream consumers, conformance vectors, and the documentation site's version snapshots.
+
+Frozen areas include:
+
+- `versions/<x.y.z>/` — any numbered release directory (e.g. `versions/0.1.0/`, `versions/0.2.0/`). The working draft lives in `versions/draft/`; edit there.
+- `profiles/<name>/<version>/` — any **released** profile version. Edit the in-development draft version; never retroactively change a released one.
+- `site/spec_versioned_docs/` and other generated version snapshots — these mirror frozen releases and are produced by the release tooling.
+
+A version's status (`draft` / `rc` / `released` / `deprecated`) is defined in `versions/manifest.yaml` and `profiles/manifest.yaml` — consult those when status is unclear. A fix that looks like it belongs in a released version belongs in the draft (and, if warranted, a new release), never in the frozen copy. If editing a frozen area seems genuinely required, stop and raise it with a maintainer.
+
 ## Layout
 
 - `versions/0.1.0/spec.md` — current draft spec (edit here for spec changes)
