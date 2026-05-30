@@ -23,7 +23,7 @@ The Agent Definition Language (ADL) provides a standard format for describing AI
 
 ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, AsyncAPI for event-driven architectures, and WSDL for web services. It enables:
 
-- **Discovery:** Agents can be found and understood programmatically.
+- **Discovery:** Agents can find other agents and assess their fit for the task at hand.
 - **Interoperability:** Agents can interact with tools, resources, and other agents using a common description format.
 - **Deployment:** Runtime environments can provision and configure agents based on declared requirements.
 - **Security:** Permission boundaries and security requirements are explicitly declared and enforceable.
