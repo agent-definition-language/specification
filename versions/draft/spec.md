@@ -44,7 +44,7 @@ An ADL document **describes** an AI agent — its identity, capabilities, permis
 
 The passport model establishes two principles:
 
-1. **Self-contained trust signals.** The passport **MUST** carry enough information for a counterparty to evaluate whether to interact with the agent, without requiring access to external systems.
+1. **Self-contained trust signals.** The passport **MUST** carry enough information for a counterparty to decide whether to interact with the agent and whether to act on its requests, without requiring access to external systems.
 
 2. **Separation of declaration from operations.** Operational detail that changes independently of the agent's declared behavior — escalation contacts, audit schedules, evaluation reports, deployment logs — belongs in external records (e.g., a governance record in a registry), not in the passport. Profiles **MAY** define linking members (e.g., `governance_record_ref`) that reference such records by stable URI.
 
