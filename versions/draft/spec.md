@@ -387,6 +387,8 @@ Example discovery document:
 }
 ```
 
+The discovery document format is defined by the JSON Schema `schema-discovery.json`, a standalone artifact verified independently of any individual ADL document.
+
 Clients performing discovery **MUST** fetch the discovery document over HTTPS. Clients **SHOULD** validate the TLS certificate chain. The discovery document **SHOULD** be cacheable; servers **SHOULD** set appropriate `Cache-Control` headers.
 
 > **Note:** Registration of `.well-known/adl-agents` with IANA per [RFC8615] will be pursued alongside the IETF Internet-Draft submission.

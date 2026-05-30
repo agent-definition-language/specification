@@ -90,6 +90,7 @@ Spec content is organized by version under `versions/`. The **working draft is `
 - `versions/draft/spec-manifest.yaml` — section structure for body-specific generation; keep in sync with `spec.md`
 - `versions/draft/schema.json` — JSON Schema for ADL documents; `schema-strict.json` rejects unknown top-level members
 - `versions/draft/schema-enforcement-record.json` — standalone schema for Runtime Protocol enforcement records
+- `versions/draft/schema-discovery.json` — standalone schema for the `.well-known/adl-agents` discovery document (§6.4)
 - `versions/draft/examples/` — version-scoped example ADL documents (`*.yaml` with `*.mdx` doc wrappers); keep `examples/README.md` current
 - `versions/draft/snippets/` — code snippets (YAML + JSON pairs) embedded in docs
 - `versions/draft/test-vectors/` — conformance test vectors
