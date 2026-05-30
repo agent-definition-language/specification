@@ -49,7 +49,7 @@ The passport model establishes two principles:
 2. **Separation of declaration from operations.** Operational detail that changes independently of the agent's declared behavior — escalation contacts, audit schedules, evaluation reports, deployment logs — belongs in external records (e.g., a governance record in a registry), not in the passport. Profiles **MAY** define linking members (e.g., `governance_record_ref`) that reference such records by stable URI.
 
 This separation ensures that:
-- The passport remains compact for agent-to-agent and agent-to-gateway interactions.
+- The passport remains compact, so it can travel on every agent-to-agent and agent-to-gateway exchange.
 - Operational changes (personnel rotation, policy updates) do not require re-issuing the passport.
 - Internal operational detail is not exposed to external counterparties.
 
