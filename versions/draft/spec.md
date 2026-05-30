@@ -345,7 +345,19 @@ Agent discovery enables clients to locate agents published by a domain without p
 https://{domain}/.well-known/adl-agents
 ```
 
-The discovery document, when present, **MUST** be a JSON object served with media type `application/json` and **MUST** contain an `agents` array. Each entry in the array **MUST** be an object with at least `id` (string, the agent's identifier per Section 6.1) and `adl_document` (string, URL to the full ADL document). Entries **MAY** include `name`, `version`, `description`, and `status`.
+The discovery document, when present, **MUST** be a JSON object served with media type `application/json` and **MUST** contain an `agents` array. Each entry in the array **MUST** be an object containing:
+
+| Member | Type | Required | Description |
+|--------|------|----------|-------------|
+| `id` | string | REQUIRED | The agent's identifier per Section 6.1. |
+| `adl_document` | string | REQUIRED | URL to the full ADL document. |
+| `description` | string | RECOMMENDED | A concise, capability-focused summary of what the agent does and when to engage it (see below). |
+| `name` | string | OPTIONAL | Human-readable agent name. |
+| `version` | string | OPTIONAL | Agent version (Section 5.5). |
+| `status` | string | OPTIONAL | Lifecycle status (Section 5.6). |
+| `keywords` | array | OPTIONAL | Short strings naming the agent's domains, tasks, or capabilities, to support programmatic matching. |
+
+A domain that publishes a discovery document is, in effect, inviting other agents to connect. The `description` exists so a discovering agent can triage the list — deciding which agents merit retrieving the full document — **without** fetching every agent's document first. Publishers **SHOULD** include it; a discovery document whose entries omit it forces every consumer to fetch each full ADL document just to learn what each agent does. When present, `description` **MUST** be a summary of the agent's overall purpose and capabilities, written so another agent can assess fit for a task, and **MUST NOT** exceed 256 characters. It **SHOULD** be the agent's top-level `description` (Section 5.4), or a purpose-focused summary derived from it. The `description` is a triage aid, not a substitute for the full document: the authoritative capability declarations (tools, resources, permissions) remain in the ADL document at `adl_document`.
 
 Example discovery document:
 
@@ -357,6 +369,8 @@ Example discovery document:
       "id": "https://acme.example.com/agents/invoice-processor",
       "adl_document": "https://acme.example.com/agents/invoice-processor/adl.json",
       "name": "Invoice Processor",
+      "description": "Processes vendor invoices: extracts line items, validates against purchase orders, and flags discrepancies for human review. Handles PDF and structured formats; does not issue payments.",
+      "keywords": ["invoicing", "accounts-payable", "document-extraction"],
       "version": "2.0.0",
       "status": "active"
     },
@@ -364,6 +378,8 @@ Example discovery document:
       "id": "https://acme.example.com/agents/research-assistant",
       "adl_document": "https://acme.example.com/agents/research-assistant/adl.json",
       "name": "Research Assistant",
+      "description": "Answers research questions by searching internal knowledge bases and the public web, then synthesizing cited summaries. Read-only; does not modify records or take external actions.",
+      "keywords": ["research", "search", "summarization"],
       "version": "2.1.0",
       "status": "active"
     }
