@@ -1029,6 +1029,8 @@ The `fallback_behavior` member, when present, **MUST** be an object describing b
 | default | any    | OPTIONAL | Default value to return when `action` is `"use_default"` |
 | message | string | OPTIONAL | User-facing message on fallback                        |
 
+`runtime.degradation` (§11.5) generalizes `fallback_behavior` across all limit causes; this member is equivalent to `degradation.on_tool_error`, and `degradation` takes precedence when both are present.
+
 Example:
 
 ```json
