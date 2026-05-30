@@ -26,8 +26,9 @@ ADL serves a similar role for AI agents that OpenAPI serves for REST APIs, Async
 - **Discovery:** Agents can find other agents and assess their fit for the task at hand.
 - **Interoperability:** Agents can interact with tools, resources, and other agents using a common description format.
 - **Deployment:** Runtime environments can provision and configure agents based on declared requirements.
-- **Security:** Permission boundaries and security requirements are explicitly declared and enforceable.
+- **Security:** Permission boundaries and security requirements are explicitly declared, and given force at admission and at runtime by the protocol layer (see the Trust and Runtime Protocols).
 - **Lifecycle:** Agents can be versioned, tracked through operational states, and managed across their entire lifecycle from draft to retirement.
+- **Accountability:** A runtime governor enforces declared limits — budgets, iteration, sub-agent admission, oversight, and degradation — and can produce verifiable evidence that it did (see the Runtime Protocol).
 
 ### 1.2 Goals
 
@@ -96,6 +97,10 @@ The terms "AI agent", "AI system", "autonomy", and "automation" are used in this
 | **permission domain** | A category of system access (network, filesystem, etc.) that defines operational boundaries for an agent. |
 | **runtime** | The system or environment that executes an agent based on its ADL definition. |
 | **autonomy** | The characteristic of a system that is capable of modifying its intended domain of use or goal without external intervention, control, or oversight [ISO-22989]. ADL expresses the degree of permitted autonomy through governance profile tiers. |
+| **agent passport** | A compact, verifiable credential derived from an agent's ADL document, carried during agent-to-agent interactions and verified on every exchange (§1.3). Its verification procedures are defined by the Trust Protocol. |
+| **counterparty** | An actor — a human, service, or other agent — that interacts with an agent and decides whether to verify, admit, and act on its requests. Counterparty procedures performed at admission are defined by the Trust Protocol. |
+| **runtime governor** | The actor that holds an admitted agent to its declared operational limits during execution, enforcing them on every step. It is a logical role, not a prescribed component; its procedures are defined by the Runtime Protocol. |
+| **enforcement record** | A verifiable record produced by a runtime governor attesting that it enforced an agent's declared limits. Its format is specified by the Runtime Protocol (§8). |
 
 ---
 
@@ -144,7 +149,7 @@ Example:
 
 ```json
 {
-  "adl_spec": "0.2.0",
+  "adl_spec": "0.3.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
   "description": "Processes and routes invoices.",
@@ -205,11 +210,11 @@ Specifies the ADL specification version the document conforms to.
 - Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
 - Pre-release suffixes (e.g., `"0.2.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
 
-Example: `"adl_spec": "0.2.0"`
+Example: `"adl_spec": "0.3.0"`
 
 ### 5.2 $schema
 
-Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.2: `https://adl-spec.org/0.2/schema.json`.
+Optional. URI reference to the JSON Schema for validation. **RECOMMENDED** for JSON documents (enables IDE validation). Canonical schema URI for ADL 0.3: `https://adl-spec.org/0.3/schema.json`.
 
 ### 5.3 Name
 
@@ -1089,7 +1094,7 @@ Example:
 
 ### 11.5 Degradation
 
-The `degradation` member declares how the agent behaves when an operational limit is reached or a fault occurs. **OPTIONAL.** When present, **MUST** be an object whose keys are *cause* identifiers matching `^on_[a-z0-9_]+$` and whose values are *response* objects. Recognized causes include `on_budget_exhausted` (§9.6), `on_iteration_limit` (§11.3), `on_sub_agent_denied` (§9.7), `on_oversight_timeout` (Governance Profile), `on_tool_error`, and `on_anomaly`.
+The `degradation` member declares how the agent behaves when an operational limit is reached or a fault occurs. **OPTIONAL.** When present, **MUST** be an object whose keys are *cause* identifiers matching `^on_[a-z0-9_]+$` and whose values are *response* objects. Recognized causes include `on_budget_exhausted` (§9.6), `on_iteration_limit` (§11.3), `on_sub_agent_denied` (§9.7), `on_oversight_timeout` (Governance Profile), `on_tool_error`, and `on_anomaly`. Causes are an open set: this list is not exhaustive, and profiles **MAY** define additional causes (for example, `on_oversight_timeout` and `on_anomaly` are defined by the Governance Profile).
 
 Each response object **MUST** contain `action` and **MAY** contain the rest:
 
@@ -1196,7 +1201,7 @@ At the schema level, a dependent profile composes its parent via `allOf`:
 ```json
 {
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.2/schema.json" },
+    { "$ref": "https://adl-spec.org/0.3/schema.json" },
     { "$ref": "https://adl-spec.org/profiles/governance/1.0/schema.json" }
   ],
   "properties": {
@@ -1252,7 +1257,7 @@ If a member becomes cross-cutting (needed by multiple standard profiles), the re
 
 ```json
 {
-  "adl_spec": "0.2.0",
+  "adl_spec": "0.3.0",
   "name": "Invoice Processor",
   "version": "2.0.0",
   "description": "Processes invoices with governance and financial compliance.",
@@ -1316,6 +1321,7 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-33 | `runtime.tool_invocation.loop_detection.window`, when present, MUST be an integer >= 2 |
 | VAL-34 | `permissions.sub_agents.allowed` and `denied` patterns MUST conform to Section 4.4 pattern syntax |
 | VAL-35 | `permissions.sub_agents.max_depth`, when present, MUST be an integer >= 1 |
+| VAL-36 | Each `runtime.degradation` cause key MUST match `^on_[a-z0-9_]+$` |
 
 Implementations **MAY** perform additional validation based on declared profiles.
 
@@ -1411,6 +1417,7 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-6005 | Runtime  | Invalid loop-detection window (VAL-33) |
 | ADL-6006 | Runtime  | Invalid sub-agent pattern syntax (VAL-34) |
 | ADL-6007 | Runtime  | Invalid sub-agent `max_depth` (VAL-35) |
+| ADL-6008 | Runtime  | Invalid degradation cause key (VAL-36) |
 
 ### 16.3 Error Source Examples
 
@@ -1531,7 +1538,7 @@ IANA is requested to create and maintain a new registry titled **"ADL Profile Re
 | Name | A short human-readable name for the profile (e.g., "ADL Governance Profile"). |
 | Version | The profile version string in MAJOR.MINOR.PATCH semantic versioning format. |
 | Specification Reference | A stable, publicly accessible URI or document reference for the profile specification. The specification **MUST** define all profile-required members, validation rules, and any additional semantics added by the profile. |
-| ADL Version Compatibility | The ADL specification version(s) with which the profile is designed to operate (e.g., "0.1.x"). |
+| ADL Version Compatibility | The ADL specification version(s) with which the profile is designed to operate (e.g., "0.2.x"). |
 | Contact | Name and email address of the person or group responsible for the profile registration. |
 | Status | One of: `active` (currently maintained) or `deprecated` (superseded or abandoned). |
 
@@ -1544,7 +1551,7 @@ IANA is requested to create and maintain a new registry titled **"ADL Profile Re
 | `urn:adl:profile:healthcare:1.0` | ADL Healthcare Profile | 1.0.0 |
 | `urn:adl:profile:financial:1.0` | ADL Financial Profile | 1.0.0 |
 
-All initial entries reference Appendix C of this document, target ADL compatibility 0.1.x, are `active`, and list the Author's Address as contact.
+All initial entries reference Appendix C of this document, target ADL compatibility 0.2.x, are `active`, and list the Author's Address as contact.
 
 **Designated Expert Criteria:** The designated expert **SHOULD** evaluate requests against the following criteria:
 
@@ -1691,7 +1698,7 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 
 ## Appendix A. JSON Schema
 
-The normative JSON Schema for ADL is available at `https://adl-spec.org/0.2/schema.json` (JSON Schema Draft 2020-12). A minimal required-fields schema is provided in [schema.json](./schema.json) in this directory.
+The normative JSON Schema for ADL is available at `https://adl-spec.org/0.3/schema.json` (JSON Schema Draft 2020-12). A minimal required-fields schema is provided in [schema.json](./schema.json) in this directory.
 
 ---
 
