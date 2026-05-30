@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333333"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="0" y="0" width="900" height="600" fill="#ffffff"/>
+
+  <!-- title -->
+  <text x="450" y="26" text-anchor="middle" font-size="16" font-weight="700" fill="#202124">Multi-Hop Authorization — Trust Protocol §2.3</text>
+  <text x="450" y="44" text-anchor="middle" font-size="12" fill="#5f6368">Two independent authorizations across a hop boundary (Human → Agent A → Agent B)</text>
+
+  <!-- lifelines -->
+  <line x1="120" y1="92" x2="120" y2="585" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="450" y1="92" x2="450" y2="585" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="4 4"/>
+  <line x1="780" y1="92" x2="780" y2="585" stroke="#9aa0a6" stroke-width="1" stroke-dasharray="4 4"/>
+
+  <!-- participant boxes -->
+  <g font-size="13" font-weight="600" fill="#202124">
+    <rect x="60" y="58" width="120" height="34" rx="4" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="120" y="80" text-anchor="middle">Human</text>
+    <rect x="390" y="58" width="120" height="34" rx="4" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="450" y="80" text-anchor="middle">Agent A</text>
+    <rect x="720" y="58" width="120" height="34" rx="4" fill="#e8f0fe" stroke="#1a73e8"/>
+    <text x="780" y="80" text-anchor="middle">Agent B</text>
+  </g>
+
+  <!-- activation bars -->
+  <rect x="445" y="120" width="10" height="345" fill="#d2e3fc" stroke="#1a73e8" stroke-width="0.8"/>
+  <rect x="775" y="250" width="10" height="135" fill="#d2e3fc" stroke="#1a73e8" stroke-width="0.8"/>
+
+  <!-- messages -->
+  <g font-size="12" fill="#202124">
+    <!-- (1) Human -> A -->
+    <text x="283" y="113" text-anchor="middle">(1) request  [OAuth token, scope = S_h]</text>
+    <line x1="120" y1="120" x2="443" y2="120" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- (3) A -> B -->
+    <text x="615" y="243" text-anchor="middle">(3) invoke upstream  [passport + presentation proof, scope = S_a]</text>
+    <line x1="455" y1="250" x2="773" y2="250" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- (5) B --> A return -->
+    <text x="616" y="378" text-anchor="middle">(5) result</text>
+    <line x1="775" y1="385" x2="457" y2="385" stroke="#333333" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+
+    <!-- (6) A --> Human return -->
+    <text x="284" y="458" text-anchor="middle">(6) result</text>
+    <line x1="445" y1="465" x2="122" y2="465" stroke="#333333" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+  </g>
+
+  <!-- note (2): §2.1 authorize human (Agent A's decision) -->
+  <g font-size="11.5" fill="#3c3000">
+    <rect x="196" y="138" width="214" height="46" rx="2" fill="#fff8c5" stroke="#d9b500"/>
+    <text x="206" y="158" font-weight="600">(2) §2.1 authorize human</text>
+    <text x="206" y="175">required_A ⊆ S_h</text>
+  </g>
+
+  <!-- note (4): §2.2 authorize Agent A (Agent B's decision) -->
+  <g font-size="11.5" fill="#3c3000">
+    <rect x="476" y="270" width="288" height="86" rx="2" fill="#fff8c5" stroke="#d9b500"/>
+    <text x="486" y="290" font-weight="600">(4) §2.2 authorize Agent A</text>
+    <text x="486" y="309">1. ceiling: proof.scopes ⊆</text>
+    <text x="486" y="325" xml:space="preserve">          A.passport.scopes</text>
+    <text x="486" y="345">2. required_B ⊆ proof.scopes</text>
+  </g>
+
+  <!-- spanning note -->
+  <g font-size="12" fill="#202124">
+    <rect x="90" y="498" width="720" height="64" rx="2" fill="#f1f3f4" stroke="#9aa0a6"/>
+    <text x="104" y="519">The two authorizations are independent. Agent A's outbound scope S_a is bounded only by</text>
+    <text x="104" y="537">Agent A's passport ceiling — not by S_h — and each hop keeps its own audit record, so no</text>
+    <text x="104" y="555">single hop sees the whole chain.</text>
+  </g>
+
+  <!-- legend (placed in the clear gap between Agent A and Agent B headers) -->
+  <g font-size="11" fill="#5f6368">
+    <line x1="540" y1="75" x2="566" y2="75" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="572" y="79">call</text>
+    <line x1="620" y1="75" x2="646" y2="75" stroke="#333333" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#arrow)"/>
+    <text x="652" y="79">return</text>
+  </g>
+</svg>

@@ -290,20 +290,9 @@ The proof's signature (§1.2.6.5) covers the `scopes` array as part of the canon
 
 When a human-authenticated request arrives at Agent A and Agent A subsequently calls upstream Agent B on the human's behalf, two independent authorizations occur:
 
-```
-Human ─[OAuth token, scope=S_h]──▶ Agent A
-                                    │
-                                    │ §2.1 authorizes the human
-                                    ▼
-                  Agent A's tool requiring required_A scopes
-                                    │
-                                    ▼ Agent A invokes upstream
-Agent A ─[passport + proof, scope=S_a]──▶ Agent B
-                                    │
-                                    │ §2.2 authorizes Agent A
-                                    ▼
-                  Agent B's tool requiring required_B scopes
-```
+![UML sequence diagram of multi-hop authorization with three lifelines: Human, Agent A, and Agent B. Step 1, the human sends a request to Agent A carrying an OAuth token with scope S_h. Step 2, Agent A authorizes the human under §2.1, requiring its required_A scopes to be a subset of S_h. Step 3, Agent A invokes upstream Agent B, presenting its passport and a presentation proof carrying scope S_a. Step 4, Agent B authorizes Agent A under §2.2: first a ceiling check that the proof scopes are a subset of Agent A's passport scopes, then that Agent B's required_B scopes are a subset of the proof scopes. Step 5, Agent B returns a result to Agent A; step 6, Agent A returns a result to the human. A closing note states the two authorizations are independent: Agent A's outbound scope S_a is bounded only by its passport ceiling, not by S_h, and each hop keeps its own audit record so no single hop sees the whole chain.](./diagrams/multi-hop-authorization-sequence.svg)
+
+*Figure: The two independent authorizations across the hop boundary — §2.1 (human → Agent A) and §2.2 (Agent A → Agent B). This is one representative trace: the §2.1/§2.2 checks run identically every time, while the agent's discovery of which counterparty to call is emergent.*
 
 The two authorizations are **independent**:
 
