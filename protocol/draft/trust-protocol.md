@@ -23,9 +23,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 ## The Passport
 
-A **passport** is a compact **identity document** for an agent — smaller than the agent's full [ADL Core](/spec) document — that the agent presents to establish trust with other agents. Where the full ADL Document describes everything about an agent (identity, capabilities, tools, resources, model configuration, permissions, and runtime behavior), the passport carries only what a counterparty needs to answer two questions: *who is this agent?* and *can I trust this document?* The members it carries are defined by [ADL Core](/spec), which is authoritative for their syntax and constraints.
+A **passport** is a compact **identity document** for an agent — smaller than the agent's full [ADL Core](/spec) document — that the agent presents to establish trust with other agents. Where the full ADL document describes everything about an agent (identity, capabilities, tools, resources, model configuration, permissions, and runtime behavior), the passport carries only what a counterparty needs to answer two questions: *who is this agent?* and *can I trust this document?* The members it carries are defined by [ADL Core](/spec), which is authoritative for their syntax and constraints.
 
-Keeping the passport small matters because it travels on agent-to-agent interactions — attached to a request or dereferenced by URL (§1.2.5) — and is verified on every exchange. A counterparty that needs the agent's complete definition resolves the full ADL Document separately. The passport carries the following members:
+Keeping the passport small matters because it travels on agent-to-agent interactions — attached to a request or dereferenced by URL (§1.2.5) — and is verified on every exchange. A counterparty that needs the agent's complete definition resolves the full ADL document separately. Note that `permissions` and `data_classification` are carried in full rather than as a digest; an agent with large permission sets (up to the Core §18.5 limits) therefore trades passport compactness for self-containment, which implementers sizing a passport header (e.g., `X-ADL-Passport`) should anticipate. The passport carries the following members:
 
 | Member | ADL Core | Role in trust |
 |--------|----------|---------------|

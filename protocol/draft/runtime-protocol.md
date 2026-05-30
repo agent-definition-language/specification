@@ -123,6 +123,8 @@ For each declared trigger, the governor's PDP (§1.2) **MUST**, before the PEP a
 4. **Resume.** Execution resumes only on explicit approval per the `intervention_model` (`approve_reject` or `plan_editing`); `monitor_only` does not gate execution.
 5. **Record.** Record the trigger firing, the review outcome, and any timeout in the audit trail (§1.4).
 
+Independently of the Governance Profile, a governor **MUST** treat any tool declaring `requires_confirmation: true` ([ADL Core §8.1](/spec/next#81-tools)) as an always-on oversight trigger: the governor **MUST** obtain explicit human approval before such a tool is invoked and **MUST NOT** invoke it autonomously, regardless of whether `human_oversight` is declared. This is a Core-level control and applies even when no Governance Profile is present.
+
 Structured triggers let the governor evaluate oversight conditions mechanically. Free-text triggers require governor-specific interpretation and are best treated as R1 signals unless the governor can detect them reliably.
 
 **Conformance.** At **R1** the governor records trigger evaluations without pausing. At **R2** it **MUST** pause on a fired trigger and enforce the response-time timeout. At **R3** trigger firings feed the anomaly substrate (§7).

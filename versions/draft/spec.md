@@ -359,7 +359,7 @@ The discovery document, when present, **MUST** be a JSON object served with medi
 | `description` | string | RECOMMENDED | A concise, capability-focused summary of what the agent does and when to engage it (see below). |
 | `name` | string | OPTIONAL | Human-readable agent name. |
 | `version` | string | OPTIONAL | Agent version (Section 5.5). |
-| `status` | string | OPTIONAL | Lifecycle status (Section 5.6). |
+| `status` | string | OPTIONAL | Lifecycle status (Section 5.6). Permitted values mirror §5.6 and **MUST** be kept in lockstep with it. |
 | `keywords` | array | OPTIONAL | Short strings naming the agent's domains, tasks, or capabilities, to support programmatic matching. |
 
 A domain that publishes a discovery document is, in effect, inviting other agents to connect. The `description` exists so a discovering agent can triage the list — deciding which agents merit retrieving the full document — **without** fetching every agent's document first. Publishers **SHOULD** include it; a discovery document whose entries omit it forces every consumer to fetch each full ADL document just to learn what each agent does. When present, `description` **MUST** be a summary of the agent's overall purpose and capabilities, written so another agent can assess fit for a task, and **MUST NOT** exceed 256 characters. It **SHOULD** be the agent's top-level `description` (Section 5.4), or a purpose-focused summary derived from it. The `description` is a triage aid, not a substitute for the full document: the authoritative capability declarations (tools, resources, permissions) remain in the ADL document at `adl_document`.
@@ -603,31 +603,31 @@ Example: If `allowed_variables` is `["APP_*"]` and `denied_variables` is `["APP_
 
 ### 9.2 Network
 
-May contain: `allowed_hosts` (array of host patterns), `allowed_ports`, `allowed_protocols`, `deny_private` (bool). Host patterns support exact match and `*.example.com`.
+Optional members: `allowed_hosts` (array of host patterns), `allowed_ports`, `allowed_protocols`, `deny_private` (bool). Host patterns support exact match and `*.example.com`.
 
 Host patterns in `allowed_hosts` **MUST** conform to the pattern syntax defined in Section 4.4.
 
 ### 9.3 Filesystem
 
-May contain: `allowed_paths` (array of `{ path, access }` where access is `read`, `write`, or `read_write`), `denied_paths`.
+Optional members: `allowed_paths` (array of `{ path, access }` where access is `read`, `write`, or `read_write`), `denied_paths`.
 
 Path patterns in `allowed_paths[*].path` and `denied_paths` **MUST** conform to the pattern syntax defined in Section 4.4. The `**` multi-segment wildcard is valid in filesystem path patterns.
 
 ### 9.4 Environment
 
-May contain: `allowed_variables`, `denied_variables` (patterns with wildcards, e.g., `APP_*`).
+Optional members: `allowed_variables`, `denied_variables` (patterns with wildcards, e.g., `APP_*`).
 
 Variable patterns in `allowed_variables` and `denied_variables` **MUST** conform to the pattern syntax defined in Section 4.4.
 
 ### 9.5 Execution
 
-May contain: `allowed_commands`, `denied_commands`, `allow_shell` (bool).
+Optional members: `allowed_commands`, `denied_commands`, `allow_shell` (bool).
 
 Command patterns in `allowed_commands` and `denied_commands` **MUST** conform to the pattern syntax defined in Section 4.4.
 
 ### 9.6 Resource Limits
 
-May contain: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concurrent`, `budget`.
+Optional members: `max_memory_mb`, `max_cpu_percent`, `max_duration_sec`, `max_concurrent`, `budget`.
 
 The `budget` member, when present, **MUST** be an object declaring cumulative consumption ceilings. It **MAY** contain `tokens`, `cost_usd`, and `wall_clock_sec`; each, when present, **MUST** be an object that **MAY** contain `per_session` and `per_day` caps.
 
@@ -997,7 +997,7 @@ The `runtime` member configures agent runtime behavior. **OPTIONAL.** When prese
 
 ### 11.1 Input Handling
 
-May contain: `max_input_length`, `content_types`, `sanitization`.
+Optional members: `max_input_length`, `content_types`, `sanitization`.
 
 The `sanitization` member, when present, **MUST** be an object describing input sanitization rules. It **MAY** contain:
 
@@ -1011,13 +1011,13 @@ The `content_types` member, when present, **MUST** be an array of strings. Each 
 
 ### 11.2 Output Handling
 
-May contain: `max_output_length`, `format`, `streaming` (bool).
+Optional members: `max_output_length`, `format`, `streaming` (bool).
 
 The `format` member, when present, **MUST** be a string specifying the default output format. Value **MUST** be one of: `"text"`, `"json"`, `"markdown"`, `"html"`.
 
 ### 11.3 Tool Invocation
 
-May contain: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`, `max_iterations`, `max_tool_calls_per_session`, `loop_detection`.
+Optional members: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`, `max_iterations`, `max_tool_calls_per_session`, `loop_detection`.
 
 The `retry_policy` member, when present, **MUST** be an object describing retry behavior for tool invocations. It **MAY** contain:
 
@@ -1042,7 +1042,7 @@ These are declarations; the procedure a runtime governor applies — counting it
 
 ### 11.4 Error Handling
 
-May contain: `on_tool_error` (`abort`, `continue`, or `retry`), `max_retries`, `fallback_behavior`.
+Optional members: `on_tool_error` (`abort`, `continue`, or `retry`), `max_retries`, `fallback_behavior`.
 
 The `fallback_behavior` member, when present, **MUST** be an object describing behavior when errors occur and `on_tool_error` does not resolve the situation. It **MAY** contain:
 
