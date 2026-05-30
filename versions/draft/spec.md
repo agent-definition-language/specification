@@ -95,7 +95,7 @@ The terms "AI agent", "AI system", "autonomy", and "automation" are used in this
 | **profile** | A set of additional requirements and members that extend the core ADL specification for specific domains. |
 | **permission domain** | A category of system access (network, filesystem, etc.) that defines operational boundaries for an agent. |
 | **runtime** | The system or environment that executes an agent based on its ADL definition. |
-| **autonomy** | The characteristic of a system that is capable of modifying its intended domain of use or goal without external intervention, control, or oversight [ISO-22989]. ADL expresses the degree of permitted autonomy through the `autonomy` member and governance profile tiers. |
+| **autonomy** | The characteristic of a system that is capable of modifying its intended domain of use or goal without external intervention, control, or oversight [ISO-22989]. ADL expresses the degree of permitted autonomy through governance profile tiers. |
 
 ---
 
@@ -345,7 +345,7 @@ Agent discovery enables clients to locate agents published by a domain without p
 https://{domain}/.well-known/adl-agents
 ```
 
-The discovery document, when present, **MUST** be a JSON object served with media type `application/json` and **MUST** contain an `agents` array. Each entry in the array **MUST** be an object containing:
+The discovery document, when present, **MUST** be a JSON object served with media type `application/json`, **MUST** contain `adl_discovery` with the value `"1.0"`, and **MUST** contain an `agents` array. Each entry in the array **MUST** be an object containing:
 
 | Member | Type | Required | Description |
 |--------|------|----------|-------------|
@@ -423,7 +423,7 @@ Variables in templates use the `{{variable_name}}` syntax and **MUST** conform t
 
 **Escaping:** To include a literal `{{` in template text without triggering variable substitution, implementations **MUST** support the escape sequence `\{{`. A `\{{` in the template string is rendered as `{{` and is not treated as a variable reference.
 
-**Undefined variables:** When a template references a variable name not present in `variables`, the implementation **MUST** treat this as an error (error code ADL-1006) and **MUST NOT** silently substitute an empty string. Implementations **SHOULD** include the undefined variable name in the error detail.
+**Undefined variables:** When a template references a variable name not present in `variables`, the implementation **MUST** treat this as an error (error code ADL-2024) and **MUST NOT** silently substitute an empty string. Implementations **SHOULD** include the undefined variable name in the error detail.
 
 Example:
 
@@ -695,7 +695,7 @@ These are declarations; the admission procedure a runtime governor applies when 
 
 The `security` member defines security requirements. **OPTIONAL.** When present, value **MUST** be an object that **MAY** contain `authentication`, `encryption`, and `attestation`.
 
-Section 10 spans two ADL layers. The **declarative** members defined here in ADL Core — `data_classification` (§10.1), `attestation` (§10.2), the credential schemes (§10.3.3), and the scope declarations (§10.4.1–§10.4.2) — describe what an agent handles and what it advertises. The **procedural** members — passport verification (§10.3.1), presentation proof (§10.3.2), and authorization enforcement (§10.4.3–§10.4.8) — define what a counterparty **MUST** do with those declarations and are specified in the companion [**ADL Trust Protocol**](/protocol/trust), where they are numbered independently as §1 (Authentication) and §2 (Authorization).
+Section 10 spans two ADL layers. The **declarative** members defined here in ADL Core — `data_classification` (§10.1), `attestation` (§10.2), the credential schemes (§10.3.3), and the scope declarations (§10.4.1–§10.4.2) — describe what an agent handles and what it advertises. The **procedural** members — passport verification (§10.3.1), presentation proof (§10.3.2), and authorization enforcement (§10.4.3) — define what a counterparty **MUST** do with those declarations and are specified in the companion [**ADL Trust Protocol**](/protocol/trust), where they are numbered independently as §1 (Authentication) and §2 (Authorization).
 
 Section 10 is ordered to follow the dependency stack of the security model. Data Classification (§10.1) declares what the agent handles. Attestation (§10.2) signs the passport. Authentication (§10.3) defines how parties prove identity at runtime — agent-to-agent via passport verification (§10.3.1) and presentation proof (§10.3.2), and human or external services via OAuth 2.1, OIDC, mTLS, or API keys (§10.3.3). Authorization (§10.4) covers scope-based AuthZ. Encryption (§10.5) covers channel security.
 
@@ -936,7 +936,7 @@ Authentication (§10.3) establishes *who* a counterparty is. Authorization (§10
 Scopes apply uniformly across both authentication paths defined in §10.3:
 
 - **Human or external service to agent** (§10.3.3): scopes are presented in the OAuth 2.1 access token, OIDC ID token, or equivalent credential.
-- **Agent to agent** (§10.3.1 + §10.3.2): scopes are presented in the presentation proof's `scopes` member (§10.3.2.2), bound cryptographically to the request.
+- **Agent to agent** (§10.3.1 + §10.3.2): scopes are presented in the presentation proof's `scopes` member (Trust Protocol §1.2.2), bound cryptographically to the request.
 
 The two paths use the same scope vocabulary, the same inheritance and override rules, and the same effective-scope computation. They diverge only in *how* the requesting scope set arrives at the verifier.
 
@@ -946,7 +946,7 @@ ADL adds two scope-declaration members:
 
 | Member | Location | Type | Required | Description |
 |--------|----------|------|----------|-------------|
-| `security.scopes` | root | array of strings | OPTIONAL | Default required scopes for the agent. Acts as the agent's scope **ceiling** when the agent itself is making upstream calls (see §10.4.4). |
+| `security.scopes` | root | array of strings | OPTIONAL | Default required scopes for the agent. Acts as the agent's scope **ceiling** when the agent itself is making upstream calls (see Trust Protocol §2.4). |
 | `tools[*].security.scopes` | per tool | array of strings | OPTIONAL | Required scopes to invoke this specific tool. Overrides the root default for this tool. |
 
 Each scope value **MUST** be a non-empty string matching the OAuth 2.1 scope grammar: visible ASCII characters excluding double-quote and backslash, separated where needed by single space characters per [RFC6749] §3.3. The recommended convention is `<resource>:<action>` (e.g., `invoices:read`, `documents:write`), and ADL validators **SHOULD** warn on values that do not follow the convention. Scopes prefixed with `adl:` are reserved for future spec-defined values.
@@ -1395,6 +1395,7 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-2021 | Semantic | Invalid data classification category |
 | ADL-2022 | Semantic | Retention min_days exceeds max_days |
 | ADL-2023 | Semantic | Top-level sensitivity below tool/resource sensitivity (high-water mark violation) |
+| ADL-2024 | Semantic | Undefined template variable |
 | ADL-3001 | Profile  | Profile requirements not satisfied |
 | ADL-3002 | Profile  | Unknown profile |
 | ADL-4001 | Security | Weak key algorithm |
@@ -1403,6 +1404,13 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-5001 | Lifecycle | Invalid lifecycle status value |
 | ADL-5002 | Lifecycle | Successor present on active/draft agent |
 | ADL-5003 | Lifecycle | Sunset date in the past with non-retired status |
+| ADL-6001 | Runtime  | Resource-limit budget cap not greater than zero (VAL-29) |
+| ADL-6002 | Runtime  | Budget `per_session` exceeds `per_day` (VAL-30) |
+| ADL-6003 | Runtime  | Invalid degradation response action (VAL-31) |
+| ADL-6004 | Runtime  | Invalid tool-invocation iteration limit (VAL-32) |
+| ADL-6005 | Runtime  | Invalid loop-detection window (VAL-33) |
+| ADL-6006 | Runtime  | Invalid sub-agent pattern syntax (VAL-34) |
+| ADL-6007 | Runtime  | Invalid sub-agent `max_depth` (VAL-35) |
 
 ### 16.3 Error Source Examples
 
@@ -1757,6 +1765,15 @@ literal-char    = %x21-29 / %x2B-7E
                   ; Printable ASCII except "*" (%x2A)
                   ; "/" (%x2F) carries segment-boundary meaning in path patterns
                   ; "." (%x2E) carries segment-boundary meaning in host patterns
+
+; ADL URN namespace (Section 17.3)
+; Format: urn:adl:{type}:{namespace}:{name}:{version}
+adl-urn         = "urn:adl:" urn-type ":" urn-namespace ":" urn-name ":" semver
+urn-type        = "agent" / "profile"
+urn-namespace   = 1*( lc-alpha / DIGIT )
+                  ; Lowercase alphanumeric organization identifier
+urn-name        = ( lc-alpha / DIGIT ) *( lc-alpha / DIGIT / "-" )
+                  ; Lowercase alphanumeric resource name, may contain hyphens
 ```
 
 ### Cross-Reference Summary
@@ -1769,3 +1786,4 @@ literal-char    = %x21-29 / %x2B-7E
 | `template-var` | 7.2, 8.3 | `{{variable}}` references in templates |
 | `tag` | 12.5 | `metadata.tags` array items |
 | `pattern` | 4.4, 9.2–9.5 | Permission domain pattern strings |
+| `adl-urn` | 17.3 | `urn:adl:` namespace identifiers |

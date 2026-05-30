@@ -17,7 +17,7 @@ The **Runtime Protocol** defines the normative procedures a *runtime governor* p
 
 The declarative members these procedures operate on — `permissions.resource_limits`, `runtime.tool_invocation`, `permissions.sub_agents`, `human_oversight`, `runtime.degradation`, and `anomaly_baseline` — are defined by [ADL Core](/spec) and the governance profiles, which are authoritative for their syntax and constraints. This document references them but does not redefine them; it defines what a governor **MUST** do with them.
 
-The Runtime Protocol is numbered independently as a standalone document: the runtime governor is §1 and the enforcement procedures are §2–§7. Section references outside this range — for example §9.6, §11.3, or §10.1 — refer to the [ADL Core specification](/spec).
+The Runtime Protocol is numbered independently as a standalone document: the runtime governor is §1, the enforcement procedures are §2–§7, and the enforcement-evidence format is §8. Section references outside §1–§8 — for example §9.6, §11.3, or §10.1 — refer to the [ADL Core specification](/spec).
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all capitals, as shown here.
 
