@@ -523,13 +523,13 @@ The Governance Profile provides mappings between ADL/profile sections and common
 | permissions.filesystem              | NIST AC-3, AC-6; SOC2 CC6.1 |
 | security.authentication             | NIST IA-2, IA-5; SOC2 CC6.1 |
 | security.encryption                 | NIST SC-8, SC-13; SOC2 CC6.1 |
-| autonomy                            | IMDA §2.1 (IMDA-001, IMDA-016); CLTC Map 5.1 (CLTC-070, CLTC-071); CLTC Govern 1.4 (CLTC-007, CLTC-010) |
-| risk_classification                 | ISO 42001 6.1, 9.1; EU AI Act Art. 9; CLTC Map 5.1 (CLTC-070); IMDA §2.1.1 (IMDA-016) |
-| human_oversight                     | ISO 42001 6.1, 9.1; EU AI Act Art. 9; IMDA §2.2.2 (IMDA-040–IMDA-046, IMDA-069–IMDA-070); CLTC Govern 2.1 (CLTC-025, CLTC-026); CLTC Map 3.5 (CLTC-065, CLTC-066); CLTC Manage 1.3 (CLTC-104, CLTC-106) |
-| incident_response                   | IMDA §2.3.3 (IMDA-065, IMDA-066, IMDA-071); CLTC Govern 4.2 (CLTC-032, CLTC-033); CLTC Manage 2.3 (CLTC-117, CLTC-125) |
-| evaluation_attestation              | IMDA §2.3.2 (IMDA-056–IMDA-062, IMDA-072); CLTC Measure 1.1 (CLTC-077, CLTC-078, CLTC-084) |
-| disclosure                          | IMDA §2.4.2 (IMDA-078; IMDA-073, IMDA-077); CLTC Govern 4.2 (CLTC-034, CLTC-035) |
-| governance.ownership                | IMDA §2.2.1 (IMDA-028, IMDA-036, IMDA-081); CLTC Govern 2.1 (CLTC-023, CLTC-024) |
+| autonomy                            | IMDA §2.1; CLTC Map 5.1; CLTC Govern 1.4 |
+| risk_classification                 | ISO 42001 6.1, 9.1; EU AI Act Art. 9; CLTC Map 5.1; IMDA §2.1.1 |
+| human_oversight                     | ISO 42001 6.1, 9.1; EU AI Act Art. 9; IMDA §2.2.2; CLTC Govern 2.1; CLTC Map 3.5; CLTC Manage 1.3 |
+| incident_response                   | IMDA §2.3.3; CLTC Govern 4.2; CLTC Manage 2.3 |
+| evaluation_attestation              | IMDA §2.3.2; CLTC Measure 1.1 |
+| disclosure                          | IMDA §2.4.2; CLTC Govern 4.2 |
+| governance.ownership                | IMDA §2.2.1; CLTC Govern 2.1 |
 | governance.audit_trail              | NIST AU-2, AU-6; SOC2 CC7.2 |
 | governance.lifecycle_governance     | NIST CM-3, CM-4; SOC2 CC8.1 |
 
@@ -713,5 +713,5 @@ This profile has no dependencies. Profiles that depend on the governance profile
 
 The following works informed the design of this profile's conformance tiers, compliance mappings, and governance field requirements:
 
-- **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Generative AI — Agentic AI Companion", January 2026, <https://aiwp.aist.go.jp/pdf/Model_AI_Governance_Framework_for_Generative_AI_Agentic_AI.pdf>.
-- **[CLTC-AGENTIC]** Center for Long-Term Cybersecurity (CLTC), UC Berkeley, "An Agentic AI Risk Management Standards Profile Based on NIST AI 600-1", February 2026, <https://cltc.berkeley.edu/publication/an-agentic-ai-risk-management-standards-profile/>.
+- **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Agentic AI", Version 1.5, May 2026, <https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf>.
+- **[CLTC-AGENTIC]** Center for Long-Term Cybersecurity (CLTC), UC Berkeley, "Agentic AI Risk-Management Standards Profile", February 2026, <https://cltc.berkeley.edu/wp-content/uploads/2026/02/Agentic-AI-Risk-Management-Standards-Profile.pdf>.
