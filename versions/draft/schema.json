@@ -58,6 +58,16 @@
       "additionalProperties": false,
       "description": "Per-session / per-day cap for one budget dimension"
     },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "tokens": { "$ref": "#/$defs/budgetDimension" },
+        "cost_usd": { "$ref": "#/$defs/budgetDimension" },
+        "wall_clock_sec": { "$ref": "#/$defs/budgetDimension" }
+      },
+      "additionalProperties": false,
+      "description": "Cumulative token / cost / wall-clock budget, scoped per session and per day (enforced by Runtime Protocol §2)"
+    },
     "degradationResponse": {
       "type": "object",
       "required": ["action"],
@@ -411,25 +421,34 @@
             "max_cpu_percent": { "type": "number", "minimum": 0, "maximum": 100 },
             "max_duration_sec": { "type": "number", "minimum": 0 },
             "max_concurrent": { "type": "integer", "minimum": 1 },
-            "budget": {
-              "type": "object",
-              "properties": {
-                "tokens": { "$ref": "#/$defs/budgetDimension" },
-                "cost_usd": { "$ref": "#/$defs/budgetDimension" },
-                "wall_clock_sec": { "$ref": "#/$defs/budgetDimension" }
-              },
-              "additionalProperties": false,
-              "description": "Cumulative token / cost / wall-clock budget, scoped per session and per day (enforced by Runtime Protocol §2)"
-            },
+            "budget": { "$ref": "#/$defs/budget" },
             "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
         },
         "sub_agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "prompt_resource": { "type": "string" },
+              "tools": { "type": "array", "items": { "type": "string" } },
+              "max_parallel": { "type": "integer", "minimum": 1 },
+              "budget_share": { "$ref": "#/$defs/budget" },
+              "extensions": { "$ref": "#/$defs/extensions" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Subordinate personas this agent may spawn under its own identity (no separate passport); capped at spawn by Runtime Protocol §4"
+        },
+        "delegation": {
           "type": "object",
           "properties": {
-            "allowed": { "type": "array", "items": { "type": "string" } },
-            "denied": { "type": "array", "items": { "type": "string" } },
+            "match": { "type": "array", "items": { "type": "string" } },
+            "deny": { "type": "array", "items": { "type": "string" } },
             "max_depth": { "type": "integer", "minimum": 1 },
             "attenuation": {
               "type": "object",
@@ -443,7 +462,7 @@
             "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false,
-          "description": "Delegation permissions for sub-agents (admitted by Runtime Protocol §4)"
+          "description": "Envelope of separately-identified peer agents this agent may engage (admitted by Runtime Protocol §4)"
         },
         "extensions": { "$ref": "#/$defs/extensions" }
       },

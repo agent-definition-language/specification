@@ -1,7 +1,7 @@
 # ADL Proposal: Sub-Agent Permissions (Core §9.7 + Runtime Protocol §4)
 
 **Date:** 2026-05-29
-**Status:** Draft
+**Status:** Superseded by [2026-06-01-internal-vs-external-sub-agents.md](./2026-06-01-internal-vs-external-sub-agents.md) — its external-delegation model (`allowed`/`denied`/`max_depth`/`attenuation`) is retained but rehomed from `permissions.sub_agents` to `permissions.delegation`, and `permissions.sub_agents` is reshaped into a persona array. Read this proposal for the original external-delegation rationale; read the successor for the current shape.
 **ADL Version:** 0.3.0-draft (additive; no version bump required)
 **Builds on:** [2026-05-29-budget-envelopes.md](./2026-05-29-budget-envelopes.md) (template), [2026-05-29-generalized-degradation.md](./2026-05-29-generalized-degradation.md) (§6), [2026-05-21-delegation-chains-in-presentation-proof.md](./2026-05-21-delegation-chains-in-presentation-proof.md) (delegation-chain verification)
 **Affects:** `versions/draft/spec.md` (§9.7, §14.2), `versions/draft/schema.json` (`permissions.sub_agents`), `protocol/draft/runtime-protocol.md` (§4), `versions/draft/spec-manifest.yaml` (new §9.7 subsection)

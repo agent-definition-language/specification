@@ -92,6 +92,8 @@ The terms "AI agent", "AI system", "autonomy", and "automation" are used in this
 |------|------------|
 | **ADL document** | A JSON object that conforms to this specification. |
 | **agent** | An AI agent [ISO-22989] further scoped as an AI system [ISO-22989] that operates within boundaries declared by an ADL document. An agent senses and responds to its environment and takes actions to achieve its goals, subject to the permissions and constraints expressed in its ADL document. |
+| **sub-agent** | A **subordinate** agent: a persona an agent spawns that runs under the **parent agent's own identity**, sharing its passport, permissions, and accountability rather than holding its own. It is *sub*-ordinate in the literal sense — part of the parent, not a separate party — typically a distinct context with a focused prompt and a tool subset. Declared in `permissions.sub_agents` (§9.7). Engaging a *separately-identified* agent is **delegation** to a peer, not a sub-agent relationship. |
+| **delegation** | An agent engaging a **separate, independently-identified agent** — one with its own ADL document and agent passport — to act with or for it. The engaged agent is a **peer**, not a subordinate: it is discovered (§6.4) and admitted across a trust boundary via the Trust Protocol, and bounded by the calling agent's `permissions.delegation` envelope (§9.7). |
 | **AI system** | An engineered system that generates outputs such as content, forecasts, recommendations, or decisions for a given set of human-defined objectives [ISO-22989]. |
 | **model** | The AI model (e.g., large language model) that powers an agent's reasoning. In [ISO-22989] terms, a model is the learned computational artifact within an AI system. |
 | **tool** | A function or capability that an agent can invoke to perform an action or retrieve information (equivalent to "function" in function-calling and "tool" in [MCP]). |
@@ -583,13 +585,17 @@ The `permissions` member defines the agent's operational boundaries. **OPTIONAL.
 
 ### 9.1 Permissions Model
 
-| Domain          | Description                    |
-|-----------------|--------------------------------|
-| network         | Network access boundaries      |
-| filesystem      | Filesystem access boundaries   |
-| environment     | Environment variable access    |
-| execution       | Process execution boundaries   |
-| resource_limits | Resource consumption limits   |
+| Domain          | Description                                  |
+|-----------------|----------------------------------------------|
+| network         | Network access boundaries                    |
+| filesystem      | Filesystem access boundaries                 |
+| environment     | Environment variable access                  |
+| execution       | Process execution boundaries                 |
+| resource_limits | Resource consumption limits                  |
+| sub_agents      | Subordinate personas this agent may spawn    |
+| delegation      | Separate-identity peers this agent may engage |
+
+The first five domains govern the agent's access to **system resources**. The last two govern **delegation**, and they differ by identity: `sub_agents` (§9.7) bounds which **subordinate personas** the agent may spawn under its *own* identity (a static list), while `delegation` (§9.7) bounds which **separately-identified peers** it may engage across a trust boundary (an envelope over agents it discovers at runtime, §6.4). All are members of `permissions` and follow the same deny-by-default model below.
 
 Permissions operate on a **deny-by-default** model. Runtimes **MUST** deny any capability not explicitly granted in the `permissions` member. Runtimes **MUST** enforce declared permissions. Runtimes that cannot enforce a specific permission domain **MUST** warn users before execution and **SHOULD** refuse to execute the agent unless the user explicitly acknowledges the limitation.
 
@@ -683,20 +689,42 @@ Example (complete permissions object):
 }
 ```
 
-### 9.7 Sub-Agents
+### 9.7 Sub-Agents and Delegation
 
-The `sub_agents` member declares which other agents this agent may delegate to. **OPTIONAL.** When present, **MUST** be an object. Deny-by-default applies (§9.1): when `sub_agents` is present, a prospective sub-agent is permitted only if its identifier matches `allowed` and not `denied`. It **MAY** contain:
+An agent may bring other agents into its work in two structurally different ways, distinguished by **identity**. ADL declares them as two separate permission domains:
 
-| Member      | Type    | Description                                                                                          |
-|-------------|---------|------------------------------------------------------------------------------------------------------|
-| allowed     | array   | Agent-identifier patterns this agent MAY delegate to. Patterns follow §4.4.                          |
-| denied      | array   | Agent-identifier patterns this agent MUST NOT delegate to. `denied` overrides `allowed` (§9.1).      |
-| max_depth   | integer | Maximum delegation depth rooted at this agent.                                                       |
-| attenuation | object  | Constraints a sub-agent MUST satisfy; MAY contain `scopes_subset` (bool) and `budget_subset` (bool). |
+- **Sub-agents** (§9.7.1) are **subordinate personas** the agent spawns under its *own* identity — no separate passport. They are statically enumerated and governed as part of the parent.
+- **Delegation** (§9.7.2) is engaging a **separately-identified peer** — an agent with its own ADL document and passport — across a trust boundary. Peers are discovered at runtime (§6.4) and admitted via the Trust Protocol.
 
-`attenuation.scopes_subset: true` requires a sub-agent's `security.scopes` to be a subset of this agent's ceiling; `budget_subset: true` requires its `permissions.resource_limits.budget` caps to be less than or equal to this agent's. These compose with the delegation-chain verification defined in the [Trust Protocol](/protocol/trust).
+#### 9.7.1 Sub-Agents (personas)
 
-These are declarations; the admission procedure a runtime governor applies when this agent attempts to delegate is defined in the [Runtime Protocol](/protocol/runtime). A delegation that no rule permits is denied; the governor resolves `runtime.degradation.on_sub_agent_denied` (§11.5), defaulting to fail-closed.
+The `sub_agents` member declares the **subordinate personas** this agent may spawn: distinct contexts, each with a focused prompt and a tool subset, that run under the **parent's own identity** (§3). A sub-agent has no agent passport and crosses no trust boundary — it *is* the parent, acting in a narrower role — so its authority is a subset of the parent's by construction. **OPTIONAL.** When present, **MUST** be an array of persona objects. Deny-by-default applies (§9.1): a runtime **MUST NOT** spawn a persona not declared here. Each entry **MAY** contain:
+
+| Member            | Type    | Required | Description                                                                                                      |
+|-------------------|---------|----------|----------------------------------------------------------------------------------------------------------------|
+| `name`            | string  | REQUIRED | Local persona/role name (not an agent identifier). **MUST** be unique within the array.                         |
+| `description`     | string  | OPTIONAL | What the persona is for.                                                                                        |
+| `prompt_resource` | string  | OPTIONAL | Identifier of a `resources` entry (§8.2) holding the persona's prompt/instructions — keeps the persona's *content* in `resources` (versioned and signed-over) and its *declaration* here. |
+| `tools`           | array   | OPTIONAL | Subset of the parent's `tools` the persona may use. Omitted ⇒ the parent's full tool set. A persona **MUST NOT** be granted a tool the parent lacks. |
+| `max_parallel`    | integer | OPTIONAL | Maximum instances of this persona running concurrently. Composes with `resource_limits.max_concurrent` (§9.6).  |
+| `budget_share`    | object  | OPTIONAL | Per-instance sub-cap within the parent's `resource_limits.budget` (same shape as §9.6 `budget`), so one persona cannot exhaust the whole envelope. |
+
+A persona's authority is always a subset of the parent's; there is no attenuation chain to verify, because there is no separate grant. The parent's declared envelope is the ceiling for the parent **and all its personas in aggregate** — personas draw down the parent's budget rather than receiving fresh envelopes. The procedure a runtime governor applies to cap personas at spawn time is defined in the [Runtime Protocol](/protocol/runtime); a spawn that no entry permits is denied, and the governor resolves `runtime.degradation.on_sub_agent_denied` (§11.5), defaulting to fail-closed.
+
+#### 9.7.2 Delegation (external peers)
+
+The `delegation` member declares the **envelope** of separately-identified agents this agent may engage as peers. Unlike sub-agents, a delegated peer is a distinct party with its own ADL document and agent passport, and engagement crosses a trust boundary. Because peers are **discovered at runtime** (§6.4 / the Registry Profile / a trusted directory) rather than enumerated at design time, this domain declares which discovered agents are *permitted*, not a fixed roster. **OPTIONAL.** When present, **MUST** be an object. Deny-by-default applies (§9.1): a delegation to an agent matched by no `match` pattern is denied. It **MAY** contain:
+
+| Member        | Type    | Description                                                                                          |
+|---------------|---------|------------------------------------------------------------------------------------------------------|
+| `match`       | array   | Agent-identifier patterns this agent MAY delegate to. Patterns follow §4.4.                          |
+| `deny`        | array   | Agent-identifier patterns this agent MUST NOT delegate to. `deny` overrides `match` (§9.1).          |
+| `max_depth`   | integer | Maximum delegation depth rooted at this agent.                                                       |
+| `attenuation` | object  | Constraints a delegated peer MUST satisfy; MAY contain `scopes_subset` (bool) and `budget_subset` (bool). |
+
+`attenuation.scopes_subset: true` requires a peer's `security.scopes` to be a subset of this agent's ceiling; `budget_subset: true` requires its `permissions.resource_limits.budget` caps to be less than or equal to this agent's. These compose with the delegation-chain verification defined in the [Trust Protocol](/protocol/trust).
+
+These are declarations; the admission procedure a runtime governor applies when this agent attempts to delegate to a peer is defined in the [Runtime Protocol](/protocol/runtime). A delegation that no rule permits is denied; the governor resolves `runtime.degradation.on_sub_agent_denied` (§11.5), defaulting to fail-closed.
 
 ---
 
@@ -1323,8 +1351,9 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-31 | Each `runtime.degradation` response `action` MUST be one of `halt`, `pause`, `fallback`, `continue` |
 | VAL-32 | `runtime.tool_invocation.max_iterations` and `max_tool_calls_per_session`, when present, MUST be integers >= 1 |
 | VAL-33 | `runtime.tool_invocation.loop_detection.window`, when present, MUST be an integer >= 2 |
-| VAL-34 | `permissions.sub_agents.allowed` and `denied` patterns MUST conform to Section 4.4 pattern syntax |
-| VAL-35 | `permissions.sub_agents.max_depth`, when present, MUST be an integer >= 1 |
+| VAL-34 | `permissions.delegation.match` and `deny` patterns MUST conform to Section 4.4 pattern syntax |
+| VAL-35 | `permissions.delegation.max_depth`, when present, MUST be an integer >= 1 |
+| VAL-35a | Each `permissions.sub_agents[]` entry MUST have a `name`, unique within the array; a persona's `tools` MUST be a subset of the parent's `tools` |
 | VAL-36 | Each `runtime.degradation` cause key MUST match `^on_[a-z0-9_]+$` |
 
 Implementations **MAY** perform additional validation based on declared profiles.

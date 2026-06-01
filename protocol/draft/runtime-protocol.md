@@ -15,7 +15,7 @@ hide_table_of_contents: false
 
 The **Runtime Protocol** defines the normative procedures a *runtime governor* performs to enforce an ADL agent's declared operational limits while the agent executes: budgets, iteration limits, sub-agent admission, human-oversight triggers, degradation, and anomaly detection. It sits in the ADL document family alongside the [ADL Core specification](/spec), which declares what an agent **is** and the limits it advertises, and the [Trust Protocol](/protocol/trust), which defines what a *counterparty* does to verify and authorize it; it is one document in ADL's open protocol layer. Where the Trust Protocol acts **once, at admission**, the Runtime Protocol acts **continuously, after admission**: it is the layer that gives an agent's declared operational limits force at runtime.
 
-The declarative members these procedures operate on — `permissions.resource_limits`, `runtime.tool_invocation`, `permissions.sub_agents`, `human_oversight`, `runtime.degradation`, and `anomaly_baseline` — are defined by [ADL Core](/spec) and the governance profiles, which are authoritative for their syntax and constraints. This document references them but does not redefine them; it defines what a governor **MUST** do with them.
+The declarative members these procedures operate on — `permissions.resource_limits`, `runtime.tool_invocation`, `permissions.sub_agents`, `permissions.delegation`, `human_oversight`, `runtime.degradation`, and `anomaly_baseline` — are defined by [ADL Core](/spec) and the governance profiles, which are authoritative for their syntax and constraints. This document references them but does not redefine them; it defines what a governor **MUST** do with them.
 
 The Runtime Protocol is numbered independently as a standalone document: the runtime governor is §1, the enforcement procedures are §2–§7, and the enforcement-evidence format is §8. Section references outside §1–§8 — for example §9.6, §11.3, or §10.1 — refer to the [ADL Core specification](/spec).
 
@@ -89,6 +89,8 @@ The governor's PDP (§1.2) **MUST** maintain cumulative counters for each declar
 
 Cost accounting — mapping token counts and tool calls to `cost_usd` — is governor-specific. A governor claiming R2 or above on the `cost_usd` dimension **MUST** document its cost model.
 
+**Sub-agent personas draw down the parent's envelope.** When the agent spawns subordinate personas ([Core §9.7.1](/spec/next#971-sub-agents-personas)), their consumption is **not** metered separately: a persona acts under the parent's identity, so the governor **MUST** count persona tokens, cost, and wall-clock against the parent's `budget` counters in **aggregate** (parent plus all personas), and **MUST** additionally enforce a persona's `budget_share` against that persona's own consumption when declared. The parent's caps are therefore the ceiling for the whole persona fan-out, not per-persona. (A separately-identified *peer*, by contrast, carries its own `budget` and is governed under §4.2.)
+
 **Conformance.** At **R1** the governor tracks usage against caps and records boundary events but does not block. At **R2** it **MUST** block any step that would exceed a declared cap and apply §6 degradation. At **R3** the boundary events additionally feed the anomaly substrate (§7).
 
 ## 3 Iteration Control
@@ -105,19 +107,36 @@ The governor's PDP (§1.2) **MUST** maintain, per session (§1.3), a count of re
 
 **Conformance.** At **R1** the governor counts iterations and tool calls and flags loops without blocking. At **R2** it **MUST** block on a reached limit or detected loop and apply §6. At **R3** loop and limit events feed the anomaly substrate (§7).
 
-## 4 Sub-Agent Admission
+## 4 Sub-Agent Spawning and Peer Delegation
 
-This section defines how the governor admits delegated sub-agents against the [ADL Core §9.7](/spec/next#97-sub-agents) `permissions.sub_agents` declaration (`allowed` / `denied`, `max_depth`, `attenuation`).
+ADL Core §9.7 declares two ways an agent brings other agents into its work, distinguished by identity, and the governor treats them differently because only one crosses a trust boundary:
 
-When the agent attempts to delegate to a sub-agent, the governor's PDP (§1.2) **MUST**, before the PEP admits the delegation:
+- **Sub-agents** ([Core §9.7.1](/spec/next#971-sub-agents-personas)) are subordinate **personas** spawned under the parent's own identity. There is no passport to verify and no counterparty — the governor *caps* them, it does not *admit* them.
+- **Delegation** ([Core §9.7.2](/spec/next#972-delegation-external-peers)) engages a separately-identified **peer**. This crosses a trust boundary and is the case that requires admission.
 
-1. **Match identity.** Resolve the prospective sub-agent's identifier and evaluate it against `allowed` and `denied` per §4.4 patterns. `denied` overrides `allowed`; an identifier matching no `allowed` pattern is **not** permitted (deny-by-default).
+### 4.1 Sub-agent (persona) capping
+
+When the agent attempts to spawn a persona declared in `permissions.sub_agents`, the governor's PDP (§1.2) **MUST**, before the PEP admits the spawn:
+
+1. **Match the persona.** The persona **MUST** correspond to a declared `sub_agents[]` entry by `name`; a spawn naming no declared persona is **not** permitted (deny-by-default). The governor **MUST NOT** grant the persona any tool outside its declared `tools` subset (or the parent's tools when `tools` is omitted), and never a tool the parent itself lacks.
+2. **Check concurrency.** Reject the spawn if it would exceed the persona's `max_parallel` or the parent's `resource_limits.max_concurrent` (§9.6).
+3. **Account against the parent.** Persona consumption draws down the parent's envelope: the governor **MUST** count a persona's tokens, cost, and wall-clock against the parent's `budget` (§2) in **aggregate**, and against the persona's `budget_share` when declared. A persona does **not** receive a fresh budget.
+4. **Decide and enforce.** If any check fails, the spawn is denied; the PEP resolves `runtime.degradation.on_sub_agent_denied` (§6), defaulting to fail-closed (do not spawn).
+5. **Record.** Record the spawn decision (persona `name`, matched rule, aggregate draw-down) in the audit trail (§1.4).
+
+A persona is **never** admitted as a counterparty: there is no passport, no delegation chain, and no attenuation to verify, because the persona acts under the parent's identity and its authority is a subset of the parent's by construction.
+
+### 4.2 Peer (external) admission
+
+When the agent attempts to delegate to a separately-identified peer, the governor's PDP (§1.2) **MUST**, before the PEP admits the delegation, evaluate the peer against `permissions.delegation`:
+
+1. **Match identity.** Resolve the prospective peer's identifier and evaluate it against `match` and `deny` per §4.4 patterns. `deny` overrides `match`; an identifier matching no `match` pattern is **not** permitted (deny-by-default).
 2. **Check depth.** Reject the delegation if it would exceed `max_depth` relative to the root of the current delegation chain.
-3. **Check attenuation.** When `attenuation.scopes_subset` is set, the sub-agent's passport `security.scopes` **MUST** be a subset of this agent's ceiling; when `attenuation.budget_subset` is set, its `budget` caps **MUST** be ≤ this agent's. This composes with — and does not replace — the Trust Protocol's delegation-chain verification, which establishes the sub-agent's identity and the chain's integrity.
+3. **Check attenuation.** When `attenuation.scopes_subset` is set, the peer's passport `security.scopes` **MUST** be a subset of this agent's ceiling; when `attenuation.budget_subset` is set, its `budget` caps **MUST** be ≤ this agent's. This composes with — and does not replace — the Trust Protocol's delegation-chain verification, which establishes the peer's identity and the chain's integrity.
 4. **Decide and enforce.** If any check fails, the delegation is denied; the PEP resolves `runtime.degradation.on_sub_agent_denied` (§6), defaulting to fail-closed (do not spawn).
-5. **Record.** Record the admission decision (sub-agent identity, matched rule, attenuation result) in the audit trail (§1.4).
+5. **Record.** Record the admission decision (peer identity, matched rule, attenuation result) in the audit trail (§1.4).
 
-**Conformance.** At **R1** the governor records prospective delegations and what the decision *would* be; it does not block. At **R2** it **MUST** enforce admission and apply §6 on denial. At **R3** delegation patterns feed the anomaly substrate (§7).
+**Conformance.** At **R1** the governor records prospective spawns and delegations and what the decision *would* be; it does not block. At **R2** it **MUST** enforce persona caps (§4.1) and peer admission (§4.2) and apply §6 on denial. At **R3** spawn and delegation patterns feed the anomaly substrate (§7).
 
 ## 5 Oversight Triggers
 
@@ -214,7 +233,7 @@ An enforcement record **MUST** be a JSON object with the following members:
 | `outcome` | string | REQUIRED | Session outcome: `"completed"`, `"halted"`, or `"paused"`. |
 | `signature` | object | REQUIRED | Signature over the JCS-canonical record minus `signature`, by the governor's key. Same shape as §10.2 attestation signatures (Ed25519 RECOMMENDED). |
 
-Each `events[]` entry **MUST** contain `seq` (0-based index), `cause` (`on_budget_exhausted`, `on_iteration_limit`, `on_sub_agent_denied`, `on_oversight_timeout`, `on_tool_error`, `on_anomaly`), `action` (the §6 action applied), `at` (ISO 8601), and `prev_hash` (§8.4); it **MAY** contain `detail`.
+Each `events[]` entry **MUST** contain `seq` (0-based index), `cause` (`on_budget_exhausted`, `on_iteration_limit`, `on_sub_agent_denied`, `on_oversight_timeout`, `on_tool_error`, `on_anomaly`), `action` (the §6 action applied), `at` (ISO 8601), and `prev_hash` (§8.4); it **MAY** contain `detail`. When the event was produced by a subordinate persona ([Core §9.7.1](/spec/next#971-sub-agents-personas)), the governor **SHOULD** record the persona's `name` in `detail` (e.g. `"persona": "doc-reviewer"`), so the account can attribute conduct to the persona that produced it — without implying the persona was a separately-admitted party. The record's `subject` remains the parent agent, since the persona acts under the parent's identity.
 
 ### 8.4 Event hash-chaining
 
