@@ -1731,7 +1731,7 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 
 ### 19.2 Informative References
 
-- **[A2A]** A2A Protocol Working Group, "Agent-to-Agent Protocol Specification", <https://a2a-protocol.org/specification>.
+- **[A2A]** A2A Protocol Working Group, "Agent2Agent (A2A) Protocol Specification", <https://a2a-protocol.org/latest/specification/>.
 - **[CLTC-AGENTIC]** Center for Long-Term Cybersecurity (CLTC), UC Berkeley, "Agentic AI Risk-Management Standards Profile", February 2026, <https://cltc.berkeley.edu/wp-content/uploads/2026/02/Agentic-AI-Risk-Management-Standards-Profile.pdf>.
 - **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Agentic AI", Version 1.5, May 2026, <https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf>.
 - **[JSON-SCHEMA]** Wright, A., et al., "JSON Schema: A Media Type for Describing JSON Documents", <https://json-schema.org/draft/2020-12/json-schema-core>.
@@ -1739,7 +1739,7 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 - **[OPENAPI]** OpenAPI Initiative, "OpenAPI Specification", Version 3.1, <https://spec.openapis.org/oas/v3.1.0>.
 - **[OPENID-CONNECT]** Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and C. Mortimore, "OpenID Connect Core 1.0", November 2014, <https://openid.net/specs/openid-connect-core-1_0.html>.
 - **[W3C.DID]** Sporny, M., et al., "Decentralized Identifiers (DIDs) v1.0", W3C Recommendation, <https://www.w3.org/TR/did-core/>.
-- **[W3C.VC]** Sporny, M., et al., "Verifiable Credentials Data Model v1.1", W3C Recommendation, <https://www.w3.org/TR/vc-data-model/>.
+- **[W3C.VC]** Sporny, M., et al., "Verifiable Credentials Data Model v2.0", W3C Recommendation, <https://www.w3.org/TR/vc-data-model-2.0/>.
 - **[ISO-22989]** ISO/IEC JTC 1/SC 42, "Information technology — Artificial intelligence — Artificial intelligence concepts and terminology", ISO/IEC 22989:2022, <https://www.iso.org/standard/74296.html>.
 - **[AI-PROTOCOLS]** Rosenberg, J., "Framework, Use Cases and Requirements for AI Agent Protocols", Internet-Draft draft-rosenberg-ai-protocols-00, 2025, <https://datatracker.ietf.org/doc/html/draft-rosenberg-ai-protocols-00>.
 
