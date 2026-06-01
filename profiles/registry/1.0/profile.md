@@ -13,7 +13,7 @@ adl_profile_meta:
 
 **Identifier:** `urn:adl:profile:registry:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.1.x
+**ADL Compatibility:** 0.2.x
 **Schema:** [`schema.json`](schema.json)
 **Dependencies:** None
 

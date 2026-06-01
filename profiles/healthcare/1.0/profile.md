@@ -13,7 +13,7 @@ adl_profile_meta:
 
 **Identifier:** `urn:adl:profile:healthcare:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.1.x
+**ADL Compatibility:** 0.2.x
 
 > **Regulatory Disclaimer:** This profile is provided as a technical specification in DRAFT status and does not constitute legal, regulatory, or compliance advice. It has not been reviewed or endorsed by HHS, OCR, the FDA, or any regulatory body. Organizations **MUST NOT** rely on this profile as their sole basis for regulatory compliance. Compliance with HIPAA, HITECH, FDA regulations, or any other healthcare regulatory framework requires qualified professional assessment specific to your organization's circumstances. This profile does not substitute for a HIPAA risk assessment as required by 45 CFR §164.308(a)(1).
 

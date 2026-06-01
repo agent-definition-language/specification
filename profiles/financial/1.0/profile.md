@@ -13,7 +13,7 @@ adl_profile_meta:
 
 **Identifier:** `urn:adl:profile:financial:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.1.x
+**ADL Compatibility:** 0.2.x
 
 > **Regulatory Disclaimer:** This profile is provided as a technical specification in DRAFT status and does not constitute legal, regulatory, or compliance advice. It has not been reviewed or endorsed by the PCI Security Standards Council, the SEC, FINRA, the FTC, or any regulatory body. Organizations **MUST NOT** rely on this profile as their sole basis for regulatory compliance. Compliance with PCI-DSS, SOX, GLBA, or any other financial regulatory framework requires qualified professional assessment specific to your organization's circumstances. This profile does not substitute for a PCI-DSS assessment by a Qualified Security Assessor (QSA) or a SOX audit by a registered public accounting firm.
 
