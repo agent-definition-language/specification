@@ -29,10 +29,10 @@ Profiles are identified by URIs (e.g., `urn:adl:profile:governance:1.0`).
 | Profile | Identifier | Status | Description |
 |---------|------------|--------|-------------|
 | [Governance](./governance/README.md) | `urn:adl:profile:governance:1.0` | Draft | Compliance frameworks, audit trails, enterprise governance |
-| [Registry](./registry/README.md) | `urn:adl:profile:registry:1.0` | Draft | Agent catalog identity, classification, and federation |
 | [Portfolio](./portfolio/README.md) | `urn:adl:profile:portfolio:1.0` | Draft | Agent relationships and domain membership |
-| [Healthcare](./healthcare/README.md) | `urn:adl:profile:healthcare:1.0` | Draft | HIPAA compliance, PHI handling, clinical safety, FHIR interoperability |
+| [Registry](./registry/README.md) | `urn:adl:profile:registry:1.0` | Draft | Agent catalog identity, classification, and federation |
 | [Financial](./financial/README.md) | `urn:adl:profile:financial:1.0` | Draft | PCI-DSS, SOX, GLBA, MiFID II, AML/KYC compliance |
+| [Healthcare](./healthcare/README.md) | `urn:adl:profile:healthcare:1.0` | Draft | HIPAA compliance, PHI handling, clinical safety, FHIR interoperability |
 
 ## Profile Versioning
 

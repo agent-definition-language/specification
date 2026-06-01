@@ -88,6 +88,59 @@ profiles:
             number: "5.3"
             title: Profile Dependencies
 
+  - id: portfolio
+    version: "1.0"
+    identifier: "urn:adl:profile:portfolio:1.0"
+    status: draft
+    title: "Portfolio Profile Specification"
+    description: "agent relationships and domain membership"
+    adl_compatibility: "0.2.x"
+    schema: "schema.json"
+    dependencies: []
+    overview: "The Portfolio Profile extends ADL with agent relationships and domain membership for managing agent portfolios at scale."
+    keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
+    example_filename: "customer-service-agent.adl.json"
+    sections:
+      - id: introduction
+        number: "1"
+        title: Introduction
+        subsections:
+          - id: relationship-other-profiles
+            number: "1.1"
+            title: Relationship to Other Profiles
+      - id: additional-members
+        number: "2"
+        title: Additional Members
+        subsections:
+          - id: relationships
+            number: "2.1"
+            title: relationships
+          - id: domain
+            number: "2.2"
+            title: domain
+      - id: example
+        number: "3"
+        title: Example
+      - id: validation-rules
+        number: "4"
+        title: Validation Rules
+        subsections:
+          - id: schema-validation
+            number: "4.1"
+            title: Schema Validation
+          - id: profile-dependencies
+            number: "4.2"
+            title: Profile Dependencies
+      - id: use-cases
+        number: "5"
+        title: Use Cases
+        subsections:
+          - id: dependency-management
+            number: "5.1"
+            title: Dependency Management
+          - id: domain-alignment
+            number: "5.2"
+            title: Domain Alignment
   - id: registry
     version: "1.0"
     identifier: "urn:adl:profile:registry:1.0"
@@ -142,51 +195,6 @@ profiles:
             number: "5.3"
             title: Multi-Path Classification
 
-  - id: healthcare
-    version: "1.0"
-    identifier: "urn:adl:profile:healthcare:1.0"
-    status: draft
-    title: "Healthcare Profile Specification"
-    description: "HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability"
-    adl_compatibility: "0.2.x"
-    schema: null
-    dependencies: []
-    overview: "The Healthcare Profile extends ADL for healthcare environments with HIPAA compliance, PHI handling, and clinical safety controls."
-    keywords: [adl, healthcare specification, hipaa, phi, fhir, clinical ai, agentic ai, healthcare ai compliance, medical ai, ai safety]
-    example_filename: "clinical-research-agent.adl.json"
-    sections:
-      - id: introduction
-        number: "1"
-        title: Introduction
-      - id: additional-members
-        number: "2"
-        title: Additional Members
-        subsections:
-          - id: hipaa-compliance
-            number: "2.1"
-            title: hipaa_compliance
-          - id: phi-handling
-            number: "2.2"
-            title: phi_handling
-          - id: clinical-safety
-            number: "2.3"
-            title: clinical_safety
-          - id: interoperability
-            number: "2.4"
-            title: interoperability
-          - id: data-classification-extension
-            number: "2.5"
-            title: data_classification Extension
-      - id: compliance-mapping
-        number: "3"
-        title: Compliance Mapping
-      - id: example
-        number: "4"
-        title: Example
-      - id: validation-rules
-        number: "5"
-        title: Validation Rules
-
   - id: financial
     version: "1.0"
     identifier: "urn:adl:profile:financial:1.0"
@@ -232,56 +240,48 @@ profiles:
         number: "5"
         title: Validation Rules
 
-  - id: portfolio
+  - id: healthcare
     version: "1.0"
-    identifier: "urn:adl:profile:portfolio:1.0"
+    identifier: "urn:adl:profile:healthcare:1.0"
     status: draft
-    title: "Portfolio Profile Specification"
-    description: "agent relationships and domain membership"
+    title: "Healthcare Profile Specification"
+    description: "HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability"
     adl_compatibility: "0.2.x"
-    schema: "schema.json"
+    schema: null
     dependencies: []
-    overview: "The Portfolio Profile extends ADL with agent relationships and domain membership for managing agent portfolios at scale."
-    keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
-    example_filename: "customer-service-agent.adl.json"
+    overview: "The Healthcare Profile extends ADL for healthcare environments with HIPAA compliance, PHI handling, and clinical safety controls."
+    keywords: [adl, healthcare specification, hipaa, phi, fhir, clinical ai, agentic ai, healthcare ai compliance, medical ai, ai safety]
+    example_filename: "clinical-research-agent.adl.json"
     sections:
       - id: introduction
         number: "1"
         title: Introduction
-        subsections:
-          - id: relationship-other-profiles
-            number: "1.1"
-            title: Relationship to Other Profiles
       - id: additional-members
         number: "2"
         title: Additional Members
         subsections:
-          - id: relationships
+          - id: hipaa-compliance
             number: "2.1"
-            title: relationships
-          - id: domain
+            title: hipaa_compliance
+          - id: phi-handling
             number: "2.2"
-            title: domain
-      - id: example
+            title: phi_handling
+          - id: clinical-safety
+            number: "2.3"
+            title: clinical_safety
+          - id: interoperability
+            number: "2.4"
+            title: interoperability
+          - id: data-classification-extension
+            number: "2.5"
+            title: data_classification Extension
+      - id: compliance-mapping
         number: "3"
+        title: Compliance Mapping
+      - id: example
+        number: "4"
         title: Example
       - id: validation-rules
-        number: "4"
-        title: Validation Rules
-        subsections:
-          - id: schema-validation
-            number: "4.1"
-            title: Schema Validation
-          - id: profile-dependencies
-            number: "4.2"
-            title: Profile Dependencies
-      - id: use-cases
         number: "5"
-        title: Use Cases
-        subsections:
-          - id: dependency-management
-            number: "5.1"
-            title: Dependency Management
-          - id: domain-alignment
-            number: "5.2"
-            title: Domain Alignment
+        title: Validation Rules
+
