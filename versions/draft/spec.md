@@ -350,7 +350,13 @@ Example (agent identity with DID and public key):
 
 ### 6.4 Discovery
 
-Agent discovery enables clients to locate agents published by a domain without prior knowledge of individual agent identifiers. Domains hosting ADL agents **MAY** publish a discovery document at the well-known URI [RFC8615]:
+Agent discovery enables clients to locate agents published by a domain without prior knowledge of individual agent identifiers. It is the **front-end of delegation**: an agent does its work with its own tools, resources, and model, and turns to discovery only when a task exceeds its own reach and it needs to engage another agent. What it finds is then bounded by the agent's declared `permissions.delegation` envelope (§9.7.2) and admitted via the Trust Protocol — so discovery widens reach without widening authority.
+
+![A two-region figure of governed discovery. On the left is the agent's own reach: a task arrives, and in the common case the agent handles it itself with its own tools, resources, and model, completing with no delegation — whether a task exceeds its reach is judged emergently per run. Only on a capability gap (the exception, drawn at the bottom) does the agent reach out, an arrow crossing into the right region. There a deterministic flow runs top to bottom: a registry served at the well-known adl-agents URL (the directory; publishing invites connection); triage by description and keywords, fetching only the few candidates that fit (emergent — which it picks varies); the delegation envelope of match and deny patterns that permits only peers within the declared boundary (§9.7.2); and Trust Protocol admission verifying the peer's passport and attenuation. Only an admitted peer is engaged, as a separate party. The agent does the work itself whenever it can and reaches a discovered peer only when a task exceeds its own reach, within its declared delegation envelope.](./diagrams/governed-discovery.svg)
+
+*Figure (informative): Discovery is the governed front-end of delegation. The agent acts on its own by default and reaches a discovered peer only when a task exceeds its own reach — bounded by the `permissions.delegation` envelope (§9.7.2) and admitted via the Trust Protocol. Whether it needs help and which peer it selects are emergent per run; the envelope gate and admission are deterministic. This figure is illustrative; this section and §9.7.2 are authoritative.*
+
+Domains hosting ADL agents **MAY** publish a discovery document at the well-known URI [RFC8615]:
 
 ```
 https://{domain}/.well-known/adl-agents

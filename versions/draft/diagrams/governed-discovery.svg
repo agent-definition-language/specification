@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900" height="600" role="img" aria-labelledby="gd-title gd-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="gd-title">Governed discovery: an agent reaches a discovered peer only when a task exceeds its own reach</title>
+  <desc id="gd-desc">A two-region figure. On the left is the agent's own reach — a bounded zone holding the agent and what it can do with its own tools, resources, and model. A task arrives at the agent; in the common case the agent handles it itself and the task completes with no delegation. A caption notes this is emergent: the agent judges, per run, whether a task exceeds its own reach. Only when a task needs a capability the agent lacks — a capability gap, drawn at the bottom as the exception — does the agent reach out. An arrow then crosses, only on a gap, into the right region: governed discovery. There a vertical flow shows the deterministic machinery: a registry served at the well-known adl-agents URL (the directory; publishing invites connection, section 6.4); the agent triaging candidates by their description and keywords and fetching only the few that fit (emergent — which it picks varies); the delegation envelope of match and deny patterns that permits only peers within the declared boundary (section 9.7.2); and Trust Protocol admission that verifies the peer's passport and attenuation. Only an admitted peer is engaged, as a separate party. A footnote states the agent does the work itself whenever it can and reaches a discovered peer only when a task exceeds its own reach, within its declared delegation envelope; whether it needs help and which peer it selects are emergent per run, while the envelope gate and admission are deterministic.</desc>
+
+  <defs>
+    <marker id="gd-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="gd-ar-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="gd-ar-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#137333"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="600" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Governed Discovery</text>
+  <text x="450" y="56" text-anchor="middle" font-size="12.5" font-style="italic" fill="#475569">The agent does the work itself; it reaches a discovered peer only when a task exceeds its own reach</text>
+
+  <!-- ===================== LEFT: the agent's own reach ===================== -->
+  <rect x="40" y="84" width="372" height="412" rx="12" fill="#eef4ff" stroke="#1a73e8" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="58" y="108" font-size="11" font-weight="700" fill="#0b57d0" letter-spacing="0.6">THE AGENT'S OWN REACH</text>
+  <text x="58" y="123" font-size="9" font-style="italic" fill="#5478b8">what it can do with its own tools, resources, and model</text>
+
+  <!-- task in -->
+  <line x1="8" y1="186" x2="106" y2="186" stroke="#334155" stroke-width="1.5" marker-end="url(#gd-ar)"/>
+  <rect x="40" y="178" width="40" height="15" fill="#eef4ff"/>
+  <text x="60" y="190" text-anchor="middle" font-size="10" fill="#334155">task</text>
+
+  <!-- agent badge -->
+  <rect x="108" y="152" width="236" height="70" rx="10" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="226" y="182" text-anchor="middle" font-size="14" font-weight="700" fill="#0b57d0">this agent</text>
+  <text x="226" y="203" text-anchor="middle" font-size="10.5" fill="#1f2937">tools &#183; resources &#183; model</text>
+
+  <!-- handles it itself (the dominant path: heavier green stroke) -->
+  <line x1="226" y1="222" x2="226" y2="292" stroke="#137333" stroke-width="3" marker-end="url(#gd-ar-green)"/>
+  <text x="334" y="248" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0d652d">handles it</text>
+  <text x="334" y="263" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0d652d">itself</text>
+  <text x="334" y="280" text-anchor="middle" font-size="9" font-style="italic" fill="#0d652d">the default path</text>
+
+  <rect x="120" y="294" width="212" height="48" rx="10" fill="#e6f4ea" stroke="#137333" stroke-width="1.6"/>
+  <text x="226" y="314" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0d652d">task complete</text>
+  <text x="226" y="330" text-anchor="middle" font-size="9" fill="#1f2937">no delegation needed</text>
+
+  <!-- emergent judgment caption -->
+  <text x="226" y="366" text-anchor="middle" font-size="9.5" font-style="italic" fill="#64748b">Emergent: the agent judges, per run, whether</text>
+  <text x="226" y="379" text-anchor="middle" font-size="9.5" font-style="italic" fill="#64748b">a task exceeds its own reach.</text>
+
+  <!-- capability gap (the exception, at the bottom) -->
+  <rect x="96" y="402" width="260" height="44" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.4"/>
+  <text x="226" y="421" text-anchor="middle" font-size="10.5" font-weight="700" fill="#b45309">capability gap</text>
+  <text x="226" y="437" text-anchor="middle" font-size="9" fill="#92722f">the task needs something outside its reach</text>
+
+  <!-- ===================== reach-out (only on a gap): thin dashed elbow = the conditional exception ===================== -->
+  <line x1="356" y1="424" x2="440" y2="424" stroke="#d9a441" stroke-width="1.2" stroke-dasharray="6 4"/>
+  <line x1="440" y1="424" x2="440" y2="166" stroke="#d9a441" stroke-width="1.2" stroke-dasharray="6 4"/>
+  <line x1="440" y1="166" x2="522" y2="166" stroke="#d9a441" stroke-width="1.2" stroke-dasharray="6 4" marker-end="url(#gd-ar-amber)"/>
+  <text transform="rotate(-90 432 300)" x="432" y="300" text-anchor="middle" font-size="9.5" font-style="italic" fill="#b45309">reach out &#8212; only when it can't do it alone</text>
+
+  <!-- ===================== RIGHT: governed discovery ===================== -->
+  <rect x="470" y="84" width="390" height="412" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="488" y="108" font-size="11" font-weight="700" fill="#334155" letter-spacing="0.6">GOVERNED DISCOVERY</text>
+  <text x="488" y="123" font-size="9" font-style="italic" fill="#64748b">find a peer, bounded by the delegation envelope</text>
+
+  <!-- 1 registry (the directory; external) -->
+  <rect x="524" y="140" width="282" height="52" rx="10" fill="#ffffff" stroke="#5f6368" stroke-width="1.4"/>
+  <text x="665" y="160" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">registry &#183; /.well-known/adl-agents</text>
+  <text x="665" y="177" text-anchor="middle" font-size="8.5" fill="#5f6368">the directory &#8212; publishing invites connection (&#167;6.4)</text>
+
+  <line x1="665" y1="192" x2="665" y2="210" stroke="#334155" stroke-width="1.4" marker-end="url(#gd-ar)"/>
+
+  <!-- 2 triage (emergent) -->
+  <rect x="524" y="210" width="282" height="52" rx="10" fill="#eef4ff" stroke="#1a73e8" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="665" y="230" text-anchor="middle" font-size="11" font-weight="700" fill="#0b57d0">triage by description + keywords</text>
+  <text x="665" y="247" text-anchor="middle" font-size="8.5" fill="#1f2937">fetch only the few that fit &#8212; which it picks varies</text>
+
+  <line x1="665" y1="262" x2="665" y2="280" stroke="#334155" stroke-width="1.4" marker-end="url(#gd-ar)"/>
+
+  <!-- 3 delegation envelope gate (deterministic) -->
+  <rect x="524" y="280" width="282" height="52" rx="10" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="665" y="300" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">delegation envelope &#8212; match / deny</text>
+  <text x="665" y="317" text-anchor="middle" font-size="8.5" fill="#92722f">permits only peers within the declared boundary (&#167;9.7.2)</text>
+
+  <line x1="665" y1="332" x2="665" y2="350" stroke="#334155" stroke-width="1.4" marker-end="url(#gd-ar)"/>
+
+  <!-- 4 admission (deterministic); two-line sublabel so the citation fits the box -->
+  <rect x="524" y="348" width="282" height="58" rx="10" fill="#ffffff" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="665" y="367" text-anchor="middle" font-size="11" font-weight="700" fill="#0b57d0">admit &#8212; verify passport &#183; attenuation</text>
+  <text x="665" y="384" text-anchor="middle" font-size="8.5" fill="#1f2937">passport: Trust &#167;1.1</text>
+  <text x="665" y="397" text-anchor="middle" font-size="8.5" fill="#1f2937">attenuation: peer scopes / budget &#8838; this agent (&#167;9.7.2)</text>
+
+  <line x1="665" y1="406" x2="665" y2="422" stroke="#137333" stroke-width="1.6" marker-end="url(#gd-ar-green)"/>
+
+  <!-- 5 engage peer -->
+  <rect x="567" y="422" width="196" height="46" rx="10" fill="#e6f4ea" stroke="#137333" stroke-width="1.75"/>
+  <text x="665" y="442" text-anchor="middle" font-size="12" font-weight="700" fill="#0d652d">engage the peer</text>
+  <text x="665" y="458" text-anchor="middle" font-size="8.5" fill="#1f2937">a separate, admitted party</text>
+
+  <!-- ===================== footnote ===================== -->
+  <text x="450" y="540" text-anchor="middle" font-size="10.5" font-style="italic" fill="#475569">The agent does the work itself whenever it can; it reaches a discovered peer only when a task exceeds its own reach &#8212; and only within its declared delegation envelope.</text>
+  <text x="450" y="557" text-anchor="middle" font-size="10.5" font-style="italic" fill="#475569">Emergent per run: whether it needs help, and which peer it selects. Deterministic: the envelope gate and admission. Illustrative; &#167;6.4 and &#167;9.7.2 are authoritative.</text>
+</svg>
