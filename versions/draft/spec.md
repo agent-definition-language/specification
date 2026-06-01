@@ -1715,10 +1715,19 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 
 - **[RFC2119]** Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, <https://www.rfc-editor.org/info/rfc2119>.
 - **[RFC3986]** Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform Resource Identifier (URI): Generic Syntax", STD 66, RFC 3986, <https://www.rfc-editor.org/info/rfc3986>.
+- **[RFC6749]** Hardt, D., Ed., "The OAuth 2.0 Authorization Framework", RFC 6749, <https://www.rfc-editor.org/info/rfc6749>.
+- **[RFC6838]** Freed, N., Klensin, J., and T. Hansen, "Media Type Specifications and Registration Procedures", BCP 13, RFC 6838, <https://www.rfc-editor.org/info/rfc6838>.
 - **[RFC6901]** Bryan, P., Ed., "JavaScript Object Notation (JSON) Pointer", RFC 6901, <https://www.rfc-editor.org/info/rfc6901>.
+- **[RFC7636]** Sakimura, N., Ed., Bradley, J., and N. Agarwal, "Proof Key for Code Exchange by OAuth Public Clients", RFC 7636, <https://www.rfc-editor.org/info/rfc7636>.
+- **[RFC8126]** Cotton, M., Leiba, B., and T. Narten, "Guidelines for Writing an IANA Considerations Section in RFCs", BCP 26, RFC 8126, <https://www.rfc-editor.org/info/rfc8126>.
+- **[RFC8141]** Saint-Andre, P. and J. Klensin, "Uniform Resource Names (URNs)", RFC 8141, <https://www.rfc-editor.org/info/rfc8141>.
 - **[RFC8174]** Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174, <https://www.rfc-editor.org/info/rfc8174>.
 - **[RFC8259]** Bray, T., Ed., "The JavaScript Object Notation (JSON) Data Interchange Format", STD 90, RFC 8259, <https://www.rfc-editor.org/info/rfc8259>.
+- **[RFC8615]** Nottingham, M., "Well-Known Uniform Resource Identifiers (URIs)", RFC 8615, <https://www.rfc-editor.org/info/rfc8615>.
+- **[RFC8705]** Campbell, B., Bradley, J., Sakimura, N., and T. Lodderstedt, "OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens", RFC 8705, <https://www.rfc-editor.org/info/rfc8705>.
 - **[RFC8785]** Rundgren, A., Jordan, B., and S. Erdtman, "JSON Canonicalization Scheme (JCS)", RFC 8785, <https://www.rfc-editor.org/info/rfc8785>.
+- **[RFC9449]** Fett, D., Campbell, B., Bradley, J., Lodderstedt, T., Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of Possession (DPoP)", RFC 9449, <https://www.rfc-editor.org/info/rfc9449>.
+- **[RFC9700]** Lodderstedt, T., Bradley, J., Labunets, A., and D. Fett, "Best Current Practice for OAuth 2.0 Security", BCP 240, RFC 9700, <https://www.rfc-editor.org/info/rfc9700>.
 
 ### 19.2 Informative References
 
@@ -1728,6 +1737,7 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 - **[JSON-SCHEMA]** Wright, A., et al., "JSON Schema: A Media Type for Describing JSON Documents", <https://json-schema.org/draft/2020-12/json-schema-core>.
 - **[MCP]** Anthropic, "Model Context Protocol Specification", <https://modelcontextprotocol.io/specification>.
 - **[OPENAPI]** OpenAPI Initiative, "OpenAPI Specification", Version 3.1, <https://spec.openapis.org/oas/v3.1.0>.
+- **[OPENID-CONNECT]** Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and C. Mortimore, "OpenID Connect Core 1.0", November 2014, <https://openid.net/specs/openid-connect-core-1_0.html>.
 - **[W3C.DID]** Sporny, M., et al., "Decentralized Identifiers (DIDs) v1.0", W3C Recommendation, <https://www.w3.org/TR/did-core/>.
 - **[W3C.VC]** Sporny, M., et al., "Verifiable Credentials Data Model v1.1", W3C Recommendation, <https://www.w3.org/TR/vc-data-model/>.
 - **[ISO-22989]** ISO/IEC JTC 1/SC 42, "Information technology — Artificial intelligence — Artificial intelligence concepts and terminology", ISO/IEC 22989:2022, <https://www.iso.org/standard/74296.html>.
