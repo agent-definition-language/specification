@@ -392,3 +392,69 @@ A failure at any §1 step **MUST** prevent §2 evaluation. Conversely, §2 succe
 ```
 
 The verifier (`invoice-processor`) checks that `["invoices:write", "invoices:approve"]` is a subset of `finance-bot`'s passport ceiling, then checks that the `approve_invoice` tool's required scopes are a subset of those, then proxies the call.
+
+---
+
+## IANA Considerations
+
+This document requests the registrations below, following [RFC8126] and the HTTP registration procedures of [RFC9110].
+
+### HTTP Authentication Scheme
+
+IANA is requested to add the following entry to the "Hypertext Transfer Protocol (HTTP) Authentication Scheme Registry" ([RFC9110] §16.4.1):
+
+| Authentication Scheme Name | Reference |
+|----------------------------|-----------|
+| `ADL` | This document, §1.2.7 |
+
+The `ADL` scheme appears only in a `WWW-Authenticate` challenge, carrying a single verifier-issued `nonce` auth-param (`WWW-Authenticate: ADL nonce="…"`) on a `401 Unauthorized` response; the presenter echoes the value in the presentation proof's `nonce` member (§1.2.7). It does not define an `Authorization`-header credential.
+
+### HTTP Field Names
+
+IANA is requested to add the following entries to the "Hypertext Transfer Protocol (HTTP) Field Name Registry" ([RFC9110] §16.3.1):
+
+| Field Name | Status | Reference |
+|------------|--------|-----------|
+| `X-ADL-Passport` | permanent | This document, §1.2.5 |
+| `X-ADL-Passport-URL` | permanent | This document, §1.2.5 |
+| `X-ADL-Proof` | permanent | This document, §1.2.5 |
+
+> **Open item ([RFC6648]).** [RFC6648] deprecates the `X-` prefix for new field names. Before publication these **SHOULD** be renamed to `ADL-Passport`, `ADL-Passport-URL`, and `ADL-Proof`, with the `X-`-prefixed forms retained only as deprecated aliases; the final registration should use the unprefixed names. The names above reflect the current draft.
+
+No media type is registered by this document. The passport is conveyed base64-encoded in `X-ADL-Passport` (or dereferenced via `X-ADL-Passport-URL`) and validated against the ADL JSON Schema; the presentation proof is conveyed base64-encoded in `X-ADL-Proof` and validated against the structure in §1.2.2.
+
+## Security Considerations
+
+This section consolidates the security properties and residual risks of the §1 authentication and §2 authorization procedures. The presentation-proof threat model (§1.2.1) and the no-leak authorization rules (§2.1) are normative where stated; this section summarizes them and adds operational guidance.
+
+**Passports are public; presentation proofs are not optional.** A passport is not secret (§1.2.1): an attacker may obtain a complete, valid, signed passport from a discovery endpoint, a registry, or network capture. Authentication of a *request* therefore **MUST** rely on the per-request presentation proof (§1.2), which binds the passport to the request method, URI, time window, and `jti` under a signature the attacker cannot produce. Accepting a passport without a fresh proof (outside the §1.2.10 waivers) re-opens the replay vector the proof exists to close.
+
+**did:web trust anchor.** When identity is resolved via `did:web` (§1.1.3, [W3C.DID-WEB]), the verification key is only as trustworthy as the TLS and DNS for the DID's domain: whoever controls `https://{domain}/.well-known/did.json` controls the key. Compromise of the domain, its TLS certificate, or its DNS permits key substitution. Verifiers **SHOULD** pin or monitor did:web keys for high-value counterparties and **MUST** apply the §1.1.8 provider-coherence checks. An unsigned or URN-only document remains Trust-On-First-Use (§1.1.3) and **MUST NOT** be elevated above the trust of the channel that delivered it.
+
+**Replay-cache integrity and exhaustion.** Replay prevention (§1.2.6.6) requires a `jti` cache with a TTL at least the maximum proof lifetime. Two operational hazards follow. (1) *Distribution:* the cache is scoped to the verifier instance; a horizontally-scaled verifier whose instances do not share the cache can accept the same `jti` once per instance within the window. Deployments that scale a logical verifier across instances **SHOULD** use a shared or replicated `jti` store, or restrict the freshness guarantee to single-instance verifiers and rely on server-issued nonces (§1.2.7) for stronger binding. (2) *Exhaustion:* an attacker can flood the cache with distinct `jti` values; verifiers **SHOULD** bound cache size, rate-limit unauthenticated presentations, and use the proof's short `exp` (≤ 5 minutes, §1.2.3) as the eviction horizon.
+
+**Clock skew.** The bounded skew tolerance (§1.2.8; default 60 s, maximum 5 min) limits the window in which a captured proof could be replayed before the `jti` cache is consulted; deployments **MUST NOT** widen it beyond the §1.2.8 maximum.
+
+**No information leakage on failure.** Authorization failures **MUST** return only the structured outcome and **MUST NOT** leak data the caller was attempting to access (§2.1); the `WWW-Authenticate: Bearer error="insufficient_scope"` response ([RFC6750]) names missing scopes only to the extent the caller is already entitled to know them.
+
+**Algorithm agility.** Signatures are verified over the JCS canonicalization of [RFC8785] with Ed25519 RECOMMENDED; verifiers **MUST** reject weak or unknown signature algorithms (per the ADL Core cryptographic floors) rather than downgrading.
+
+## References
+
+### Normative References
+
+- **[RFC2119]** Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, <https://www.rfc-editor.org/info/rfc2119>.
+- **[RFC3986]** Berners-Lee, T., Fielding, R., and L. Masinter, "Uniform Resource Identifier (URI): Generic Syntax", STD 66, RFC 3986, <https://www.rfc-editor.org/info/rfc3986>.
+- **[RFC6648]** Saint-Andre, P., Crocker, D., and M. Nottingham, "Deprecating the 'X-' Prefix and Similar Constructs in Application Protocols", BCP 178, RFC 6648, <https://www.rfc-editor.org/info/rfc6648>.
+- **[RFC6750]** Jones, M. and D. Hardt, "The OAuth 2.0 Authorization Framework: Bearer Token Usage", RFC 6750, <https://www.rfc-editor.org/info/rfc6750>.
+- **[RFC8126]** Cotton, M., Leiba, B., and T. Narten, "Guidelines for Writing an IANA Considerations Section in RFCs", BCP 26, RFC 8126, <https://www.rfc-editor.org/info/rfc8126>.
+- **[RFC8174]** Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174, <https://www.rfc-editor.org/info/rfc8174>.
+- **[RFC8785]** Rundgren, A., Jordan, B., and S. Erdtman, "JSON Canonicalization Scheme (JCS)", RFC 8785, <https://www.rfc-editor.org/info/rfc8785>.
+- **[RFC9110]** Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke, Ed., "HTTP Semantics", STD 97, RFC 9110, <https://www.rfc-editor.org/info/rfc9110>.
+- **[W3C.DID-WEB]** Guy, A., et al., "did:web Method Specification", W3C Credentials Community Group, <https://w3c-ccg.github.io/did-method-web/>.
+- **[ADL-CORE]** Nederveld, T., "Agent Definition Language (ADL)", the Core document of this specification family; see [/spec](/spec).
+
+### Informative References
+
+- **[RFC8693]** Jones, M., Nadalin, A., Campbell, B., Ed., Bradley, J., and C. Mortimore, "OAuth 2.0 Token Exchange", RFC 8693, <https://www.rfc-editor.org/info/rfc8693>.
+- **[RFC9449]** Fett, D., Campbell, B., Bradley, J., Lodderstedt, T., Jones, M., and D. Waite, "OAuth 2.0 Demonstrating Proof of Possession (DPoP)", RFC 9449, <https://www.rfc-editor.org/info/rfc9449>.

@@ -280,9 +280,36 @@ A runtime governor advertises the tier of enforcement it implements. Tiers are c
 
 **Status:** Tier definitions are provisional; their normative conformance requirements continue to firm up.
 
+## IANA Considerations
+
+This document requests no IANA registrations. The enforcement record (§8) is a JSON document whose format version is carried in-band in its `adl_enforcement_record` member (`"1.0"`) and whose structure is validated by `schema-enforcement-record.json` (§8.3); it is conveyed inline on request or published to the agent's governance record (§8.7) without a dedicated HTTP field or media type. Should a media type for the enforcement record be desired in a future revision (for example `application/adl-enforcement-record+json`), it would be registered through the IANA media-types registry at that time; no such registration is requested here.
+
+## Security Considerations
+
+The runtime governor's security model is developed normatively in §1.4 (Trust in the Governor) and §8.1 (what the evidence proves); this section consolidates it for review.
+
+**Self-governance is the central limitation.** The governor **MAY** be operated by the same party as the agent (§1.1), so its enforcement cannot be taken on faith. The protocol addresses this with tiered, externally-verifiable evidence (§8) rather than by mandating separation: an enforcement record lets a counterparty distinguish a governor that *actually* enforced at a tier from one that merely claims it.
+
+**The evidence proves tamper-evidence and freshness, not completeness.** A signed, hash-chained record (§8.4) detects alteration, reordering, or deletion of recorded events, and a counterparty-issued nonce (§8.5) defeats stale or pre-fabricated records — but a valid record does **not** prove that no *unrecorded* violation occurred. Detecting omission by a self-interested operator requires an independent witness and is the reserved tier of §8.8 (the [RFC6962] transparency-log model); counterparties **MUST NOT** read a valid record as proof of completeness (§8.1).
+
+**Fail-closed is a security property.** Absence of a declared degradation response halts the session (§6): a limit with no declared handling stops the agent rather than waving it through. Implementations **MUST** preserve this default and **MUST** record any explicit `continue` (fail-open) override together with the cause it overrode (§6).
+
+**The admitted passport is pinned.** The governor enforces against the exact canonical passport bytes admitted at session start (§1.3); any mid-session change to the governed members is a session-integrity fault that fails closed, preventing silent limit-swapping during a session.
+
+**Governor key trust.** The governor is a first-class identified actor whose key is resolved and verified with the same machinery as a passport (§8.2, Trust Protocol §1.1.3/§1.1.5); the did:web and TLS trust-anchor considerations in the Trust Protocol's Security Considerations apply equally to the governor's identity.
+
 ## References
 
-- [XACML] — OASIS, *eXtensible Access Control Markup Language (XACML) Version 3.0* — the policy decision point / policy enforcement point (PDP/PEP) model adopted in §1.2.
-- [NIST.SP.800-162] — NIST Special Publication 800-162, *Guide to Attribute Based Access Control (ABAC) Definition and Considerations*.
-- [RFC8785] — JSON Canonicalization Scheme (JCS), used to canonicalize an enforcement record before signing/verifying (§8.3–§8.6).
-- [RFC6962] — Certificate Transparency, the witness model the reserved completeness tier (§8.8) draws on.
+### Normative References
+
+- **[RFC2119]** Bradner, S., "Key words for use in RFCs to Indicate Requirement Levels", BCP 14, RFC 2119, <https://www.rfc-editor.org/info/rfc2119>.
+- **[RFC8174]** Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words", BCP 14, RFC 8174, <https://www.rfc-editor.org/info/rfc8174>.
+- **[RFC8785]** Rundgren, A., Jordan, B., and S. Erdtman, "JSON Canonicalization Scheme (JCS)", RFC 8785, <https://www.rfc-editor.org/info/rfc8785>. Used to canonicalize an enforcement record before signing and verifying (§8.3–§8.6).
+- **[ADL-CORE]** Nederveld, T., "Agent Definition Language (ADL)", the Core document of this specification family; see [/spec](/spec).
+- **[ADL-TRUST]** Nederveld, T., "ADL Trust Protocol", the companion authentication and authorization document; the governor resolves and verifies its own key with the Trust Protocol's §1.1.3/§1.1.5 machinery; see [/protocol/trust](/protocol/trust).
+
+### Informative References
+
+- **[XACML]** OASIS, "eXtensible Access Control Markup Language (XACML) Version 3.0", OASIS Standard, January 2013. The policy decision point / policy enforcement point (PDP/PEP) model adopted in §1.2.
+- **[NIST.SP.800-162]** Hu, V., et al., "Guide to Attribute Based Access Control (ABAC) Definition and Considerations", NIST Special Publication 800-162, <https://doi.org/10.6028/NIST.SP.800-162>.
+- **[RFC6962]** Laurie, B., Langley, A., and E. Kasper, "Certificate Transparency", RFC 6962, <https://www.rfc-editor.org/info/rfc6962>. The witness model the reserved completeness tier (§8.8) draws on.
