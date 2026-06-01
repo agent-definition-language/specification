@@ -13,6 +13,10 @@ ADL is specified as a **family of documents** built around one signed passport. 
 
 Core declares; the protocols enforce. A declared limit has force only when a protocol procedure acts on it.
 
+![Component diagram of the ADL document family. A DECLARE region at the top holds the ADL Core (identity, capabilities, limits, lifecycle), which derives the Agent Passport, a declared and signed artifact. A dashed declare-versus-enforce boundary separates it from the ENFORCE region (the protocol layer) below, holding the Trust Protocol (admission-time verification and authorization), the Runtime Protocol (a continuous governor performing enforcement and evidence), and a dashed open-layer slot for future protocols such as discovery, reputation, and settlement. The passport is consumed by the Trust Protocol at admission and by the Runtime Protocol at runtime, and is available to the open-layer slot in future. The Runtime Protocol produces an Enforcement Evidence hash-chained record.](./diagrams/document-family-architecture.svg)
+
+*Figure 1 (informative): The ADL document family — Core declares the agent passport; the protocols enforce it (Trust at admission, Runtime continuously), with an open slot for future protocols. Illustrative only; the normative requirements live in the Core and protocol documents.*
+
 ## The protocol layer
 
 Two protocols are defined today. The layer is open: further protocols may join it as new enforcement boundaries emerge.

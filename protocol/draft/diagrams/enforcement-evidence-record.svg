@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 660" width="900" height="660" role="img" aria-labelledby="ee-title ee-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="ee-title">Enforcement evidence: a signed, hash-chained record of what the governor enforced</title>
+  <desc id="ee-desc">A data-structure diagram of an ADL enforcement record. At the top is the record header, binding the record to a governor identity, the subject agent by passport digest (the version pin), the session and tier, the time window, and an optional counterparty nonce for freshness. Below the header is an ordered chain of enforcement events, each carrying a sequence number, the cause that fired, the section 6 action applied, a timestamp, and a prev_hash field. An arrow from each event's prev_hash points back to the previous event: event zero's prev_hash is the SHA-256 of the record header, and each later event's prev_hash is the SHA-256 of the previous event, so any alteration, reordering, or deletion breaks a link. At the bottom, the governor's signature seals the whole chain. A callout states what the evidence proves — tamper-evidence and, with a nonce, freshness — and what it does not prove: completeness, which is the reserved witness tier.</desc>
+
+  <defs>
+    <marker id="ee-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8430ce"/>
+    </marker>
+    <marker id="ee-seal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="660" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Enforcement Evidence</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">A signed, hash-chained record of what the governor enforced &#8212; tamper-evident, not complete</text>
+
+  <!-- ===================== HEADER ===================== -->
+  <rect x="70" y="84" width="470" height="136" rx="10" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="86" y="106" font-size="12.5" font-weight="700" fill="#3730a3">Record header</text>
+  <g font-size="10.5" fill="#1f2937">
+    <text x="86" y="128"><tspan font-weight="700">governor</tspan> &#8212; identity (HTTPS / did:web), resolved to a key</text>
+    <text x="86" y="146"><tspan font-weight="700">subject.passport_digest</tspan> &#8212; binds to the admitted passport (version pin)</text>
+    <text x="86" y="164"><tspan font-weight="700">session &#183; tier</tspan> (R1 / R2 / R3) &#183; <tspan font-weight="700">window</tspan> (start &#8211; end)</text>
+    <text x="86" y="182"><tspan font-weight="700">nonce</tspan> &#8212; optional counterparty challenge (freshness, &#167;8.5)</text>
+    <text x="86" y="198" fill="#64748b" font-style="italic">&#8230; plus adl_enforcement_record, iat, outcome (full canonical header is hashed)</text>
+  </g>
+
+  <!-- header -> event0 chain anchor -->
+  <line x1="305" y1="220" x2="305" y2="232" stroke="#334155" stroke-width="1.4" marker-end="url(#ee-seal)"/>
+  <text x="313" y="230" text-anchor="start" font-size="9" font-style="italic" fill="#64748b">SHA-256(header) = events[0].prev_hash</text>
+
+  <!-- ===================== EVENT CHAIN ===================== -->
+  <!-- event 0 -->
+  <rect x="120" y="234" width="370" height="56" rx="8" fill="#f3e8fd" stroke="#8430ce" stroke-width="1.5"/>
+  <text x="134" y="254" font-size="11" font-weight="700" fill="#6b21a8">events[0]</text>
+  <text x="134" y="272" font-size="10" fill="#1f2937">seq 0 &#183; cause on_budget_exhausted &#183; action halt</text>
+  <text x="134" y="285" font-size="9.5" fill="#475569">at &#183; <tspan font-weight="700" fill="#6b21a8">prev_hash</tspan> &#8594; header</text>
+
+  <!-- event 1 -->
+  <rect x="120" y="320" width="370" height="56" rx="8" fill="#f3e8fd" stroke="#8430ce" stroke-width="1.5"/>
+  <text x="134" y="340" font-size="11" font-weight="700" fill="#6b21a8">events[1]</text>
+  <text x="134" y="358" font-size="10" fill="#1f2937">seq 1 &#183; cause on_anomaly &#183; action pause</text>
+  <text x="134" y="371" font-size="9.5" fill="#475569">at &#183; <tspan font-weight="700" fill="#6b21a8">prev_hash</tspan> &#8594; SHA-256(events[0])</text>
+
+  <!-- event 2 -->
+  <rect x="120" y="406" width="370" height="56" rx="8" fill="#f3e8fd" stroke="#8430ce" stroke-width="1.5"/>
+  <text x="134" y="426" font-size="11" font-weight="700" fill="#6b21a8">events[2]</text>
+  <text x="134" y="444" font-size="10" fill="#1f2937">seq 2 &#183; cause on_oversight_timeout &#183; action halt</text>
+  <text x="134" y="457" font-size="9.5" fill="#475569">at &#183; <tspan font-weight="700" fill="#6b21a8">prev_hash</tspan> &#8594; SHA-256(events[1])</text>
+
+  <!-- back-pointing chain arrows (each prev_hash points to the prior block) -->
+  <!-- event1 -> event0 -->
+  <path d="M504,348 C 524,348 524,262 504,262" fill="none" stroke="#8430ce" stroke-width="1.5" marker-end="url(#ee-arrow)"/>
+  <!-- event2 -> event1 -->
+  <path d="M504,434 C 524,434 524,348 504,348" fill="none" stroke="#8430ce" stroke-width="1.5" marker-end="url(#ee-arrow)"/>
+  <text transform="rotate(-90 543 355)" x="543" y="355" text-anchor="middle" font-size="9" font-style="italic" fill="#8430ce">each link verifies the prior block</text>
+
+  <!-- chain -> signature -->
+  <line x1="305" y1="462" x2="305" y2="490" stroke="#334155" stroke-width="1.4" marker-end="url(#ee-seal)"/>
+
+  <!-- ===================== SIGNATURE ===================== -->
+  <rect x="120" y="492" width="370" height="56" rx="8" fill="#e6f4ea" stroke="#137333" stroke-width="1.75"/>
+  <text x="305" y="515" text-anchor="middle" font-size="12" font-weight="700" fill="#0d652d">governor signature</text>
+  <text x="305" y="533" text-anchor="middle" font-size="9.5" fill="#1f2937">seals the full record (header + chain) &#183; Ed25519 RECOMMENDED</text>
+
+  <!-- ===================== CALLOUT: proves / does not prove ===================== -->
+  <rect x="566" y="234" width="284" height="314" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="708" y="260" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">What it proves &#8212; and does not</text>
+
+  <text x="584" y="288" font-size="11" font-weight="700" fill="#0d652d">&#10003; Tamper-evidence</text>
+  <text x="584" y="305" font-size="10" fill="#1f2937">altered, reordered, or deleted</text>
+  <text x="584" y="319" font-size="10" fill="#1f2937">events break a prev_hash link.</text>
+
+  <text x="584" y="346" font-size="11" font-weight="700" fill="#0d652d">&#10003; Freshness (with nonce)</text>
+  <text x="584" y="363" font-size="10" fill="#1f2937">a record carrying the challenge</text>
+  <text x="584" y="377" font-size="10" fill="#1f2937">post-dates it &#8212; not pre-fabricated.</text>
+
+  <line x1="584" y1="398" x2="832" y2="398" stroke="#cbd5e1" stroke-width="1"/>
+
+  <text x="584" y="422" font-size="11" font-weight="700" fill="#a50e0e">&#10007; NOT completeness</text>
+  <text x="584" y="439" font-size="10" fill="#1f2937">a valid record proves what the</text>
+  <text x="584" y="453" font-size="10" fill="#1f2937">governor <tspan font-style="italic">recorded</tspan>, not that no</text>
+  <text x="584" y="467" font-size="10" fill="#1f2937">unrecorded violation occurred.</text>
+  <text x="584" y="487" font-size="9.5" font-style="italic" fill="#64748b">Detecting omission is the reserved</text>
+  <text x="584" y="500" font-size="9.5" font-style="italic" fill="#64748b">witness tier (&#167;8.8).</text>
+
+  <!-- ===================== footnote ===================== -->
+  <text x="450" y="600" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">A counterparty resolves the governor key, verifies the signature, re-checks the hash-chain, and confirms the passport digest.</text>
+  <text x="450" y="617" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">The structure and verification are deterministic; the record's content is a per-run account of conduct.</text>
+</svg>

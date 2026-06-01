@@ -25,6 +25,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 A **passport** is a compact **identity document** for an agent — smaller than the agent's full [ADL Core](/spec) document — that the agent presents to establish trust with other agents. Where the full ADL document describes everything about an agent (identity, capabilities, tools, resources, model configuration, permissions, and runtime behavior), the passport carries only what a counterparty needs to answer two questions: *who is this agent?* and *can I trust this document?* The members it carries are defined by [ADL Core](/spec), which is authoritative for their syntax and constraints.
 
+![Left-to-right class diagram of passport distillation. On the left, the full ADL Document lists all its member groups; the identity-and-trust members (adl_spec, id and provider, cryptographic_identity, security attestation and scopes, lifecycle status, permissions, and data_classification) are highlighted as the distilled subset, while the operational members (capabilities, tools, resources, model, runtime behaviour and degradation, human_oversight, anomaly_baseline) are greyed as staying behind. A derive arrow crosses to the middle column, the Agent Passport — a compact signed box carrying only that subset, the members a counterparty needs to answer who is this agent and can I trust this document. A present arrow then carries the passport to a counterparty on the right, attached to a request or dereferenced by URL. The passport is a typed projection of the document: identity and trust travel; capabilities and runtime stay behind, resolved separately when needed.](./diagrams/passport-distillation.svg)
+
+*Figure 1 (informative): The passport is a typed projection of the full ADL document — the identity-and-trust subset a counterparty needs, distilled into a compact signed credential, while the operational members stay in the full document and are resolved separately. This figure is illustrative; the member list below is authoritative.*
+
 Keeping the passport small matters because it travels on agent-to-agent interactions — attached to a request or dereferenced by URL (§1.2.5) — and is verified on every exchange. A counterparty that needs the agent's complete definition resolves the full ADL document separately. Note that `permissions` and `data_classification` are carried in full rather than as a digest; an agent with large permission sets (up to the Core §18.5 limits) therefore trades passport compactness for self-containment, which implementers sizing a passport header (e.g., `X-ADL-Passport`) should anticipate. The passport carries the following members:
 
 | Member | ADL Core | Role in trust |
@@ -53,6 +57,10 @@ The procedures in §1.1 and §1.2 are procedural rather than declarative: they d
 When a counterparty receives an ADL document — whether through peer exchange, a discovery endpoint (§6.4), a registry, or any other channel — and intends to act on its declarations (provision the agent, route requests to it, grant access, or treat it as authoritative), the counterparty **MUST** perform the verification procedure defined in this section before relying on any declaration in the document.
 
 The procedure is layered: each step gates the next. An implementation **MUST NOT** skip earlier steps to reach later ones, and **MUST NOT** treat a partial verification as sufficient unless this section explicitly allows it.
+
+![Top-to-bottom activity diagram of the ten-gate passport verification procedure. An incoming ADL passport enters a vertical sequence of gates, each of which must pass before the next runs: retrieval integrity, schema validation, identity resolution, public-key cross-check, signature verification, temporal validity, lifecycle gating, provider-identity coherence, and permission and classification compatibility, ending in the verification outcome. A reject rail down the right side catches any gate that fails and sends the document to a single rejected outcome whose declarations must not be acted upon. Two branch callouts on the left show that a URN-only or unsigned document drops to Trust-On-First-Use rather than failing, and a deprecated lifecycle status warns but may continue. Passing all ten gates yields a verified outcome at the bottom.](./diagrams/passport-verification-pipeline.svg)
+
+*Figure 2 (informative): The verification procedure is a layered pipeline — each gate gates the next, any failure rejects, and the same passport yields the same outcome every time. This figure is illustrative; the normative steps are §1.1.1–§1.1.10 below.*
 
 #### 1.1.1 Retrieval Integrity
 
@@ -211,6 +219,10 @@ For HTTP-based push, the presenter **SHOULD** use the following header conventio
 For non-HTTP transports, the presentation proof **MUST** be carried in a transport-appropriate analog (for example, an A2A `proof` field alongside the `passport` field).
 
 #### 1.2.6 Verification Procedure
+
+![Two-path comparison converging on one verifier. On the left, an attacker replays a scraped, valid, signed passport alone; because the attacker lacks the agent's private key the replay carries no per-request proof, and the verifier rejects it — replay defeated. On the right, the legitimate agent presents the same passport together with a presentation proof: a per-request object binding the passport id (iss) to the request method and canonical URI, an issued-at and short expiry, and a unique jti, all signed by the agent's private key. The verifier's §1.2.6 checks — issuer match, temporal validity within five minutes, request binding, signature against the passport key, and replay prevention via the jti cache — accept the bound request. The proof binds the passport to one request URI, method, timestamp, and jti, signed by the key the attacker does not have.](./diagrams/presentation-proof-replay-binding.svg)
+
+*Figure (informative): A scraped passport is replayable; a passport bound to a per-request proof is not. The proof binds the passport to a specific request and is signed by the private key an attacker lacks, so a replayed passport without a fresh proof is rejected. This figure is illustrative; the §1.2.6 steps below are authoritative.*
 
 After §1.1 succeeds, the verifier **MUST** perform the following checks. They are gated: failure of an earlier check halts the procedure.
 

@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" width="900" height="720" role="img" aria-labelledby="vp-title vp-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="vp-title">Passport verification pipeline: ten gated steps, each gating the next</title>
+  <desc id="vp-desc">A top-to-bottom activity diagram of the passport verification procedure. An incoming ADL passport enters a vertical sequence of ten gates, each of which must pass before the next runs: retrieval integrity, schema validation, identity resolution, public-key cross-check, signature verification, temporal validity, lifecycle gating, provider-identity coherence, and permission and classification compatibility, ending in the verification outcome. The procedure is layered: an implementation must not skip an earlier step to reach a later one. Two branch points are shown: at identity resolution, a URN-only or unsigned document drops to Trust-On-First-Use rather than failing; at lifecycle gating, a deprecated status warns but may continue while retired or draft is rejected. A reject rail runs down the right side: any gate that fails sends the document to a single rejected outcome on the right, and its declarations must not be acted upon. Passing all ten gates yields a verified outcome at the bottom.</desc>
+
+  <defs>
+    <marker id="vp-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="vp-ar-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c5221f"/>
+    </marker>
+    <marker id="vp-ar-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f59e0b"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="720" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Passport Verification Pipeline</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">Ten gated steps (&#167;1.1.1&#8211;&#167;1.1.10) &#8212; each gate gates the next; no step may be skipped</text>
+
+  <!-- incoming -->
+  <rect x="250" y="78" width="200" height="34" rx="17" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="350" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#0b57d0">incoming ADL passport</text>
+
+  <!-- reject rail target (right) -->
+  <rect x="690" y="332" width="150" height="56" rx="10" fill="#fce8e6" stroke="#c5221f" stroke-width="1.75"/>
+  <text x="765" y="356" text-anchor="middle" font-size="13" font-weight="700" fill="#a50e0e">REJECTED</text>
+  <text x="765" y="374" text-anchor="middle" font-size="9.5" fill="#1f2937">declarations not acted upon</text>
+
+  <!-- vertical gates: x center 350, each 200 wide, 40 tall, spaced 54 -->
+  <!-- helper: gate rows -->
+  <!-- 1 -->
+  <rect x="250" y="124" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="143" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">1 &#183; Retrieval integrity</text>
+  <text x="350" y="157" text-anchor="middle" font-size="9" fill="#475569">HTTPS + TLS &#183; provenance</text>
+
+  <rect x="250" y="178" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="197" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">2 &#183; Schema validation</text>
+  <text x="350" y="211" text-anchor="middle" font-size="9" fill="#475569">against the adl_spec schema</text>
+
+  <rect x="250" y="232" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="251" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">3 &#183; Identity resolution</text>
+  <text x="350" y="265" text-anchor="middle" font-size="9" fill="#475569">id / did:web &#8594; authoritative key</text>
+
+  <rect x="250" y="286" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="305" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">4 &#183; Public-key cross-check</text>
+  <text x="350" y="319" text-anchor="middle" font-size="9" fill="#475569">inline key == resolved key</text>
+
+  <rect x="250" y="340" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="359" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">5 &#183; Signature verification</text>
+  <text x="350" y="373" text-anchor="middle" font-size="9" fill="#475569">JCS-canonical &#183; &#167;10.2</text>
+
+  <rect x="250" y="394" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="413" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">6 &#183; Temporal validity</text>
+  <text x="350" y="427" text-anchor="middle" font-size="9" fill="#475569">attestation not expired</text>
+
+  <rect x="250" y="448" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="467" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">7 &#183; Lifecycle gating</text>
+  <text x="350" y="481" text-anchor="middle" font-size="9" fill="#475569">active / deprecated / retired / draft</text>
+
+  <rect x="250" y="502" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="521" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">8 &#183; Provider coherence</text>
+  <text x="350" y="535" text-anchor="middle" font-size="9" fill="#475569">signer aligns with provider</text>
+
+  <rect x="250" y="556" width="200" height="40" rx="8" fill="#f8fafc" stroke="#64748b" stroke-width="1.4"/>
+  <text x="350" y="575" text-anchor="middle" font-size="11.5" font-weight="700" fill="#0f172a">9 &#183; Permission &amp; class.</text>
+  <text x="350" y="589" text-anchor="middle" font-size="9" fill="#475569">deny-by-default &#183; data class</text>
+
+  <!-- 10 outcome -->
+  <rect x="250" y="624" width="200" height="44" rx="10" fill="#e6f4ea" stroke="#137333" stroke-width="1.75"/>
+  <text x="350" y="643" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0d652d">10 &#183; VERIFIED</text>
+  <text x="350" y="659" text-anchor="middle" font-size="9" fill="#1f2937">outcome recorded; declarations trusted</text>
+
+  <!-- vertical gating arrows between steps (x=350) -->
+  <line x1="350" y1="112" x2="350" y2="124" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="164" x2="350" y2="178" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="218" x2="350" y2="232" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="272" x2="350" y2="286" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="326" x2="350" y2="340" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="380" x2="350" y2="394" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="434" x2="350" y2="448" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="488" x2="350" y2="502" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="542" x2="350" y2="556" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <line x1="350" y1="596" x2="350" y2="624" stroke="#334155" stroke-width="1.4" marker-end="url(#vp-ar)"/>
+  <text x="358" y="613" text-anchor="start" font-size="9" fill="#137333">all gates pass</text>
+
+  <!-- reject rail: one continuous solid bracket embracing all nine gates -> any gate fails -> REJECTED -->
+  <line x1="455" y1="144" x2="600" y2="144" stroke="#c5221f" stroke-width="1.5"/>
+  <line x1="600" y1="144" x2="600" y2="576" stroke="#c5221f" stroke-width="1.5"/>
+  <line x1="455" y1="576" x2="600" y2="576" stroke="#c5221f" stroke-width="1.5"/>
+  <line x1="600" y1="360" x2="688" y2="360" stroke="#c5221f" stroke-width="1.6" marker-end="url(#vp-ar-red)"/>
+  <rect x="606" y="340" width="76" height="14" fill="#ffffff"/>
+  <text x="644" y="351" text-anchor="middle" font-size="9.5" font-weight="700" fill="#a50e0e">any gate fails</text>
+
+  <!-- branch callouts (left side) -->
+  <!-- URN-only -> TOFU at step 3 -->
+  <rect x="40" y="235" width="190" height="34" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="135" y="249" text-anchor="middle" font-size="9.5" font-weight="700" fill="#b45309">URN-only / unsigned</text>
+  <text x="135" y="262" text-anchor="middle" font-size="9" fill="#92722f">&#8594; Trust-On-First-Use (not reject)</text>
+  <line x1="230" y1="252" x2="248" y2="252" stroke="#f59e0b" stroke-width="1.3" marker-end="url(#vp-ar-amber)"/>
+
+  <!-- deprecated -> warn at step 7 -->
+  <rect x="40" y="451" width="190" height="34" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.3"/>
+  <text x="135" y="465" text-anchor="middle" font-size="9.5" font-weight="700" fill="#b45309">deprecated</text>
+  <text x="135" y="478" text-anchor="middle" font-size="9" fill="#92722f">&#8594; warn, MAY continue</text>
+  <line x1="230" y1="468" x2="248" y2="468" stroke="#f59e0b" stroke-width="1.3" marker-end="url(#vp-ar-amber)"/>
+
+  <!-- footnote -->
+  <text x="450" y="700" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">The procedure is layered and deterministic: the same passport yields the same outcome every time. Illustrative; &#167;1.1 is authoritative.</text>
+</svg>

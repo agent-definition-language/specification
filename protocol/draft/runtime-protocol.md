@@ -25,6 +25,10 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 The Trust Protocol's §1 defines the *counterparty* — the actor that decides, once, whether to admit an agent. This protocol defines a second actor, the **runtime governor**: the actor that holds an admitted agent to its declared operational limits on every step thereafter. Authentication asks *should this agent act?*; runtime governance asks *is it still acting within the limits it declared?* The two are complementary and independently conformant.
 
+![Consumption-versus-time chart of the runtime governor. The vertical axis is cumulative consumption (tokens, cost, wall-clock); the horizontal axis is session progress. A bold red horizontal line near the top is the declared budget ceiling, fixed at admission — the deterministic boundary the governor enforces, with a GOVERNOR marker stationed on it. Rising from the session-start origin is a fan of blue curves, each a possible run of the agent; four level off below the ceiling and complete within budget, while one keeps climbing and is halted at the moment it would cross the ceiling, marked with a red cross labelled fail-closed. A caption notes the fan is one representative set of runs and the next run differs — the conduct is emergent; only the ceiling and the governor are fixed. To the right, a deterministic activity diagram shows the governor's decision loop: observe (the PDP projects usage), decide whether projected usage exceeds the cap, permit and loop if not, otherwise enforce (the PEP resolves the section 6 degradation response) and either apply the declared response or, if none is declared, HALT as the fail-closed default. A footnote states the governor is the control authority over the runtime, not the runtime itself and not the admission-time counterparty, and that the boundary and decision loop are fixed while the trajectories are not.](./diagrams/runtime-governor-envelope.svg)
+
+*Figure 1 (informative): The runtime governor holds an admitted agent to its declared limits. A declared limit is a fixed boundary — here a budget ceiling (`permissions.resource_limits.budget`), fixed at admission (§1.3) — while the agent's consumption is emergent: a fan of possible runs, most completing under budget while one is halted at the boundary, fail-closed by default (§2, §6). The inset is the governor's deterministic observe → decide → enforce loop (§1.2). This figure is illustrative; the normative requirements are stated in the text.*
+
 ### 1.1 Role
 
 The runtime governor is a **logical role**, not a prescribed component. Any element of a deployment with the authority to observe and intercept an agent's execution **MAY** act as the governor: the agent's own runtime, an AI gateway, a sidecar proxy, or an orchestrator. This protocol specifies the governor's responsibilities and authority, not its deployment shape.
@@ -53,6 +57,10 @@ Two invariants bind the governor to that passport:
 2. **Anti-swap.** If the agent's declared limits change mid-session — a different passport, a re-signed passport, or any mutation of the members governed by §2–§7 — the governor **MUST NOT** silently adopt the new limits. It **MUST** treat the change as a session-integrity fault and apply the configured degradation response (§6), defaulting to fail-closed.
 
 An agent's declared limits are therefore not advisory inputs to the runtime; they are the governor's enforcement contract for the session, fixed at admission.
+
+![State machine of the governor's binding to the passport. At session start the admitted passport is pinned to its exact canonical bytes — the version whose signature the counterparty verified — moving the governor into a governing state where it enforces against those pinned bytes on every step; while the bytes are unchanged it loops and continues. If the declared limits change mid-session — a different passport, a re-signed passport, or any mutation of the members governed by sections 2 to 7 — the governor must not silently adopt them; it transitions to a session-integrity fault state and applies the configured degradation response, defaulting to fail-closed (halt), so the swapped limits are never adopted.](./diagrams/anti-swap-version-pinning.svg)
+
+*Figure 2 (informative): The admitted passport is pinned at session start; every step is checked against the pin. A mid-session change is treated as a session-integrity fault and fails closed by default — a swap is a fault, not an update. This figure is illustrative; §1.3 is authoritative.*
 
 ### 1.4 Trust in the Governor
 
@@ -133,6 +141,10 @@ Structured triggers let the governor evaluate oversight conditions mechanically.
 
 This section defines how the governor responds when a limit fires or a fault occurs. Responses are declared in [ADL Core §11.5](/spec/next#115-degradation) as `runtime.degradation`, a map from *cause* (`on_budget_exhausted`, `on_iteration_limit`, `on_sub_agent_denied`, `on_oversight_timeout`, `on_tool_error`, `on_anomaly`, …) to a *response* whose `action` is one of `halt`, `pause`, `fallback`, or `continue`.
 
+![Activity diagram of the degradation procedure. A cause fires — budget exhausted, iteration limit, sub-agent denied, oversight timeout, tool error, or anomaly. The governor looks up the cause in the declared runtime.degradation map. If a response is declared, it applies the declared action: halt terminates the session, pause suspends and escalates for human oversight, fallback substitutes a declared value and continues, or continue proceeds despite the cause — continue is fail-open and must be explicitly declared and recorded with the cause it overrode. If no response is declared, the governor must halt the session: absence of a declared response is not consent to continue; this fail-closed default is the core of teeth at runtime. Every degradation event, including whether the fail-closed default applied, is recorded in the audit trail.](./diagrams/degradation-fail-closed.svg)
+
+*Figure (informative): A fired cause either resolves to a declared response (halt, pause, fallback, or the explicit fail-open continue) or, when no response is declared, halts the session — the fail-closed default. This figure is illustrative; the procedure below (and Core §11.5) is authoritative.*
+
 This is the shared response procedure that §2–§5 and §7 invoke. When a cause fires, the governor's PEP (§1.2) **MUST** resolve the response as follows:
 
 1. **Look up the cause.** If `runtime.degradation` declares a response for the fired cause, apply it (step 3).
@@ -166,6 +178,10 @@ Because the baseline is self-declared by the agent, anomaly detection against it
 ## 8 Enforcement Evidence
 
 §1.4 requires that, at R2 and above, a governor's enforcement be *externally evidenced* so a counterparty can distinguish a governor that actually enforced from one that merely claims a tier. This section specifies that evidence: a signed, per-session **enforcement record**.
+
+![Data-structure diagram of an ADL enforcement record. At the top is the record header, binding the record to a governor identity, the subject agent by passport digest (the version pin), the session and tier, the time window, and an optional counterparty nonce for freshness. Below it is an ordered chain of enforcement events, each carrying a sequence number, the cause that fired, the section 6 action applied, a timestamp, and a prev_hash field; an arrow from each event's prev_hash points back to the previous block — event zero's prev_hash is the SHA-256 of the header, each later event's is the SHA-256 of the prior event — so any alteration, reordering, or deletion breaks a link. At the bottom, the governor's signature seals the whole chain. A callout states what the evidence proves (tamper-evidence, and freshness with a nonce) and what it does not (completeness — the reserved witness tier).](./diagrams/enforcement-evidence-record.svg)
+
+*Figure 1 (informative): An enforcement record binds a governor's signature over a hash-chained event sequence to the admitted passport (by digest) and, optionally, a counterparty nonce. The structure and its verification (§8.6) are deterministic; what the record proves — tamper-evidence and freshness, but not completeness (§8.1) — is fixed by that structure. This figure is illustrative; the normative structure is the table in §8.3.*
 
 ### 8.1 Trust model — what the evidence proves, and what it does not
 

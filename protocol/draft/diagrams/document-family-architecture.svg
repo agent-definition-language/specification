@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 740" width="820" height="740" role="img" aria-labelledby="dfa-title dfa-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="dfa-title">ADL document family: Core declares; the protocols enforce</title>
+  <desc id="dfa-desc">A two-region component diagram. A DECLARE region at the top contains the ADL Core (identity, capabilities, limits, lifecycle), which derives the Agent Passport, a declared and signed artifact stacked directly beneath it. A dashed declare-versus-enforce boundary separates it from the ENFORCE region (the protocol layer) below, which contains the Trust Protocol (admission-time verification and authorization), the Runtime Protocol (a continuous governor performing enforcement and evidence), and a dashed open-layer slot for future protocols such as discovery, reputation, and settlement. From a single hub point, the passport fans out as evenly spaced spokes: consumed by the Trust Protocol at admission, by the Runtime Protocol at runtime, and available to the open-layer slot in future. The Runtime Protocol produces an Enforcement Evidence hash-chained record.</desc>
+
+  <defs>
+    <marker id="dfa-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="dfa-arrow-open" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="820" height="740" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="410" y="38" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">ADL Document Family</text>
+  <text x="410" y="60" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">Core declares; the protocols enforce</text>
+
+  <!-- DECLARE region -->
+  <rect x="30" y="82" width="760" height="268" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="50" y="104" font-size="12" font-weight="700" fill="#475569" letter-spacing="1">DECLARE</text>
+
+  <!-- ADL Core box (top of stack, centered on x=410) -->
+  <rect x="280" y="100" width="260" height="86" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="410" y="132" text-anchor="middle" font-size="15" font-weight="700" fill="#0b57d0">ADL Core</text>
+  <text x="410" y="154" text-anchor="middle" font-size="11.5" fill="#1f2937">identity &#183; capabilities</text>
+  <text x="410" y="171" text-anchor="middle" font-size="11.5" fill="#1f2937">limits &#183; lifecycle</text>
+
+  <!-- derive arrow Core -> Passport (vertical); wider gutter so the line and arrowhead read clearly around the label -->
+  <line x1="410" y1="186" x2="410" y2="240" stroke="#334155" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#dfa-arrow)"/>
+  <rect x="378" y="205" width="64" height="16" fill="#f8fafc"/>
+  <text x="410" y="216" text-anchor="middle" font-size="10.5" font-style="italic" fill="#475569">&#171;derive&#187;</text>
+
+  <!-- Agent Passport box (bottom of stack, centered on x=410 = the hub) -->
+  <rect x="280" y="240" width="260" height="86" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="410" y="272" text-anchor="middle" font-size="15" font-weight="700" fill="#b45309">Agent Passport</text>
+  <text x="410" y="294" text-anchor="middle" font-size="11.5" fill="#1f2937">declared limits, signed</text>
+  <text x="410" y="311" text-anchor="middle" font-size="10.5" font-style="italic" fill="#6b7280">the declared artifact</text>
+
+  <!-- declare/enforce boundary; the line carries "enforced" plus the three crossing labels, all centered on it -->
+  <line x1="30" y1="372" x2="790" y2="372" stroke="#64748b" stroke-width="1.75" stroke-dasharray="7 5"/>
+  <rect x="112" y="363" width="76" height="18" rx="9" fill="#ffffff" stroke="#64748b" stroke-width="1"/>
+  <text x="150" y="376" text-anchor="middle" font-size="11" font-weight="700" fill="#334155">enforced</text>
+
+  <!-- ENFORCE region -->
+  <rect x="30" y="394" width="760" height="320" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+
+  <!-- Trust Protocol -->
+  <rect x="62" y="420" width="210" height="118" rx="8" fill="#e6f4ea" stroke="#137333" stroke-width="1.5"/>
+  <text x="167" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#0d652d">Trust Protocol</text>
+  <text x="167" y="474" text-anchor="middle" font-size="11" fill="#1f2937">admission-time</text>
+  <text x="167" y="490" text-anchor="middle" font-size="11" fill="#1f2937">verification &amp;</text>
+  <text x="167" y="506" text-anchor="middle" font-size="11" fill="#1f2937">authorization</text>
+
+  <!-- Runtime Protocol -->
+  <rect x="305" y="420" width="210" height="118" rx="8" fill="#fce8e6" stroke="#c5221f" stroke-width="1.5"/>
+  <text x="410" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#a50e0e">Runtime Protocol</text>
+  <text x="410" y="474" text-anchor="middle" font-size="11" fill="#1f2937">continuous governor:</text>
+  <text x="410" y="490" text-anchor="middle" font-size="11" fill="#1f2937">enforcement &amp;</text>
+  <text x="410" y="506" text-anchor="middle" font-size="11" fill="#1f2937">evidence</text>
+
+  <!-- Open-layer slot -->
+  <rect x="548" y="420" width="210" height="118" rx="8" fill="#f1f3f4" stroke="#9aa0a6" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="653" y="450" text-anchor="middle" font-size="14" font-weight="700" fill="#5f6368">Open-layer slot</text>
+  <text x="653" y="474" text-anchor="middle" font-size="11" fill="#5f6368">discovery &#183; reputation</text>
+  <text x="653" y="490" text-anchor="middle" font-size="11" fill="#5f6368">&#183; settlement</text>
+  <text x="653" y="512" text-anchor="middle" font-size="10" font-style="italic" fill="#80868b">(future)</text>
+
+  <!-- hub-and-spoke: three evenly fanned arrows from the passport hub (410,326); each crossing label is centered on the boundary line where its spoke pierces it (x = 291 / 410 / 529) -->
+  <!-- spoke -> Trust (at admission) -->
+  <line x1="410" y1="326" x2="167" y2="420" stroke="#334155" stroke-width="1.5" marker-end="url(#dfa-arrow)"/>
+  <rect x="245" y="364" width="92" height="16" fill="#ffffff"/>
+  <text x="291" y="376" text-anchor="middle" font-size="10.5" fill="#334155">at admission</text>
+  <!-- spoke -> Runtime (at runtime) -->
+  <line x1="410" y1="326" x2="410" y2="420" stroke="#334155" stroke-width="1.5" marker-end="url(#dfa-arrow)"/>
+  <rect x="371" y="364" width="78" height="16" fill="#ffffff"/>
+  <text x="410" y="376" text-anchor="middle" font-size="10.5" fill="#334155">at runtime</text>
+  <!-- spoke -> Open (future) -->
+  <line x1="410" y1="326" x2="653" y2="420" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#dfa-arrow-open)"/>
+  <rect x="503" y="364" width="52" height="16" fill="#ffffff"/>
+  <text x="529" y="376" text-anchor="middle" font-size="10.5" font-style="italic" fill="#64748b">future</text>
+
+  <!-- Runtime -> Evidence (produce, vertical) -->
+  <line x1="410" y1="538" x2="410" y2="580" stroke="#334155" stroke-width="1.5" marker-end="url(#dfa-arrow)"/>
+  <rect x="378" y="551" width="64" height="15" fill="#f8fafc"/>
+  <text x="410" y="562" text-anchor="middle" font-size="10" font-style="italic" fill="#475569">&#171;produce&#187;</text>
+
+  <!-- Enforcement Evidence -->
+  <rect x="305" y="580" width="210" height="80" rx="8" fill="#f3e8fd" stroke="#8430ce" stroke-width="1.5"/>
+  <text x="410" y="614" text-anchor="middle" font-size="13" font-weight="700" fill="#6b21a8">Enforcement Evidence</text>
+  <text x="410" y="635" text-anchor="middle" font-size="11" fill="#1f2937">hash-chained record</text>
+
+  <!-- Open-layer note -->
+  <text x="653" y="600" text-anchor="middle" font-size="10" font-style="italic" fill="#80868b">builds on the same passport;</text>
+  <text x="653" y="614" text-anchor="middle" font-size="10" font-style="italic" fill="#80868b">no change to the Core</text>
+
+  <!-- ENFORCE region label moved to the bottom so the inbound spokes never cross it -->
+  <text x="50" y="702" font-size="12" font-weight="700" fill="#475569" letter-spacing="1">ENFORCE &#183; PROTOCOL LAYER</text>
+</svg>
