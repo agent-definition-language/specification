@@ -130,7 +130,8 @@
       "Risk classified as critical severity",
       "Finding implicates a regulatory filing deadline within 30 days",
       "Agent detects potential fraud indicators",
-      "Cumulative risk score for any business unit exceeds threshold"
+      "Cumulative risk score for any business unit exceeds threshold",
+      { "description": "Large remediation spend", "when": { "cost_usd_over": 5000 } }
     ],
     "response_time_minutes": 30,
     "intervention_model": "approve_reject"
@@ -208,6 +209,15 @@
     }
   },
   "governance_record_ref": "https://gorvnd.acme.example/agents/risk-assessment/governance-record",
+  "anomaly_baseline": {
+    "expected_tools": [
+      { "name": "assess_risk", "share": 0.5 },
+      { "name": "lookup_regulation", "share": 0.3 },
+      { "name": "generate_report", "share": 0.2 }
+    ],
+    "cost_per_session_usd": { "min": 0.05, "max": 8.0 },
+    "data_classes": ["financial", "regulatory"]
+  },
   "registry": {
     "catalog_id": "urn:acme:agents:risk-assessment:1.0.0",
     "catalog_classification": [

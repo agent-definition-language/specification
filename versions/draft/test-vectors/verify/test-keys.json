@@ -1,0 +1,15 @@
+{
+  "_comment": "Test keys for the verify test vector pack. Do not use in production.",
+  "consumer": {
+    "public_key": "OxP9noTzMJyWX72NdF4f7VCp/pTjmLggVuNJ1YSGj3g=",
+    "private_key_pem": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIBVsjftBhNnS0wZ8svp5QPEXPCbDxj77h5n2obTvT7D4\n-----END PRIVATE KEY-----\n"
+  },
+  "enterprise": {
+    "public_key": "ofRQyhYpcPCP9tVZ3dWnRbPlGNocXEtCzP1tYrN2aPg=",
+    "private_key_pem": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIN1C+Bwn8oQPmhlWTSRvvq6K3ckPK2q1W4GlMFqYKDzD\n-----END PRIVATE KEY-----\n"
+  },
+  "imposter": {
+    "public_key": "jduAD+8BNAYs0pFF3LGqUeizH5r2i+VofodFQLojEHE=",
+    "private_key_pem": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIEd+JSoNGcgMgyH/NJVxDZzgYsxul8oHs/KYXF9hXLdK\n-----END PRIVATE KEY-----\n"
+  }
+}

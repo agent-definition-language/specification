@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" width="900" height="580" role="img" aria-labelledby="mh-title mh-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="mh-title">Multi-hop authorization: two independent authorizations across a hop boundary</title>
+  <desc id="mh-desc">A UML sequence diagram with three lifelines: Human, Agent A, and Agent B. Step 1, the human sends a request to Agent A carrying an OAuth token with scope S_h. Step 2, Agent A authorizes the human under §2.1, requiring its required_A scopes to be a subset of S_h. Step 3, Agent A invokes upstream Agent B, presenting its passport and a presentation proof carrying scope S_a. Step 4, Agent B authorizes Agent A under §2.2: first a ceiling check that the proof scopes are a subset of Agent A's passport scopes, then that Agent B's required_B scopes are a subset of the proof scopes. Step 5, Agent B returns a result to Agent A; step 6, Agent A returns a result to the human. A closing note states the two authorizations are independent: Agent A's outbound scope S_a is bounded only by its passport ceiling, not by S_h, and each hop keeps its own audit record so no single hop sees the whole chain.</desc>
+
+  <defs>
+    <marker id="mh-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="580" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Multi-Hop Authorization</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">Two independent authorizations across a hop boundary &#8212; Human &#8594; Agent A &#8594; Agent B (&#167;2.3)</text>
+
+  <!-- lifelines -->
+  <line x1="130" y1="116" x2="130" y2="452" stroke="#cbd5e1" stroke-width="1.25" stroke-dasharray="4 4"/>
+  <line x1="450" y1="116" x2="450" y2="452" stroke="#cbd5e1" stroke-width="1.25" stroke-dasharray="4 4"/>
+  <line x1="770" y1="116" x2="770" y2="452" stroke="#cbd5e1" stroke-width="1.25" stroke-dasharray="4 4"/>
+
+  <!-- participant boxes -->
+  <rect x="65" y="78" width="130" height="36" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="130" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="#0b57d0">Human</text>
+  <rect x="385" y="78" width="130" height="36" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="450" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="#0b57d0">Agent A</text>
+  <rect x="705" y="78" width="130" height="36" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="770" y="101" text-anchor="middle" font-size="13" font-weight="700" fill="#0b57d0">Agent B</text>
+
+  <!-- legend (in the clear gap between Agent A and Agent B headers) -->
+  <line x1="540" y1="96" x2="566" y2="96" stroke="#334155" stroke-width="1.5" marker-end="url(#mh-ar)"/>
+  <text x="572" y="100" font-size="10.5" fill="#64748b">call</text>
+  <line x1="616" y1="96" x2="642" y2="96" stroke="#334155" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#mh-ar)"/>
+  <text x="648" y="100" font-size="10.5" fill="#64748b">return</text>
+
+  <!-- activation bars -->
+  <rect x="444" y="144" width="12" height="292" fill="#d2e3fc" stroke="#1a73e8" stroke-width="0.9"/>
+  <rect x="764" y="252" width="12" height="132" fill="#d2e3fc" stroke="#1a73e8" stroke-width="0.9"/>
+
+  <!-- (1) Human -> Agent A -->
+  <text x="287" y="142" text-anchor="middle" font-size="11" fill="#1f2937">(1) request &#183; OAuth token, scope S_h</text>
+  <line x1="130" y1="150" x2="442" y2="150" stroke="#334155" stroke-width="1.5" marker-end="url(#mh-ar)"/>
+
+  <!-- (2) §2.1 authorize human (Agent A's decision); centered in the Human<->A gutter (mid x=290), balanced padding -->
+  <rect x="198" y="167" width="184" height="50" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.4"/>
+  <text x="216" y="188" font-size="10.5" font-weight="700" fill="#b45309">(2) &#167;2.1 &#8212; authorize human</text>
+  <text x="216" y="207" font-size="10.5" fill="#1f2937">required_A &#8838; S_h</text>
+
+  <!-- (3) Agent A -> Agent B -->
+  <text x="610" y="250" text-anchor="middle" font-size="11" fill="#1f2937">(3) invoke upstream &#183; passport + proof, scope S_a</text>
+  <line x1="456" y1="258" x2="762" y2="258" stroke="#334155" stroke-width="1.5" marker-end="url(#mh-ar)"/>
+
+  <!-- (4) §2.2 authorize Agent A (Agent B's decision); centered in the A<->B gutter (mid x=610), balanced padding -->
+  <rect x="483" y="277" width="254" height="72" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.4"/>
+  <text x="501" y="297" font-size="10.5" font-weight="700" fill="#b45309">(4) &#167;2.2 &#8212; authorize Agent A</text>
+  <text x="501" y="316" font-size="10" fill="#1f2937">1 &#183; ceiling: proof.scopes &#8838; A.passport.scopes</text>
+  <text x="501" y="335" font-size="10" fill="#1f2937">2 &#183; required_B &#8838; proof.scopes</text>
+
+  <!-- (5) Agent B --> Agent A (return) -->
+  <text x="610" y="376" text-anchor="middle" font-size="11" fill="#1f2937">(5) result</text>
+  <line x1="764" y1="384" x2="458" y2="384" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#mh-ar)"/>
+
+  <!-- (6) Agent A --> Human (return) -->
+  <text x="287" y="428" text-anchor="middle" font-size="11" fill="#1f2937">(6) result</text>
+  <line x1="444" y1="436" x2="132" y2="436" stroke="#334155" stroke-width="1.5" stroke-dasharray="6 4" marker-end="url(#mh-ar)"/>
+
+  <!-- spanning takeaway note -->
+  <rect x="70" y="462" width="760" height="54" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="86" y="484" font-size="11" fill="#1f2937">Two independent authorizations &#8212; Agent A's outbound scope S_a is bounded only by its passport ceiling,</text>
+  <text x="86" y="502" font-size="11" fill="#1f2937">not by S_h &#8212; and each hop keeps its own audit record, so no single hop sees the whole chain.</text>
+
+  <!-- footnote -->
+  <text x="450" y="546" text-anchor="middle" font-size="10.5" font-style="italic" fill="#475569">The &#167;2.1 / &#167;2.2 checks run identically every time (deterministic); which counterparty the agent discovers, and in what order, is emergent.</text>
+  <text x="450" y="562" text-anchor="middle" font-size="10.5" font-style="italic" fill="#475569">One representative trace. Illustrative; &#167;2.1&#8211;&#167;2.3 are authoritative.</text>
+</svg>

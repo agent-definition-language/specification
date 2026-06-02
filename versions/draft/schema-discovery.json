@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/draft/schema-discovery.json",
+  "title": "ADL Agent Discovery Document",
+  "description": "The discovery document served at https://{domain}/.well-known/adl-agents, listing the ADL agents a domain publishes (ADL Core §6.4). Verified independently of any single ADL document.",
+  "type": "object",
+  "required": ["adl_discovery", "agents"],
+  "properties": {
+    "adl_discovery": {
+      "type": "string",
+      "description": "Discovery document format version. MUST be \"1.0\" for this specification.",
+      "const": "1.0"
+    },
+    "agents": {
+      "type": "array",
+      "description": "The agents published by this domain.",
+      "items": { "$ref": "#/$defs/discoveryEntry" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "discoveryEntry": {
+      "type": "object",
+      "required": ["id", "adl_document"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The agent's identifier per §6.1."
+        },
+        "adl_document": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to the full ADL document."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 256,
+          "description": "Concise, capability-focused summary for triage (RECOMMENDED). MUST NOT exceed 256 characters."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable agent name."
+        },
+        "version": {
+          "type": "string",
+          "description": "Agent version (§5.5)."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "active", "deprecated", "retired"],
+          "description": "Lifecycle status (§5.6)."
+        },
+        "keywords": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Short strings naming the agent's domains, tasks, or capabilities, for programmatic matching."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

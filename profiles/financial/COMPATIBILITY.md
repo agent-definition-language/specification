@@ -14,7 +14,7 @@ This document tracks compatibility between Financial Profile versions and ADL sp
 
 | Profile Version | ADL Versions | Status | Notes |
 |-----------------|--------------|--------|-------|
-| 1.0             | 0.1.x        | Draft  | Initial release |
+| 1.0             | 0.2.x        | Draft  | Initial release |
 
 ## Compatibility Policy
 

@@ -1,0 +1,174 @@
+{
+  "id": "080-classification-requesting-too-low",
+  "description": "Requesting agent's data_classification.sensitivity (public) is lower than the target agent's (confidential). MUST block at §10.3.9.",
+  "spec_sections": [
+    "1.1.9"
+  ],
+  "input": {
+    "passport": {
+      "adl_spec": "0.2.0",
+      "name": "Enterprise Agent",
+      "description": "Enterprise agent for verification test vectors",
+      "version": "1.0.0",
+      "id": "https://acme.example/agents/enterprise",
+      "data_classification": {
+        "sensitivity": "confidential"
+      },
+      "lifecycle": {
+        "status": "active",
+        "effective_date": "2026-04-01T00:00:00.000Z"
+      },
+      "provider": {
+        "name": "Acme",
+        "url": "https://acme.example",
+        "contact": "platform@acme.example"
+      },
+      "cryptographic_identity": {
+        "did": "did:web:acme.example:agents:enterprise",
+        "public_key": {
+          "algorithm": "Ed25519",
+          "value": "ofRQyhYpcPCP9tVZ3dWnRbPlGNocXEtCzP1tYrN2aPg="
+        }
+      },
+      "permissions": {
+        "network": {
+          "allowed_hosts": [
+            "api.acme.example"
+          ],
+          "allowed_protocols": [
+            "https"
+          ],
+          "deny_private": false
+        },
+        "resource_limits": {
+          "max_memory_mb": 1024,
+          "max_duration_sec": 120
+        }
+      },
+      "security": {
+        "authentication": {
+          "type": "api_key",
+          "required": true
+        },
+        "encryption": {
+          "in_transit": {
+            "required": true,
+            "min_version": "1.2"
+          }
+        },
+        "attestation": {
+          "type": "self",
+          "issued_at": "2026-04-01T00:00:00.000Z",
+          "expires_at": "2027-04-01T00:00:00.000Z",
+          "signature": {
+            "algorithm": "Ed25519",
+            "value": "QSALjMpiSsWStCB3phND9MqCA7HNxpilAECE8X7-CeE3Cn2zzFWkiBO46d29baHhnYzQaacJjA1elacU5qrWDw",
+            "signed_content": "canonical"
+          }
+        }
+      },
+      "metadata": {
+        "license": "MIT",
+        "tags": [
+          "consumer",
+          "test"
+        ]
+      }
+    },
+    "retrieval": {
+      "channel": "header",
+      "authority": "localhost:3000"
+    },
+    "requesting_agent": {
+      "adl_spec": "0.2.0",
+      "name": "Personal Assistant",
+      "description": "Consumer agent for verification test vectors",
+      "version": "1.0.0",
+      "id": "https://test.example/agents/personal-assistant",
+      "data_classification": {
+        "sensitivity": "public"
+      },
+      "lifecycle": {
+        "status": "active",
+        "effective_date": "2026-04-01T00:00:00.000Z"
+      },
+      "provider": {
+        "name": "Test Org",
+        "url": "https://test.example",
+        "contact": "test@test.example"
+      },
+      "cryptographic_identity": {
+        "did": "did:web:test.example:agents:personal-assistant",
+        "public_key": {
+          "algorithm": "Ed25519",
+          "value": "OxP9noTzMJyWX72NdF4f7VCp/pTjmLggVuNJ1YSGj3g="
+        }
+      },
+      "permissions": {
+        "network": {
+          "allowed_hosts": [
+            "api.test.example"
+          ],
+          "allowed_protocols": [
+            "https"
+          ],
+          "deny_private": false
+        },
+        "resource_limits": {
+          "max_memory_mb": 1024,
+          "max_duration_sec": 120
+        }
+      },
+      "security": {
+        "authentication": {
+          "type": "api_key",
+          "required": true
+        },
+        "encryption": {
+          "in_transit": {
+            "required": true,
+            "min_version": "1.2"
+          }
+        },
+        "attestation": {
+          "type": "self",
+          "issued_at": "2026-04-01T00:00:00.000Z",
+          "expires_at": "2027-04-01T00:00:00.000Z",
+          "signature": {
+            "algorithm": "Ed25519",
+            "value": "oWJj-NjRHoVQ2Jcss0zTSnr9SH0nBbGCv_03yaA8ZMVJK24v-SPEo8tdM_7OYODzyPsBZyt9jYd24EyaOyV9BQ",
+            "signed_content": "canonical"
+          }
+        }
+      },
+      "metadata": {
+        "license": "MIT",
+        "tags": [
+          "consumer",
+          "test"
+        ]
+      }
+    }
+  },
+  "config": {
+    "mode": "enforce",
+    "requireSignature": true,
+    "requireDidResolution": false,
+    "requireProviderCoherence": false,
+    "trustOnFirstUse": true,
+    "didLocalOverrides": {},
+    "providerAllowlist": []
+  },
+  "expected": {
+    "verified": false,
+    "public_key_source": "inline_only",
+    "blocked_at_section": "1.1.9",
+    "step_outcomes": [
+      {
+        "section": "1.1.9",
+        "passed": false,
+        "severity": "block"
+      }
+    ]
+  }
+}

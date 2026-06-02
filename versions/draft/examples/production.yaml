@@ -3,7 +3,7 @@ adl_spec: "0.3.0"
 name: Research Assistant
 description: An AI assistant that helps researchers find, summarize, and analyze academic papers.
 version: "2.1.0"
-id: urn:adl:acme:research-assistant:2.1.0
+id: urn:adl:agent:acme:research-assistant:2.1.0
 
 data_classification:
   sensitivity: internal

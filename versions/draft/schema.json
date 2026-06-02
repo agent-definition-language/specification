@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://adl-spec.org/0.2/schema.json",
+  "$id": "https://adl-spec.org/0.3/schema.json",
   "title": "ADL Document",
-  "description": "Agent Definition Language v0.2.0",
+  "description": "Agent Definition Language v0.3.0",
   "$defs": {
     "data_classification": {
       "type": "object",
@@ -48,6 +48,38 @@
         "extensions": { "$ref": "#/$defs/extensions" }
       },
       "description": "Data classification (composable; profiles MAY add domain-specific sub-objects via schema composition)"
+    },
+    "budgetDimension": {
+      "type": "object",
+      "properties": {
+        "per_session": { "type": "number", "exclusiveMinimum": 0 },
+        "per_day": { "type": "number", "exclusiveMinimum": 0 }
+      },
+      "additionalProperties": false,
+      "description": "Per-session / per-day cap for one budget dimension"
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "tokens": { "$ref": "#/$defs/budgetDimension" },
+        "cost_usd": { "$ref": "#/$defs/budgetDimension" },
+        "wall_clock_sec": { "$ref": "#/$defs/budgetDimension" }
+      },
+      "additionalProperties": false,
+      "description": "Cumulative token / cost / wall-clock budget, scoped per session and per day (enforced by Runtime Protocol §2)"
+    },
+    "degradationResponse": {
+      "type": "object",
+      "required": ["action"],
+      "properties": {
+        "action": { "type": "string", "enum": ["halt", "pause", "fallback", "continue"] },
+        "value": { "description": "Value to return when action is fallback" },
+        "message": { "type": "string" },
+        "notify": { "type": "boolean" },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false,
+      "description": "Governor response to a degradation cause (Runtime Protocol §6)"
     },
     "extensions": {
       "type": "object",
@@ -389,9 +421,48 @@
             "max_cpu_percent": { "type": "number", "minimum": 0, "maximum": 100 },
             "max_duration_sec": { "type": "number", "minimum": 0 },
             "max_concurrent": { "type": "integer", "minimum": 1 },
+            "budget": { "$ref": "#/$defs/budget" },
             "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
+        },
+        "sub_agents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name"],
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "prompt_resource": { "type": "string" },
+              "tools": { "type": "array", "items": { "type": "string" } },
+              "max_parallel": { "type": "integer", "minimum": 1 },
+              "budget_share": { "$ref": "#/$defs/budget" },
+              "extensions": { "$ref": "#/$defs/extensions" }
+            },
+            "additionalProperties": false
+          },
+          "description": "Subordinate personas this agent may spawn under its own identity (no separate passport); capped at spawn by Runtime Protocol §4"
+        },
+        "delegation": {
+          "type": "object",
+          "properties": {
+            "match": { "type": "array", "items": { "type": "string" } },
+            "deny": { "type": "array", "items": { "type": "string" } },
+            "max_depth": { "type": "integer", "minimum": 1 },
+            "attenuation": {
+              "type": "object",
+              "properties": {
+                "scopes_subset": { "type": "boolean" },
+                "budget_subset": { "type": "boolean" },
+                "extensions": { "$ref": "#/$defs/extensions" }
+              },
+              "additionalProperties": false
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false,
+          "description": "Envelope of separately-identified peer agents this agent may engage (admitted by Runtime Protocol §4)"
         },
         "extensions": { "$ref": "#/$defs/extensions" }
       },
@@ -525,6 +596,17 @@
             "parallel": { "type": "boolean" },
             "max_concurrent": { "type": "integer", "minimum": 1 },
             "timeout_ms": { "type": "integer", "minimum": 0 },
+            "max_iterations": { "type": "integer", "minimum": 1 },
+            "max_tool_calls_per_session": { "type": "integer", "minimum": 1 },
+            "loop_detection": {
+              "type": "object",
+              "properties": {
+                "window": { "type": "integer", "minimum": 2 },
+                "on_detected": { "$ref": "#/$defs/degradationResponse" },
+                "extensions": { "$ref": "#/$defs/extensions" }
+              },
+              "additionalProperties": false
+            },
             "retry_policy": {
               "type": "object",
               "properties": {
@@ -569,6 +651,17 @@
             "extensions": { "$ref": "#/$defs/extensions" }
           },
           "additionalProperties": false
+        },
+        "degradation": {
+          "type": "object",
+          "properties": {
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "patternProperties": {
+            "^on_[a-z0-9_]+$": { "$ref": "#/$defs/degradationResponse" }
+          },
+          "additionalProperties": false,
+          "description": "Behavior when an operational limit is reached or a fault occurs, keyed by cause (enforced by Runtime Protocol §6)"
         },
         "extensions": { "$ref": "#/$defs/extensions" }
       },

@@ -10,7 +10,7 @@ keywords: [adl, governance, governance record, registry, escalation, accountabil
 
 **Companion to:** `urn:adl:profile:governance:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.1.x
+**ADL Compatibility:** 0.2.x
 
 ## 1. Introduction
 

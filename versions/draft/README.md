@@ -1,13 +1,13 @@
-# Agent Definition Language (ADL) — Version 0.2.0
+# Agent Definition Language (ADL) — Version 0.3.0 (Draft)
 
-This directory contains the specification for ADL v0.2.0.
+This directory contains the specification for the ADL v0.3.0 working draft.
 
 > **Note:** Version status (draft, released, deprecated) is defined in the root [`manifest.yaml`](../manifest.yaml), not in the directory name.
 
 ## Directory Structure
 
 ```
-0.2.0/
+draft/
 ├── spec.md              # Canonical specification (source of truth)
 ├── spec-manifest.yaml   # Section structure for multi-format generation
 ├── schema.json          # JSON Schema for validation
@@ -49,6 +49,7 @@ ADL follows [Semantic Versioning](https://semver.org/). Version status is manage
 
 ```yaml
 versions:
-  - id: "0.2.0"
+  - id: "draft"
     status: draft  # draft | rc | released | deprecated
+    label: "0.3.0 (Draft)"
 ```

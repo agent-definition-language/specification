@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/draft/schema-enforcement-record.json",
+  "title": "ADL Enforcement Record",
+  "description": "A signed, per-session record a runtime governor produces as enforcement evidence (ADL Runtime Protocol §8). Verified independently of the ADL document.",
+  "type": "object",
+  "required": [
+    "adl_enforcement_record",
+    "governor",
+    "subject",
+    "session",
+    "tier",
+    "window",
+    "iat",
+    "events",
+    "outcome",
+    "signature"
+  ],
+  "properties": {
+    "adl_enforcement_record": { "const": "1.0" },
+    "governor": {
+      "type": "string",
+      "description": "Governor identifier (HTTPS URI or did:web), resolved to a verification key per §8.2."
+    },
+    "subject": {
+      "type": "object",
+      "required": ["id", "passport_digest"],
+      "properties": {
+        "id": { "type": "string", "description": "The admitted agent's passport id." },
+        "passport_digest": {
+          "type": "string",
+          "description": "Digest of the JCS-canonical admitted passport bytes (the §1.3 version pin)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "session": { "type": "string", "description": "Governed session identifier (§1.3)." },
+    "tier": { "type": "string", "enum": ["R1", "R2", "R3"] },
+    "window": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "type": "string", "format": "date-time" },
+        "end": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "iat": { "type": "string", "format": "date-time" },
+    "nonce": { "type": "string", "description": "Counterparty-issued nonce for freshness binding (§8.5)." },
+    "limits": {
+      "type": "object",
+      "description": "Summary of the declared limits the governor enforced (§2–§7).",
+      "additionalProperties": true
+    },
+    "events": {
+      "type": "array",
+      "description": "Ordered, hash-chained enforcement events (§8.4). MAY be empty.",
+      "items": {
+        "type": "object",
+        "required": ["seq", "cause", "action", "at", "prev_hash"],
+        "properties": {
+          "seq": { "type": "integer", "minimum": 0 },
+          "cause": {
+            "type": "string",
+            "pattern": "^on_[a-z0-9_]+$"
+          },
+          "action": { "type": "string", "enum": ["halt", "pause", "fallback", "continue"] },
+          "at": { "type": "string", "format": "date-time" },
+          "prev_hash": {
+            "type": "string",
+            "description": "base64url SHA-256 over the prior event (or the record header for seq 0), per §8.4."
+          },
+          "detail": { "description": "Optional cause-specific detail (e.g. dimension, observed vs. limit)." }
+        },
+        "additionalProperties": false
+      }
+    },
+    "outcome": { "type": "string", "enum": ["completed", "halted", "paused"] },
+    "signature": {
+      "type": "object",
+      "required": ["algorithm", "value", "signed_content"],
+      "properties": {
+        "algorithm": { "type": "string" },
+        "value": { "type": "string", "description": "Base64url-encoded signature over the JCS-canonical record minus this signature object." },
+        "signed_content": { "type": "string", "enum": ["canonical", "digest"] },
+        "digest_algorithm": { "type": "string" },
+        "digest_value": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

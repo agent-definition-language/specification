@@ -1,4 +1,4 @@
-id: urn:adl:acme:research-assistant:2.1.0
+id: urn:adl:agent:acme:research-assistant:2.1.0
 provider:
   name: Acme AI
   url: https://acme.ai

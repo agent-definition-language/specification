@@ -11,7 +11,7 @@ keywords: [adl, registry specification, agent catalog, agent registry, agentic a
 
 **Identifier:** `urn:adl:profile:registry:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.1.x
+**ADL Compatibility:** 0.2.x
 
 > **Note:** This profile is in **draft** status. The specification is stable for early adoption, but minor changes may occur before 1.0.
 

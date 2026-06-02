@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 540" width="900" height="540" role="img" aria-labelledby="dg-title dg-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="dg-title">Degradation: a fired cause resolves to a declared response, or fails closed by default</title>
+  <desc id="dg-desc">An activity diagram of the governor's degradation procedure. A cause fires — for example budget exhausted, iteration limit, sub-agent denied, oversight timeout, tool error, or anomaly. The governor looks up the cause in the declared runtime.degradation map. If a response is declared, it applies the declared action: halt terminates the session, pause suspends and escalates for human oversight, fallback substitutes a declared value and continues, or continue proceeds despite the cause. Continue is fail-open and must be explicitly declared and recorded in the audit trail together with the cause it overrode. If no response is declared for the cause, the governor must halt the session — absence of a declared response is not consent to continue; this fail-closed default is the core of teeth at runtime. Every degradation event, including whether the fail-closed default applied, is recorded in the audit trail.</desc>
+
+  <defs>
+    <marker id="dg-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="dg-ar-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c5221f"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="540" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Degradation &amp; the Fail-Closed Default</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">A fired cause resolves to a declared response &#8212; or the session halts (&#167;6)</text>
+
+  <!-- cause fires -->
+  <rect x="320" y="80" width="260" height="48" rx="10" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="450" y="100" text-anchor="middle" font-size="12" font-weight="700" fill="#b45309">a cause fires</text>
+  <text x="450" y="116" text-anchor="middle" font-size="8" fill="#1f2937">budget &#183; iteration &#183; sub-agent &#183; oversight &#183; tool-error &#183; anomaly</text>
+
+  <line x1="450" y1="128" x2="450" y2="150" stroke="#334155" stroke-width="1.4" marker-end="url(#dg-ar)"/>
+
+  <!-- decision: declared? -->
+  <polygon points="450,150 580,192 450,234 320,192" fill="#ffffff" stroke="#f59e0b" stroke-width="1.6"/>
+  <text x="450" y="188" text-anchor="middle" font-size="11" font-weight="700" fill="#1f2937">response declared in</text>
+  <text x="450" y="202" text-anchor="middle" font-size="10" fill="#1f2937">runtime.degradation?</text>
+
+  <!-- YES branch (left/down to actions) -->
+  <line x1="320" y1="192" x2="150" y2="192" stroke="#334155" stroke-width="1.4"/>
+  <line x1="150" y1="192" x2="150" y2="250" stroke="#334155" stroke-width="1.4" marker-end="url(#dg-ar)"/>
+  <rect x="120" y="200" width="60" height="16" fill="#ffffff"/>
+  <text x="150" y="212" text-anchor="middle" font-size="10" font-weight="700" fill="#137333">yes</text>
+
+  <!-- NO branch (right/down to HALT) -->
+  <line x1="580" y1="192" x2="750" y2="192" stroke="#c5221f" stroke-width="1.5"/>
+  <line x1="750" y1="192" x2="750" y2="250" stroke="#c5221f" stroke-width="1.5" marker-end="url(#dg-ar-red)"/>
+  <rect x="700" y="184" width="150" height="16" fill="#ffffff"/>
+  <text x="775" y="196" text-anchor="middle" font-size="10" font-weight="700" fill="#a50e0e">no declared response</text>
+
+  <!-- apply-the-action container -->
+  <rect x="40" y="250" width="560" height="170" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="60" y="272" font-size="11" font-weight="700" fill="#334155">apply the declared action</text>
+
+  <!-- four action chips -->
+  <rect x="60" y="286" width="120" height="58" rx="8" fill="#e6f4ea" stroke="#137333" stroke-width="1.4"/>
+  <text x="120" y="307" text-anchor="middle" font-size="11" font-weight="700" fill="#0d652d">halt</text>
+  <text x="120" y="324" text-anchor="middle" font-size="8.5" fill="#1f2937">terminate the</text>
+  <text x="120" y="335" text-anchor="middle" font-size="8.5" fill="#1f2937">session</text>
+
+  <rect x="192" y="286" width="120" height="58" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.4"/>
+  <text x="252" y="307" text-anchor="middle" font-size="11" font-weight="700" fill="#0b57d0">pause</text>
+  <text x="252" y="324" text-anchor="middle" font-size="8.5" fill="#1f2937">escalate to human</text>
+  <text x="252" y="335" text-anchor="middle" font-size="8.5" fill="#1f2937">oversight (&#167;5)</text>
+
+  <rect x="324" y="286" width="120" height="58" rx="8" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.4"/>
+  <text x="384" y="307" text-anchor="middle" font-size="11" font-weight="700" fill="#0b57d0">fallback</text>
+  <text x="384" y="324" text-anchor="middle" font-size="8.5" fill="#1f2937">substitute value,</text>
+  <text x="384" y="335" text-anchor="middle" font-size="8.5" fill="#1f2937">continue</text>
+
+  <rect x="456" y="286" width="120" height="58" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.4"/>
+  <text x="516" y="307" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">continue</text>
+  <text x="516" y="324" text-anchor="middle" font-size="8.5" fill="#92400e">fail-open &#8212; explicit</text>
+  <text x="516" y="335" text-anchor="middle" font-size="8.5" fill="#92400e">&amp; recorded</text>
+
+  <text x="320" y="372" text-anchor="middle" font-size="9.5" font-style="italic" fill="#475569">&#8220;continue&#8221; is the only path that does not stop or substitute &#8212; it must be declared on purpose and logged.</text>
+  <text x="320" y="402" text-anchor="middle" font-size="9.5" fill="#475569">Every degradation event &#8212; cause, resolved action, and whether fail-closed applied &#8212; is recorded in the audit trail.</text>
+
+  <!-- HALT (fail-closed) terminal -->
+  <rect x="660" y="250" width="200" height="84" rx="10" fill="#fde8e8" stroke="#c5221f" stroke-width="2"/>
+  <text x="760" y="280" text-anchor="middle" font-size="14" font-weight="700" fill="#a50e0e">HALT</text>
+  <text x="760" y="300" text-anchor="middle" font-size="10" font-weight="700" fill="#a50e0e">fail-closed default</text>
+  <text x="760" y="316" text-anchor="middle" font-size="8.5" fill="#1f2937">absence of a response is</text>
+  <text x="760" y="327" text-anchor="middle" font-size="8.5" fill="#1f2937">not consent to continue</text>
+
+  <!-- thesis callout under HALT -->
+  <rect x="660" y="360" width="200" height="60" rx="10" fill="#f8fafc" stroke="#c5221f" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <text x="760" y="382" text-anchor="middle" font-size="9.5" font-weight="700" fill="#a50e0e">teeth at runtime</text>
+  <text x="760" y="398" text-anchor="middle" font-size="8.5" fill="#1f2937">a limit with no declared</text>
+  <text x="760" y="409" text-anchor="middle" font-size="8.5" fill="#1f2937">handling stops the agent</text>
+
+  <!-- footnote -->
+  <text x="450" y="500" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">The governor's resolution logic is deterministic: the same cause and the same declaration always resolve the same way.</text>
+  <text x="450" y="518" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">Illustrative; &#167;6 (and Core &#167;11.5) are authoritative.</text>
+</svg>

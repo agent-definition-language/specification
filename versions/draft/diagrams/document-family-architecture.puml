@@ -1,0 +1,48 @@
+@startuml document-family-architecture
+' Editable UML master for the ADL document-family / layer architecture.
+' Anchors: ADL Core §1.3 (The ADL Document Family); protocol overview (protocol/draft/index.md).
+' Render to SVG: plantuml -tsvg document-family-architecture.puml
+' The committed .svg is a hand-authored render; keep both committed (see diagrams/README.md).
+'
+' Patent note: FIG. 1 system-overview / apparatus. For the filing, re-render in B/W line art
+' (no fills) and add the reference numerals below; keep numerals consistent across all figures.
+'   100 ADL Core (declaration layer)      110 Agent Passport (declared, signed artifact)
+'   120 declare<->enforce boundary        130 Trust Protocol (admission-time procedures)
+'   140 Runtime Protocol (continuous)     150 runtime governor (within Runtime Protocol)
+'   160 Enforcement Evidence record       170 open-layer extension slot
+
+title ADL Document Family — Core Declares; the Protocols Enforce
+
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam defaultTextAlignment center
+skinparam ArrowColor #334155
+
+rectangle "DECLARE" as DECL #line.dashed {
+  component "ADL Core\n(identity, capabilities,\nlimits, lifecycle)" as CORE
+  artifact "Agent Passport\n(declared limits, signed)" as PASS
+}
+
+' Core sits directly above the passport; the passport is the hub the spokes fan out from.
+CORE -down-> PASS : <<derive>>
+
+rectangle "ENFORCE  (Protocol Layer)" as ENF #line.dashed {
+  component "Trust Protocol\n(admission-time\nverification & authorization)" as TRUST
+  component "Runtime Protocol\n(continuous governor:\nenforcement & evidence)" as RUNTIME
+  component "Open-layer slot\n(discovery, reputation,\nsettlement)" as OPEN #line.dashed
+}
+
+artifact "Enforcement Evidence\n(hash-chained record)" as EVID
+
+PASS --> TRUST : at admission
+PASS --> RUNTIME : at runtime
+PASS ..> OPEN : future
+RUNTIME ..> EVID : <<produce>>
+
+note bottom of OPEN
+  Extension point: future protocols
+  build on the same passport,
+  with no change to the Core.
+end note
+
+@enduml

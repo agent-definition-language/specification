@@ -1,0 +1,106 @@
+{
+  "id": "061-lifecycle-deprecated-warn",
+  "description": "Passport with lifecycle.status='deprecated' produces a §1.1.7 warn outcome but still verifies overall.",
+  "spec_sections": [
+    "1.1.7"
+  ],
+  "input": {
+    "passport": {
+      "adl_spec": "0.2.0",
+      "name": "Personal Assistant",
+      "description": "Consumer agent for verification test vectors",
+      "version": "1.0.0",
+      "id": "https://test.example/agents/personal-assistant",
+      "data_classification": {
+        "sensitivity": "internal"
+      },
+      "lifecycle": {
+        "status": "deprecated",
+        "effective_date": "2026-04-01T00:00:00.000Z",
+        "sunset_date": "2027-01-01T00:00:00.000Z",
+        "successor": "https://test.example/agents/v2"
+      },
+      "provider": {
+        "name": "Test Org",
+        "url": "https://test.example",
+        "contact": "test@test.example"
+      },
+      "cryptographic_identity": {
+        "did": "did:web:test.example:agents:personal-assistant",
+        "public_key": {
+          "algorithm": "Ed25519",
+          "value": "OxP9noTzMJyWX72NdF4f7VCp/pTjmLggVuNJ1YSGj3g="
+        }
+      },
+      "permissions": {
+        "network": {
+          "allowed_hosts": [
+            "api.test.example"
+          ],
+          "allowed_protocols": [
+            "https"
+          ],
+          "deny_private": false
+        },
+        "resource_limits": {
+          "max_memory_mb": 1024,
+          "max_duration_sec": 120
+        }
+      },
+      "security": {
+        "authentication": {
+          "type": "api_key",
+          "required": true
+        },
+        "encryption": {
+          "in_transit": {
+            "required": true,
+            "min_version": "1.2"
+          }
+        },
+        "attestation": {
+          "type": "self",
+          "issued_at": "2026-04-01T00:00:00.000Z",
+          "expires_at": "2027-04-01T00:00:00.000Z",
+          "signature": {
+            "algorithm": "Ed25519",
+            "value": "Qi3qn-riJ68Kfi5IL1R9mvq7AIsGQJ3Kz-aGs2VUxx895XB3eRwZ_bcIrQtzsswppNrjhls6-4tfWWODYc72BQ",
+            "signed_content": "canonical"
+          }
+        }
+      },
+      "metadata": {
+        "license": "MIT",
+        "tags": [
+          "consumer",
+          "test"
+        ]
+      }
+    },
+    "retrieval": {
+      "channel": "header",
+      "authority": "localhost:3000"
+    }
+  },
+  "config": {
+    "mode": "enforce",
+    "requireSignature": true,
+    "requireDidResolution": false,
+    "requireProviderCoherence": false,
+    "trustOnFirstUse": true,
+    "didLocalOverrides": {},
+    "providerAllowlist": []
+  },
+  "expected": {
+    "verified": true,
+    "public_key_source": "inline_only",
+    "blocked_at_section": null,
+    "step_outcomes": [
+      {
+        "section": "1.1.7",
+        "passed": true,
+        "severity": "warn"
+      }
+    ]
+  }
+}

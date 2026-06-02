@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" width="900" height="580" role="img" aria-labelledby="rg-title rg-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="rg-title">The runtime governor: a declared limit is a fixed boundary; the agent's conduct is emergent</title>
+  <desc id="rg-desc">A consumption-versus-time chart. The vertical axis is cumulative consumption (tokens, cost, wall-clock); the horizontal axis is session progress over time. A bold red horizontal line near the top is the declared budget ceiling, fixed at admission — the deterministic boundary the governor enforces. Rising from the session-start origin is a fan of blue curves, each a possible run of the agent; four of them level off below the ceiling and complete within budget, while one keeps climbing and is halted by the governor at the moment it would cross the ceiling, marked with a red cross labelled fail-closed. A caption notes the fan is one representative set of runs and the next run differs: the conduct is emergent, only the ceiling and the governor are fixed. To the right, a small deterministic activity diagram shows the governor's decision loop: observe (the policy decision point projects usage), decide whether projected usage exceeds the cap, permit and loop if not, otherwise enforce (the policy enforcement point resolves the section 6 degradation response) and either apply the declared response or, if none is declared, HALT as the fail-closed default. A footnote states the governor is the control authority over the runtime, not the runtime itself and not the admission-time counterparty, and that the boundary and the decision loop are fixed while the trajectories are not.</desc>
+
+  <defs>
+    <marker id="rg-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="580" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">The Runtime Governor</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">A declared limit is a fixed boundary; the agent's conduct is emergent &#8212; enforce the boundary, don't predict the path</text>
+
+  <!-- ===================== PLOT (Regime B: emergent conduct vs. fixed boundary) ===================== -->
+
+  <!-- beyond-limit band -->
+  <rect x="111" y="104" width="449" height="46" fill="#fdeceb"/>
+  <text x="120" y="121" font-size="10" font-style="italic" fill="#b45309">over budget &#8212; forbidden</text>
+
+  <!-- axes -->
+  <line x1="110" y1="474" x2="110" y2="104" stroke="#334155" stroke-width="1.5" marker-end="url(#rg-ar)"/>
+  <line x1="106" y1="470" x2="566" y2="470" stroke="#334155" stroke-width="1.5" marker-end="url(#rg-ar)"/>
+
+  <!-- axis labels -->
+  <text transform="rotate(-90 44 300)" x="44" y="300" text-anchor="middle" font-size="13" fill="#334155">cumulative consumption</text>
+  <text transform="rotate(-90 61 300)" x="61" y="300" text-anchor="middle" font-size="10.5" fill="#64748b">tokens &#183; cost &#183; wall-clock</text>
+  <text x="338" y="498" text-anchor="middle" font-size="13" fill="#334155">session progress / time</text>
+
+  <!-- declared budget ceiling: the fixed, deterministic boundary -->
+  <line x1="110" y1="150" x2="560" y2="150" stroke="#c5221f" stroke-width="2.5"/>
+  <text x="556" y="133" text-anchor="end" font-size="12.5" font-weight="700" fill="#a50e0e" letter-spacing="0.4">DECLARED BUDGET CEILING</text>
+  <text x="556" y="146" text-anchor="end" font-size="10" font-style="italic" fill="#b45309">fixed at admission</text>
+
+  <!-- governor stationed on the boundary -->
+  <rect x="114" y="140" width="92" height="20" rx="10" fill="#ffffff" stroke="#c5221f" stroke-width="1.5"/>
+  <text x="160" y="154" text-anchor="middle" font-size="11" font-weight="700" fill="#a50e0e">GOVERNOR</text>
+
+  <!-- emergent fan: possible runs (blue). Four complete under budget; one breaches. -->
+  <path d="M110,470 C 250,455 400,416 545,416" fill="none" stroke="#3b6fd4" stroke-width="1.8" opacity="0.9"/>
+  <path d="M110,470 C 240,448 400,360 545,360" fill="none" stroke="#3b6fd4" stroke-width="1.8" opacity="0.9"/>
+  <path d="M110,470 C 220,436 390,300 545,300" fill="none" stroke="#3b6fd4" stroke-width="1.8" opacity="0.9"/>
+  <path d="M110,470 C 200,420 380,236 545,236" fill="none" stroke="#3b6fd4" stroke-width="1.8" opacity="0.9"/>
+  <!-- completion dots: run finished under budget -->
+  <circle cx="545" cy="416" r="3.4" fill="#3b6fd4"/>
+  <circle cx="545" cy="360" r="3.4" fill="#3b6fd4"/>
+  <circle cx="545" cy="300" r="3.4" fill="#3b6fd4"/>
+  <circle cx="545" cy="236" r="3.4" fill="#3b6fd4"/>
+
+  <!-- the breaching run: climbs steeply and is halted exactly at the ceiling crossing -->
+  <path d="M110,470 C 195,405 340,255 415,150" fill="none" stroke="#3b6fd4" stroke-width="2.4"/>
+  <!-- ghost continuation: the trajectory it WOULD have taken, prevented -->
+  <path d="M415,150 C 436,134 452,124 470,114" fill="none" stroke="#9bb6e6" stroke-width="1.6" stroke-dasharray="3 4"/>
+  <!-- halt marker straddling the boundary -->
+  <circle cx="415" cy="150" r="6.5" fill="#ffffff" stroke="#c5221f" stroke-width="2"/>
+  <line x1="410.5" y1="145.5" x2="419.5" y2="154.5" stroke="#c5221f" stroke-width="2"/>
+  <line x1="419.5" y1="145.5" x2="410.5" y2="154.5" stroke="#c5221f" stroke-width="2"/>
+  <text x="427" y="166" text-anchor="start" font-size="11.5" font-weight="700" fill="#a50e0e">halted (fail-closed)</text>
+
+  <!-- ===================== INSET (Regime A: deterministic decision loop) ===================== -->
+  <rect x="600" y="92" width="285" height="424" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="742" y="117" text-anchor="middle" font-size="13.5" font-weight="700" fill="#334155">Governor decision</text>
+  <text x="742" y="133" text-anchor="middle" font-size="10.5" font-style="italic" fill="#64748b">deterministic machinery &#183; &#167;1.2 &#183; &#167;6</text>
+
+  <!-- observe -->
+  <rect x="660" y="145" width="164" height="42" rx="8" fill="#ffffff" stroke="#1a73e8" stroke-width="1.5"/>
+  <text x="742" y="163" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0b57d0">observe</text>
+  <text x="742" y="178" text-anchor="middle" font-size="10.5" fill="#1f2937">PDP projects usage</text>
+  <line x1="742" y1="187" x2="742" y2="205" stroke="#334155" stroke-width="1.4" marker-end="url(#rg-ar)"/>
+
+  <!-- decide: over cap? -->
+  <polygon points="742,205 810,230 742,255 674,230" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="742" y="234" text-anchor="middle" font-size="10.5" fill="#1f2937">projected &gt; cap?</text>
+
+  <!-- no -> permit, loop back to observe -->
+  <line x1="674" y1="230" x2="630" y2="230" stroke="#334155" stroke-width="1.4"/>
+  <line x1="630" y1="230" x2="630" y2="166" stroke="#334155" stroke-width="1.4"/>
+  <line x1="630" y1="166" x2="658" y2="166" stroke="#334155" stroke-width="1.4" marker-end="url(#rg-ar)"/>
+  <text transform="rotate(-90 620 198)" x="620" y="198" text-anchor="middle" font-size="10" fill="#137333">permit (no)</text>
+
+  <!-- yes -> enforce -->
+  <line x1="742" y1="255" x2="742" y2="271" stroke="#334155" stroke-width="1.4" marker-end="url(#rg-ar)"/>
+  <text x="752" y="267" text-anchor="start" font-size="10" fill="#a50e0e">yes</text>
+
+  <!-- enforce -->
+  <rect x="660" y="272" width="164" height="42" rx="8" fill="#ffffff" stroke="#c5221f" stroke-width="1.5"/>
+  <text x="742" y="290" text-anchor="middle" font-size="12.5" font-weight="700" fill="#a50e0e">enforce</text>
+  <text x="742" y="305" text-anchor="middle" font-size="10.5" fill="#1f2937">PEP resolves degradation</text>
+  <line x1="742" y1="314" x2="742" y2="331" stroke="#334155" stroke-width="1.4" marker-end="url(#rg-ar)"/>
+
+  <!-- decide: response declared? -->
+  <polygon points="742,331 814,357 742,383 670,357" fill="#ffffff" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="742" y="361" text-anchor="middle" font-size="10.5" fill="#1f2937">response declared?</text>
+
+  <!-- symmetric fan: yes -> apply, no -> HALT (centers 676 / 808, symmetric about x=742) -->
+  <line x1="742" y1="383" x2="676" y2="426" stroke="#334155" stroke-width="1.4" marker-end="url(#rg-ar)"/>
+  <line x1="742" y1="383" x2="808" y2="426" stroke="#334155" stroke-width="1.4" marker-end="url(#rg-ar)"/>
+  <text x="680" y="410" text-anchor="middle" font-size="10" fill="#137333">yes</text>
+  <text x="804" y="410" text-anchor="middle" font-size="10" fill="#a50e0e">no</text>
+
+  <!-- apply (two-line action list so it reads at a legible size) -->
+  <rect x="614" y="428" width="124" height="58" rx="8" fill="#e6f4ea" stroke="#137333" stroke-width="1.5"/>
+  <text x="676" y="447" text-anchor="middle" font-size="12" font-weight="700" fill="#0d652d">apply response</text>
+  <text x="676" y="463" text-anchor="middle" font-size="9.5" fill="#1f2937">halt &#183; pause</text>
+  <text x="676" y="476" text-anchor="middle" font-size="9.5" fill="#1f2937">fallback &#183; continue</text>
+
+  <!-- HALT (fail-closed default) -->
+  <rect x="746" y="428" width="124" height="58" rx="8" fill="#fce8e6" stroke="#c5221f" stroke-width="1.5"/>
+  <text x="808" y="452" text-anchor="middle" font-size="13" font-weight="700" fill="#a50e0e">HALT</text>
+  <text x="808" y="470" text-anchor="middle" font-size="9.5" fill="#1f2937">fail-closed default</text>
+
+  <!-- footnote -->
+  <text x="450" y="540" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">The governor is the control authority over the runtime &#8212; not the runtime itself, and not the admission-time counterparty.</text>
+  <text x="450" y="557" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">The boundary and the decision loop are fixed (deterministic); the trajectories are not.</text>
+</svg>

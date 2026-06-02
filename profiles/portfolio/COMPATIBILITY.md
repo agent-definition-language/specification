@@ -14,7 +14,7 @@ This document tracks compatibility between Portfolio Profile versions and ADL sp
 
 | Profile Version | ADL Versions | Status | Notes |
 |-----------------|--------------|--------|-------|
-| 1.0             | 0.1.x        | Draft  | Relationships and domain membership; catalog identity in Registry Profile |
+| 1.0             | 0.2.x        | Draft  | Relationships and domain membership; catalog identity in Registry Profile |
 
 ## Compatibility Policy
 

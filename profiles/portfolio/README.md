@@ -11,7 +11,7 @@ keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestr
 
 **Identifier:** `urn:adl:profile:portfolio:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.1.x
+**ADL Compatibility:** 0.2.x
 
 > **Note:** This profile is in **draft** status. The specification is stable for early adoption, but minor changes may occur before 1.0.
 
@@ -41,8 +41,8 @@ Add the Portfolio Profile to your ADL document:
   "version": "1.0.0",
   "profiles": ["urn:adl:profile:portfolio:1.0"],
   "relationships": {
-    "depends_on": ["urn:adl:acme:knowledge-base-agent:1.0"],
-    "orchestrated_by": "urn:adl:acme:support-orchestrator:1.0"
+    "depends_on": ["urn:adl:agent:acme:knowledge-base-agent:1.0"],
+    "orchestrated_by": "urn:adl:agent:acme:support-orchestrator:1.0"
   },
   "domain": {
     "domain_id": "urn:domain:customer-service",
