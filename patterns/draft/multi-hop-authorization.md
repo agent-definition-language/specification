@@ -288,8 +288,8 @@ The signature covers the JCS-canonical form of the proof minus the `signature` o
 ```http
 POST /agents/booking/tools/search_flights HTTP/1.1
 Host: acme-flights.example
-X-ADL-Passport: <Base64-encoded YAML of assistant's signed passport>
-X-ADL-Proof: <Base64-encoded JSON of the proof above>
+ADL-Passport: <Base64-encoded YAML of assistant's signed passport>
+ADL-Proof: <Base64-encoded JSON of the proof above>
 Content-Type: application/json
 
 { "origin": "JFK", "destination": "IBZ", "depart": "2026-07-12", "return": "2026-07-17", "passengers": 1 }
@@ -478,7 +478,7 @@ Either way, the assistant falls back to the next candidate (Budget Air Legacy, w
 
 ### Personal Assistant's proof gets replayed by an attacker
 
-Someone captures the `X-ADL-Proof` header from Hop 4 (a search) and replays it at Hop 5 (a book). They want the *book* tool's effect using the *search* tool's proof.
+Someone captures the `ADL-Proof` header from Hop 4 (a search) and replays it at Hop 5 (a book). They want the *book* tool's effect using the *search* tool's proof.
 
 [§1.2.6.4](/protocol/trust#126-verification-procedure) catches this: the replayed proof has `request.uri = .../search_flights` but the actual request URL is `.../book_flight`. URI mismatch → reject.
 

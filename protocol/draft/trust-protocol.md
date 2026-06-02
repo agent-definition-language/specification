@@ -29,7 +29,7 @@ A **passport** is a compact **identity document** for an agent — smaller than 
 
 *Figure 1 (informative): The passport is a typed projection of the full ADL document — the identity-and-trust subset a counterparty needs, distilled into a compact signed credential, while the operational members stay in the full document and are resolved separately. This figure is illustrative; the member list below is authoritative.*
 
-Keeping the passport small matters because it travels on agent-to-agent interactions — attached to a request or dereferenced by URL (§1.2.5) — and is verified on every exchange. A counterparty that needs the agent's complete definition resolves the full ADL document separately. Note that `permissions` and `data_classification` are carried in full rather than as a digest; an agent with large permission sets (up to the Core §18.5 limits) therefore trades passport compactness for self-containment, which implementers sizing a passport header (e.g., `X-ADL-Passport`) should anticipate. The passport carries the following members:
+Keeping the passport small matters because it travels on agent-to-agent interactions — attached to a request or dereferenced by URL (§1.2.5) — and is verified on every exchange. A counterparty that needs the agent's complete definition resolves the full ADL document separately. Note that `permissions` and `data_classification` are carried in full rather than as a digest; an agent with large permission sets (up to the Core §18.5 limits) therefore trades passport compactness for self-containment, which implementers sizing a passport header (e.g., `ADL-Passport`) should anticipate. The passport carries the following members:
 
 | Member | ADL Core | Role in trust |
 |--------|----------|---------------|
@@ -212,9 +212,9 @@ Two presentation modes are defined:
 
 For HTTP-based push, the presenter **SHOULD** use the following header convention:
 
-- `X-ADL-Passport`: Base64-encoded passport bytes (YAML or JSON).
-- `X-ADL-Passport-URL`: Alternative to `X-ADL-Passport`. Canonical URL the verifier may dereference to retrieve the passport. When both are present, the verifier **MUST** prefer dereferencing.
-- `X-ADL-Proof`: Base64-encoded presentation proof JSON.
+- `ADL-Passport`: Base64-encoded passport bytes (YAML or JSON).
+- `ADL-Passport-URL`: Alternative to `ADL-Passport`. Canonical URL the verifier may dereference to retrieve the passport. When both are present, the verifier **MUST** prefer dereferencing.
+- `ADL-Proof`: Base64-encoded presentation proof JSON.
 
 For non-HTTP transports, the presentation proof **MUST** be carried in a transport-appropriate analog (for example, an A2A `proof` field alongside the `passport` field).
 
@@ -415,13 +415,13 @@ IANA is requested to add the following entries to the "Hypertext Transfer Protoc
 
 | Field Name | Status | Reference |
 |------------|--------|-----------|
-| `X-ADL-Passport` | permanent | This document, §1.2.5 |
-| `X-ADL-Passport-URL` | permanent | This document, §1.2.5 |
-| `X-ADL-Proof` | permanent | This document, §1.2.5 |
+| `ADL-Passport` | permanent | This document, §1.2.5 |
+| `ADL-Passport-URL` | permanent | This document, §1.2.5 |
+| `ADL-Proof` | permanent | This document, §1.2.5 |
 
-> **Open item ([RFC6648]).** [RFC6648] deprecates the `X-` prefix for new field names. Before publication these **SHOULD** be renamed to `ADL-Passport`, `ADL-Passport-URL`, and `ADL-Proof`, with the `X-`-prefixed forms retained only as deprecated aliases; the final registration should use the unprefixed names. The names above reflect the current draft.
+> **Note ([RFC6648]).** These field names omit the deprecated `X-` prefix, per [RFC6648]. ADL has no deployed base that used `X-`-prefixed forms, so the unprefixed names are registered directly and no `X-` aliases are defined.
 
-No media type is registered by this document. The passport is conveyed base64-encoded in `X-ADL-Passport` (or dereferenced via `X-ADL-Passport-URL`) and validated against the ADL JSON Schema; the presentation proof is conveyed base64-encoded in `X-ADL-Proof` and validated against the structure in §1.2.2.
+No media type is registered by this document. The passport is conveyed base64-encoded in `ADL-Passport` (or dereferenced via `ADL-Passport-URL`) and validated against the ADL JSON Schema; the presentation proof is conveyed base64-encoded in `ADL-Proof` and validated against the structure in §1.2.2.
 
 ## Security Considerations
 

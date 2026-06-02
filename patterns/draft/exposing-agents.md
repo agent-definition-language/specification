@@ -121,8 +121,8 @@ A mutual client of both Meridian and a wealth-management platform has authorized
 ### Per-request authentication at Meridian
 
 3. The aggregator calls `POST https://agents.meridian.example/portfolio/tools/get_positions`, presenting:
-    - `X-ADL-Passport`: the aggregator's own signed passport.
-    - `X-ADL-Proof`: a fresh presentation proof ([§1.2](/protocol/trust#12-presentation-proof)) bound to this request URI and method, claiming `scopes: ["portfolio:read"]`.
+    - `ADL-Passport`: the aggregator's own signed passport.
+    - `ADL-Proof`: a fresh presentation proof ([§1.2](/protocol/trust#12-presentation-proof)) bound to this request URI and method, claiming `scopes: ["portfolio:read"]`.
 
 4. Meridian — now the **verifier** — authenticates the inbound caller from scratch. **It has no prior relationship with the aggregator; everything it needs arrives in this request:**
     - [§1.1](/protocol/trust#11-passport-verification-procedure): verify the aggregator's passport (resolve its `did:web`, cross-check key, verify signature, check lifecycle).
@@ -181,7 +181,7 @@ The trade-execution agent isn't even listed in the well-known file, and its tool
 
 ### Replayed proof against the portfolio agent
 
-A captured `X-ADL-Proof` replayed at the same endpoint is caught by [§1.2.6.6](/protocol/trust#126-verification-procedure) (the `jti` is already in Meridian's recent-cache); replayed at a different endpoint, by [§1.2.6.4](/protocol/trust#126-verification-procedure) (request-binding mismatch). The provider's per-request verification is exactly what makes replay detectable.
+A captured `ADL-Proof` replayed at the same endpoint is caught by [§1.2.6.6](/protocol/trust#126-verification-procedure) (the `jti` is already in Meridian's recent-cache); replayed at a different endpoint, by [§1.2.6.4](/protocol/trust#126-verification-procedure) (request-binding mismatch). The provider's per-request verification is exactly what makes replay detectable.
 
 ### Caller's classification is too low for positions
 

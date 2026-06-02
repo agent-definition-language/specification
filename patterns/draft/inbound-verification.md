@@ -54,7 +54,7 @@ A single inbound request from the Procurement Agent — "reserve 500 units of SK
 The PEP terminates TLS and inspects the request. It classifies the caller by what it presents:
 
 - **Human / OAuth client** → `Authorization: Bearer …` (+ `DPoP`): take the [§10.3.3](/spec/next#1033-credential-schemes) credential-scheme path.
-- **Peer agent** → `X-ADL-Passport` + `X-ADL-Proof` headers: take the [§1.1](/protocol/trust#11-passport-verification-procedure) + [§1.2](/protocol/trust#12-presentation-proof) path.
+- **Peer agent** → `ADL-Passport` + `ADL-Proof` headers: take the [§1.1](/protocol/trust#11-passport-verification-procedure) + [§1.2](/protocol/trust#12-presentation-proof) path.
 
 This is the same "two front doors, one edge" idea as [Exposing Agents](./exposing-agents) — but here the doors are two branches of one PEP.
 
