@@ -1464,6 +1464,7 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-6006 | Runtime  | Invalid sub-agent pattern syntax (VAL-34) |
 | ADL-6007 | Runtime  | Invalid sub-agent `max_depth` (VAL-35) |
 | ADL-6008 | Runtime  | Invalid degradation cause key (VAL-36) |
+| ADL-6009 | Runtime  | Invalid sub-agent declaration: missing or duplicate `name`, or `tools` not a subset of the parent's (VAL-35a) |
 
 ### 16.3 Error Source Examples
 
