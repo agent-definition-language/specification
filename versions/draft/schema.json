@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://adl-spec.org/0.2/schema.json",
+  "$id": "https://adl-spec.org/0.3/schema.json",
   "title": "ADL Document",
-  "description": "Agent Definition Language v0.2.0",
+  "description": "Agent Definition Language v0.3.0",
   "$defs": {
     "data_classification": {
       "type": "object",
