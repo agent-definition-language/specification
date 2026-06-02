@@ -67,14 +67,16 @@ Core declares; the protocols enforce. A declared limit has force only when a pro
 
 ### 1.4 Relationship to Other Specifications
 
-ADL builds upon and interoperates with:
+ADL builds upon, interoperates with, and draws on:
 
-- **[JSON [RFC8259]](https://www.rfc-editor.org/rfc/rfc8259)** — ADL documents are valid JSON.
-- **[JSON Schema](https://json-schema.org/draft/2020-12/json-schema-core)** — ADL documents are validated against JSON Schema; tool parameters use JSON Schema for types.
-- **[A2A Protocol](https://a2a-protocol.org/latest/specification/)** — ADL documents can generate A2A Agent Cards.
-- **[Model Context Protocol (MCP)](https://modelcontextprotocol.io/specification)** — ADL documents can generate MCP server configurations; tools, resources, and prompts align with MCP primitives.
-- **[OpenAPI](https://spec.openapis.org/oas/latest.html)** — ADL can reference OpenAPI specifications for HTTP-based tools.
-- **[W3C DIDs](https://www.w3.org/TR/did-core/) / [Verifiable Credentials](https://www.w3.org/TR/vc-data-model-2.0/)** — ADL supports DIDs for cryptographic identity and VCs for attestations.
+- **JSON [RFC8259]** — ADL documents are valid JSON.
+- **JSON Schema [JSON-SCHEMA]** — ADL documents are validated against JSON Schema; tool parameters use JSON Schema for types.
+- **A2A Protocol [A2A]** — ADL documents can generate A2A Agent Cards.
+- **Model Context Protocol [MCP]** — ADL documents can generate MCP server configurations; tools, resources, and prompts align with MCP primitives.
+- **OpenAPI [OPENAPI]** — ADL can reference OpenAPI specifications for HTTP-based tools.
+- **W3C Decentralized Identifiers [W3C.DID] and Verifiable Credentials [W3C.VC]** — ADL supports DIDs for cryptographic identity and VCs for attestations.
+- **AI agent protocols [AI-PROTOCOLS]** — ADL's declarative model complements the framework, use cases, and requirements for AI agent protocols developed in the IETF.
+- **Agentic-AI governance frameworks [IMDA-AGENTIC], [CLTC-AGENTIC]** — ADL's governance signals, accountability model, and runtime enforcement draw on emerging agentic-AI governance and risk-management guidance.
 
 ---
 
