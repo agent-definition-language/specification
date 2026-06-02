@@ -106,7 +106,7 @@ The terms "AI agent", "AI system", "autonomy", and "automation" are used in this
 | **agent passport** | A compact, verifiable credential derived from an agent's ADL document, carried during agent-to-agent interactions and verified on every exchange (§1.3). Its verification procedures are defined by the Trust Protocol. |
 | **counterparty** | An actor — a human, service, or other agent — that interacts with an agent and decides whether to verify, admit, and act on its requests. Counterparty procedures performed at admission are defined by the Trust Protocol. |
 | **runtime governor** | The actor that holds an admitted agent to its declared operational limits during execution, enforcing them on every step. It is a logical role, not a prescribed component; its procedures are defined by the Runtime Protocol. |
-| **enforcement record** | A verifiable record produced by a runtime governor attesting that it enforced an agent's declared limits. Its format is specified by the Runtime Protocol (§8). |
+| **enforcement record** | A verifiable record produced by a runtime governor attesting that it enforced an agent's declared limits. Its format is specified by the Runtime Protocol (Enforcement Evidence). |
 
 ---
 
@@ -212,8 +212,9 @@ Implementations **MUST** apply patterns using the rules defined in this section.
 Specifies the ADL specification version the document conforms to.
 
 - **REQUIRED.** Value **MUST** be a string in semantic versioning format (MAJOR.MINOR.PATCH). The format **MUST** conform to the `semver` production in Appendix D.
-- Implementations **MUST** reject documents with an unsupported `adl_spec` version.
-- Implementations **SHOULD** support documents with the same MAJOR version and lower or equal MINOR version.
+- An implementation implements one or more ADL versions. An `adl_spec` value is **supported** when its MAJOR component equals the MAJOR of a version the implementation implements *and* its MINOR component is less than or equal to the highest MINOR the implementation implements for that MAJOR; any other value is **unsupported**. A different MAJOR version, or a higher MINOR than the implementation implements, is therefore unsupported.
+- Implementations **MUST** reject documents whose `adl_spec` version is unsupported (error `ADL-2001`, Section 16.2).
+- Within a supported MAJOR, implementations **SHOULD** accept documents with a lower or equal MINOR version (forward compatibility within a MAJOR) and **MAY** reject a higher MINOR they do not implement.
 - Pre-release suffixes (e.g., `"0.2.0-draft"`) **MUST NOT** appear in `adl_spec` values. Only release versions are valid for conformance. Pre-release identifiers **MAY** appear in the agent's own `version` member (Section 5.5).
 
 Example: `"adl_spec": "0.3.0"`
@@ -301,7 +302,7 @@ Identifier formats, in order of preference:
 
 2. **Decentralized Identifier:** `did:web:{domain}:agents:{name}` — Provides cryptographic identity binding via the DID Document. Resolution follows the `did:web` method specification [W3C.DID]. **RECOMMENDED** when cryptographic verification of agent identity is required independent of transport.
 
-3. **URN (offline/catalog use):** `urn:adl:{namespace}:{name}:{version}` — Location-independent identifier suitable for air-gapped environments, offline catalogs, and internal registries where network resolution is unavailable. URN identifiers provide naming only; they do not support ownership verification or discovery without an external resolver.
+3. **URN (offline/catalog use):** `urn:adl:agent:{namespace}:{name}:{version}` — Location-independent identifier suitable for air-gapped environments, offline catalogs, and internal registries where network resolution is unavailable. The `{type}` segment is `agent` for an agent identifier; the full namespace syntax (`urn:adl:{type}:…`) is defined in Section 17.3 and Appendix D, and an `id` using this scheme **MUST** conform to the `adl-urn` production (VAL-37). URN identifiers provide naming only; they do not support ownership verification or discovery without an external resolver.
 
 When an agent has both a resolvable identifier (HTTPS URI or DID) and a URN, the resolvable identifier **SHOULD** be used as the primary `id` value. The URN **MAY** be recorded in `metadata` for catalog interoperability.
 
@@ -471,6 +472,8 @@ Example:
 ### 8.1 Tools
 
 Array of tool objects (functions the agent can invoke). **OPTIONAL.** Each tool **MUST** contain `name` (string, REQUIRED) and `description` (string, REQUIRED). Each tool **MAY** contain: `parameters` (JSON Schema), `returns` (JSON Schema), `examples`, `requires_confirmation` (bool), `idempotent` (bool), `read_only` (bool), `annotations`, `data_classification` (Section 10.1). Tool names **MUST** be unique, **MUST** match `^[a-z][a-z0-9_]*$`, and **MUST** conform to the `tool-name` production in Appendix D. The `parameters` and `returns` objects, when present, **MUST** be valid JSON Schema.
+
+The `read_only` and `idempotent` members are behavioral hints, each a boolean defaulting to `false` when absent. `read_only: true` declares that invoking the tool does not modify any state observable outside the agent (a pure query). `idempotent: true` declares that invoking the tool more than once with the same arguments has the same observable effect as invoking it once. A runtime **MAY** use these hints to decide whether a tool is safe to retry (Section 11.3) or to invoke in parallel, but **MUST NOT** treat them as a security control: state-changing boundaries are governed by `permissions` (Section 9), not by these hints.
 
 The `examples` member, when present, **MUST** be an array of example objects. Each example object **MAY** contain:
 
@@ -730,7 +733,7 @@ The `delegation` member declares the **envelope** of separately-identified agent
 
 `attenuation.scopes_subset: true` requires a peer's `security.scopes` to be a subset of this agent's ceiling; `budget_subset: true` requires its `permissions.resource_limits.budget` caps to be less than or equal to this agent's. These compose with the delegation-chain verification defined in the [Trust Protocol](/protocol/trust).
 
-These are declarations; the admission procedure a runtime governor applies when this agent attempts to delegate to a peer is defined in the [Runtime Protocol](/protocol/runtime). A delegation that no rule permits is denied; the governor resolves `runtime.degradation.on_sub_agent_denied` (§11.5), defaulting to fail-closed.
+These are declarations; the admission procedure a runtime governor applies when this agent attempts to delegate to a peer is defined in the [Runtime Protocol](/protocol/runtime). A delegation that no rule permits is denied; the governor resolves `runtime.degradation.on_delegation_denied` (§11.5), defaulting to fail-closed.
 
 ---
 
@@ -878,7 +881,7 @@ ADL defines authentication at two complementary boundaries:
 
 1. **Agent-to-agent.** When one ADL agent calls another, both sides authenticate using cryptographically signed passports (§10.3.1) and per-request presentation proofs (§10.3.2). This path establishes identity for autonomous agent meshes where no shared OAuth 2.1 authorization server exists.
 
-2. **Human or external service to agent.** When a human user, an OAuth 2.1 client, or an external service calls an ADL agent, the agent authenticates that party using standard credential schemes — OAuth 2.1 [RFC9700], OIDC [OPENID-CONNECT], mTLS [RFC8705], or API keys (§10.3.3).
+2. **Human or external service to agent.** When a human user, an OAuth 2.1 client, or an external service calls an ADL agent, the agent authenticates that party using standard credential schemes — OAuth 2.1 [OAUTH2.1], OIDC [OPENID-CONNECT], mTLS [RFC8705], or API keys (§10.3.3).
 
 The two paths compose. A human's OAuth 2.1 access token authenticates their session at the agent boundary; the receiving agent then presents its own passport plus proof to upstream agents it calls on the human's behalf. ADL does not replace OAuth 2.1 — it adds the agent-identity layer that OAuth 2.1's resource-server protocol does not specify, and integrates cleanly with OAuth 2.1 at the human and external-service boundary.
 
@@ -894,9 +897,11 @@ The `security.authentication` member declares the credential scheme that human u
 
 `security.authentication` is **OPTIONAL**. When present, value **MUST** be an object that **MAY** contain `type` (one of `none`, `api_key`, `oauth2`, `oidc`, `mtls`) and `required` (bool). Type-specific members **MAY** be present.
 
+When `type` is `"none"`, the agent declares that it requires no credential at its request boundary: requests are accepted without authentication at this layer, and `required` **SHOULD** be omitted or `false`. `type: "none"` **MUST NOT** be used by agents handling `confidential` or `restricted` data (§10.1) without compensating network-layer controls. This setting governs only the human-and-external-service credential layer (§10.3.3); agent-to-agent passport verification (§10.3.1) and presentation proof (§10.3.2) still apply when the caller is another ADL agent, regardless of `type`.
+
 ##### 10.3.3.1 OAuth 2.1 (`type: "oauth2"`)
 
-When `type` is `"oauth2"`, the agent acts as an OAuth 2.1 [RFC9700] resource server. The following members **SHOULD** be declared so clients can integrate without out-of-band configuration:
+When `type` is `"oauth2"`, the agent acts as an OAuth 2.1 [OAUTH2.1] resource server and **SHOULD** follow the OAuth 2.0 security best current practice [RFC9700]. The following members **SHOULD** be declared so clients can integrate without out-of-band configuration:
 
 | Member | Type | Description |
 |--------|------|-------------|
@@ -974,7 +979,7 @@ Example:
 
 ### 10.4 Authorization Scopes
 
-Authentication (§10.3) establishes *who* a counterparty is. Authorization (§10.4) establishes *what they may do*. ADL adopts scope-based authorization aligned with OAuth 2.1 [RFC9700]: the agent declares scope requirements at the root level and per-tool, and a counterparty's request is authorized only if its presented scope set covers every scope the targeted resource requires.
+Authentication (§10.3) establishes *who* a counterparty is. Authorization (§10.4) establishes *what they may do*. ADL adopts scope-based authorization aligned with OAuth 2.1 [OAUTH2.1]: the agent declares scope requirements at the root level and per-tool, and a counterparty's request is authorized only if its presented scope set covers every scope the targeted resource requires.
 
 Scopes apply uniformly across both authentication paths defined in §10.3:
 
@@ -1035,7 +1040,7 @@ The `runtime` member configures agent runtime behavior. **OPTIONAL.** When prese
 
 ### 11.1 Input Handling
 
-Optional members: `max_input_length`, `content_types`, `sanitization`.
+The `input_handling` member, when present, **MUST** be an object. Optional members: `max_input_length`, `content_types`, `sanitization`.
 
 The `sanitization` member, when present, **MUST** be an object describing input sanitization rules. It **MAY** contain:
 
@@ -1049,13 +1054,13 @@ The `content_types` member, when present, **MUST** be an array of strings. Each 
 
 ### 11.2 Output Handling
 
-Optional members: `max_output_length`, `format`, `streaming` (bool).
+The `output_handling` member, when present, **MUST** be an object. Optional members: `max_output_length`, `format`, `streaming` (bool).
 
 The `format` member, when present, **MUST** be a string specifying the default output format. Value **MUST** be one of: `"text"`, `"json"`, `"markdown"`, `"html"`.
 
 ### 11.3 Tool Invocation
 
-Optional members: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`, `max_iterations`, `max_tool_calls_per_session`, `loop_detection`.
+The `tool_invocation` member, when present, **MUST** be an object. Optional members: `parallel` (bool), `max_concurrent`, `timeout_ms`, `retry_policy`, `max_iterations`, `max_tool_calls_per_session`, `loop_detection`.
 
 The `retry_policy` member, when present, **MUST** be an object describing retry behavior for tool invocations. It **MAY** contain:
 
@@ -1080,7 +1085,7 @@ These are declarations; the procedure a runtime governor applies — counting it
 
 ### 11.4 Error Handling
 
-Optional members: `on_tool_error` (`abort`, `continue`, or `retry`), `max_retries`, `fallback_behavior`.
+The `error_handling` member, when present, **MUST** be an object. Optional members: `on_tool_error` (`abort`, `continue`, or `retry`), `max_retries`, `fallback_behavior`.
 
 The `fallback_behavior` member, when present, **MUST** be an object describing behavior when errors occur and `on_tool_error` does not resolve the situation. It **MAY** contain:
 
@@ -1132,7 +1137,7 @@ Example:
 
 ### 11.5 Degradation
 
-The `degradation` member declares how the agent behaves when an operational limit is reached or a fault occurs. **OPTIONAL.** When present, **MUST** be an object whose keys are *cause* identifiers matching `^on_[a-z0-9_]+$` and whose values are *response* objects. Recognized causes include `on_budget_exhausted` (§9.6), `on_iteration_limit` (§11.3), `on_sub_agent_denied` (§9.7), `on_oversight_timeout` (Governance Profile), `on_tool_error`, and `on_anomaly`. Causes are an open set: this list is not exhaustive, and profiles **MAY** define additional causes (for example, `on_oversight_timeout` and `on_anomaly` are defined by the Governance Profile).
+The `degradation` member declares how the agent behaves when an operational limit is reached or a fault occurs. **OPTIONAL.** When present, **MUST** be an object whose keys are *cause* identifiers matching `^on_[a-z0-9_]+$` and whose values are *response* objects. Recognized causes include `on_budget_exhausted` (§9.6), `on_iteration_limit` (§11.3), `on_sub_agent_denied` (a subordinate-persona spawn was denied, §9.7.1), `on_delegation_denied` (an external-peer delegation was denied, §9.7.2), `on_oversight_timeout` (Governance Profile), `on_tool_error`, and `on_anomaly`. Causes are an open set: this list is not exhaustive, and profiles **MAY** define additional causes (for example, `on_oversight_timeout` and `on_anomaly` are defined by the Governance Profile).
 
 Each response object **MUST** contain `action` and **MAY** contain the rest:
 
@@ -1361,6 +1366,7 @@ Implementations **MUST** validate ADL documents against the JSON Schema defined 
 | VAL-35 | `permissions.delegation.max_depth`, when present, MUST be an integer >= 1 |
 | VAL-35a | Each `permissions.sub_agents[]` entry MUST have a `name`, unique within the array; a persona's `tools` MUST be a subset of the parent's `tools` |
 | VAL-36 | Each `runtime.degradation` cause key MUST match `^on_[a-z0-9_]+$` |
+| VAL-37 | Any value using the `urn:adl:` URN scheme MUST conform to the `adl-urn` production (Appendix D), including a `{type}` segment of `agent` or `profile` |
 
 Implementations **MAY** perform additional validation based on declared profiles.
 
@@ -1441,6 +1447,7 @@ The `source` object **MAY** contain: `pointer` (JSON Pointer to the error locati
 | ADL-2022 | Semantic | Retention min_days exceeds max_days |
 | ADL-2023 | Semantic | Top-level sensitivity below tool/resource sensitivity (high-water mark violation) |
 | ADL-2024 | Semantic | Undefined template variable |
+| ADL-2025 | Semantic | Invalid ADL URN: a `urn:adl:` value does not conform to the `adl-urn` production (missing or invalid `{type}` segment) (VAL-37) |
 | ADL-3001 | Profile  | Profile requirements not satisfied |
 | ADL-3002 | Profile  | Unknown profile |
 | ADL-4001 | Security | Weak key algorithm |
@@ -1518,7 +1525,7 @@ The `source.pointer` member uses JSON Pointer [RFC6901] to identify the location
   "code": "ADL-4001",
   "title": "Weak key algorithm",
   "detail": "Algorithm 'RS256' with 1024-bit key does not meet minimum strength requirements",
-  "source": { "pointer": "/security/attestation/public_key" }
+  "source": { "pointer": "/cryptographic_identity/public_key" }
 }
 ```
 
@@ -1575,7 +1582,7 @@ IANA is requested to create and maintain a new registry titled **"ADL Profile Re
 |-------|-------------|
 | Identifier (URI) | A URI that uniquely identifies the profile, conforming to [RFC3986]. The URI **SHOULD** be dereferenceable and return a human-readable description of the profile. |
 | Name | A short human-readable name for the profile (e.g., "ADL Governance Profile"). |
-| Version | The profile version string in MAJOR.MINOR.PATCH semantic versioning format. |
+| Version | The profile version string in MAJOR.MINOR form (optionally MAJOR.MINOR.PATCH), matching the `{version}` segment of the profile URN (Section 17.3). |
 | Specification Reference | A stable, publicly accessible URI or document reference for the profile specification. The specification **MUST** define all profile-required members, validation rules, and any additional semantics added by the profile. |
 | ADL Version Compatibility | The ADL specification version(s) with which the profile is designed to operate (e.g., "0.2.x"). |
 | Contact | Name and email address of the person or group responsible for the profile registration. |
@@ -1609,7 +1616,7 @@ IANA is requested to register the `adl` URN namespace identifier in the "Formal 
 - **Date:** [date of publication]
 - **Registrant:** See the Author's Address section of this document.
 - **Purpose:** The `urn:adl:` namespace provides persistent, location-independent identifiers for ADL agents, profiles, and related artifacts. These identifiers are intended for use in offline catalogs, air-gapped environments, and internal registries where network resolution is unavailable. For connected environments, HTTPS URIs (Section 6.1) are the **RECOMMENDED** identifier format.
-- **Syntax:** URNs in this namespace conform to the following structure: `urn:adl:{type}:{namespace}:{name}:{version}` where `{type}` is one of `agent` or `profile`, `{namespace}` is a lowercase alphanumeric organization identifier, `{name}` is a lowercase alphanumeric resource name with hyphens, and `{version}` is a semantic version string. The formal syntax is defined by the `adl-urn` production in Appendix D.
+- **Syntax:** URNs in this namespace take one of two type-discriminated forms. **Agent URNs** are `urn:adl:agent:{namespace}:{name}:{version}`, where `{namespace}` is a lowercase alphanumeric organization identifier and `{name}` is a lowercase alphanumeric resource name (which may contain hyphens). **Profile URNs** are `urn:adl:profile:{name}:{version}`, where `{name}` is the registry-assigned profile name; profile URNs carry no organization namespace. `{version}` is a semantic version (MAJOR.MINOR.PATCH) for agent URNs and a MAJOR.MINOR (optionally MAJOR.MINOR.PATCH) version for profile URNs. The formal syntax is defined by the `adl-urn` production in Appendix D. A `urn:adl:` value that does not conform to `adl-urn` — for example, an agent URN omitting the `{namespace}` segment, or any URN whose type segment is neither `agent` nor `profile` — **MUST** be rejected (VAL-37, error `ADL-2025`).
 - **Assignment:** Sub-namespace assignment under `urn:adl:profile:` is governed by the ADL Profile Registry (Section 17.2). Sub-namespace assignment under `urn:adl:agent:` is at the discretion of the namespace holder; no central registry is required for agent URNs.
 - **Security and Privacy:** URN identifiers in this namespace are opaque strings and carry no inherent security properties. Implementations **MUST NOT** infer ownership, trust, or authorization from a `urn:adl:` identifier alone. Verification of agent identity **MUST** rely on the mechanisms described in Section 6.3 (Cryptographic Identity) and Section 10.2 (Attestation). See Section 18 for comprehensive security considerations.
 
@@ -1736,6 +1743,7 @@ Lifecycle status **MUST** be enforced as a security boundary. Runtimes **MUST NO
 - **[IMDA-AGENTIC]** Infocomm Media Development Authority (IMDA), "Model AI Governance Framework for Agentic AI", Version 1.5, May 2026, <https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf>.
 - **[JSON-SCHEMA]** Wright, A., et al., "JSON Schema: A Media Type for Describing JSON Documents", <https://json-schema.org/draft/2020-12/json-schema-core>.
 - **[MCP]** Anthropic, "Model Context Protocol Specification", <https://modelcontextprotocol.io/specification>.
+- **[OAUTH2.1]** Parecki, A., Hardt, D., and T. Lodderstedt, "The OAuth 2.1 Authorization Framework", Work in Progress, Internet-Draft, draft-ietf-oauth-v2-1, <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1>.
 - **[OPENAPI]** OpenAPI Initiative, "OpenAPI Specification", Version 3.1, <https://spec.openapis.org/oas/v3.1.0>.
 - **[OPENID-CONNECT]** Sakimura, N., Bradley, J., Jones, M., de Medeiros, B., and C. Mortimore, "OpenID Connect Core 1.0", November 2014, <https://openid.net/specs/openid-connect-core-1_0.html>.
 - **[W3C.DID]** Sporny, M., et al., "Decentralized Identifiers (DIDs) v1.0", W3C Recommendation, <https://www.w3.org/TR/did-core/>.
@@ -1823,11 +1831,16 @@ literal-char    = %x21-29 / %x2B-7E
                   ; "." (%x2E) carries segment-boundary meaning in host patterns
 
 ; ADL URN namespace (Section 17.3)
-; Format: urn:adl:{type}:{namespace}:{name}:{version}
-adl-urn         = "urn:adl:" urn-type ":" urn-namespace ":" urn-name ":" semver
-urn-type        = "agent" / "profile"
+; Agent URNs carry an organization namespace; profile URNs do not.
+;   urn:adl:agent:{namespace}:{name}:{version}
+;   urn:adl:profile:{name}:{version}
+adl-urn         = agent-urn / profile-urn
+agent-urn       = "urn:adl:agent:" urn-namespace ":" urn-name ":" semver
+profile-urn     = "urn:adl:profile:" urn-name ":" profile-version
+profile-version = 1*DIGIT "." 1*DIGIT [ "." 1*DIGIT ]
+                  ; MAJOR.MINOR, optionally MAJOR.MINOR.PATCH
 urn-namespace   = 1*( lc-alpha / DIGIT )
-                  ; Lowercase alphanumeric organization identifier
+                  ; Lowercase alphanumeric organization identifier (agent URNs only)
 urn-name        = ( lc-alpha / DIGIT ) *( lc-alpha / DIGIT / "-" )
                   ; Lowercase alphanumeric resource name, may contain hyphens
 ```

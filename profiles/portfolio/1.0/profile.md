@@ -58,7 +58,7 @@ Organizations that need both registry and portfolio capabilities declare both pr
 
 #### depends_on
 
-When present, **MUST** be an array of strings. Each string **SHOULD** be an agent URI (e.g., `urn:adl:acme:shared-tools:1.0`). Lists agents that this agent requires to function correctly.
+When present, **MUST** be an array of strings. Each string **SHOULD** be an agent URI (e.g., `urn:adl:agent:acme:shared-tools:1.0`). Lists agents that this agent requires to function correctly.
 
 #### composed_of
 
@@ -118,13 +118,13 @@ When present, describes the agent's role within the domain (e.g., "primary-handl
   "profiles": ["urn:adl:profile:portfolio:1.0"],
   "relationships": {
     "depends_on": [
-      "urn:adl:acme:knowledge-base-agent:1.0",
-      "urn:adl:acme:ticket-api-agent:2.0"
+      "urn:adl:agent:acme:knowledge-base-agent:1.0",
+      "urn:adl:agent:acme:ticket-api-agent:2.0"
     ],
-    "orchestrated_by": "urn:adl:acme:support-orchestrator:1.0",
+    "orchestrated_by": "urn:adl:agent:acme:support-orchestrator:1.0",
     "peers": [
-      "urn:adl:acme:billing-support-agent:1.0",
-      "urn:adl:acme:technical-support-agent:1.0"
+      "urn:adl:agent:acme:billing-support-agent:1.0",
+      "urn:adl:agent:acme:technical-support-agent:1.0"
     ]
   },
   "domain": {

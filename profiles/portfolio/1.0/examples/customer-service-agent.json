@@ -99,15 +99,15 @@
   },
   "relationships": {
     "depends_on": [
-      "urn:adl:acme:knowledge-base-agent:1.0",
-      "urn:adl:acme:ticket-api-agent:2.0",
-      "urn:adl:acme:customer-data-agent:1.5"
+      "urn:adl:agent:acme:knowledge-base-agent:1.0",
+      "urn:adl:agent:acme:ticket-api-agent:2.0",
+      "urn:adl:agent:acme:customer-data-agent:1.5"
     ],
-    "orchestrated_by": "urn:adl:acme:support-orchestrator:1.0",
+    "orchestrated_by": "urn:adl:agent:acme:support-orchestrator:1.0",
     "peers": [
-      "urn:adl:acme:billing-support-agent:1.0",
-      "urn:adl:acme:technical-support-agent:1.0",
-      "urn:adl:acme:returns-agent:1.0"
+      "urn:adl:agent:acme:billing-support-agent:1.0",
+      "urn:adl:agent:acme:technical-support-agent:1.0",
+      "urn:adl:agent:acme:returns-agent:1.0"
     ]
   },
   "domain": {

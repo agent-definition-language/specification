@@ -41,8 +41,8 @@ Add the Portfolio Profile to your ADL document:
   "version": "1.0.0",
   "profiles": ["urn:adl:profile:portfolio:1.0"],
   "relationships": {
-    "depends_on": ["urn:adl:acme:knowledge-base-agent:1.0"],
-    "orchestrated_by": "urn:adl:acme:support-orchestrator:1.0"
+    "depends_on": ["urn:adl:agent:acme:knowledge-base-agent:1.0"],
+    "orchestrated_by": "urn:adl:agent:acme:support-orchestrator:1.0"
   },
   "domain": {
     "domain_id": "urn:domain:customer-service",
