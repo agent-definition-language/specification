@@ -1,0 +1,6 @@
+{
+  "name": "paper_index",
+  "type": "vector_store",
+  "description": "Vector index of paper embeddings",
+  "uri": "s3://research-data/papers/"
+}

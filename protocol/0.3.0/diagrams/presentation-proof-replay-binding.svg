@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" width="900" height="560" role="img" aria-labelledby="pp-title pp-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="pp-title">Presentation proof: a per-request signature binds the passport to one request, defeating replay</title>
+  <desc id="pp-desc">A two-path comparison converging on one verifier. Passports are not secret, so an attacker can obtain a complete, valid, signed passport. On the left, the attacker replays a scraped passport alone: it carries no per-request proof because the attacker lacks the agent's private key. The verifier rejects it. On the right, the legitimate agent presents the same passport together with a presentation proof — a per-request object binding the passport id (iss) to the request method and canonical URI, an issued-at and short expiry, and a unique jti, all signed by the agent's private key. The verifier checks issuer match, temporal validity within five minutes, request binding, the signature against the passport key, and replay prevention via the jti cache, and accepts the request. The proof binds passport to a specific request URI, method, timestamp, and jti, signed by the private key the attacker does not have.</desc>
+
+  <defs>
+    <marker id="pp-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="pp-ar-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c5221f"/>
+    </marker>
+    <marker id="pp-ar-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#137333"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="560" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Presentation Proof &#8212; Replay Binding</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">A per-request signature binds the passport to one request; a scraped passport alone is rejected (&#167;1.2)</text>
+
+  <!-- column headers -->
+  <text x="210" y="92" text-anchor="middle" font-size="12.5" font-weight="700" fill="#a50e0e">Threat: replayed passport</text>
+  <text x="690" y="92" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0d652d">Legitimate: passport + proof</text>
+
+  <!-- ===================== LEFT: attacker ===================== -->
+  <rect x="70" y="108" width="280" height="60" rx="10" fill="#fce8e6" stroke="#c5221f" stroke-width="1.5"/>
+  <text x="210" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#a50e0e">attacker</text>
+  <text x="210" y="150" text-anchor="middle" font-size="9.5" fill="#1f2937">holds a scraped, valid, signed passport</text>
+  <text x="210" y="162" text-anchor="middle" font-size="9.5" font-style="italic" fill="#a50e0e">but not the private key</text>
+
+  <!-- scraped passport token -->
+  <rect x="120" y="206" width="180" height="58" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="210" y="228" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">passport (copied)</text>
+  <text x="210" y="246" text-anchor="middle" font-size="9" fill="#1f2937">valid bytes, valid signature</text>
+  <text x="210" y="258" text-anchor="middle" font-size="9" font-style="italic" fill="#a50e0e">no per-request proof</text>
+
+  <line x1="210" y1="168" x2="210" y2="204" stroke="#334155" stroke-width="1.4" marker-end="url(#pp-ar)"/>
+  <line x1="210" y1="264" x2="210" y2="318" stroke="#c5221f" stroke-width="1.5" marker-end="url(#pp-ar-red)"/>
+  <rect x="160" y="284" width="100" height="15" fill="#ffffff"/>
+  <text x="210" y="296" text-anchor="middle" font-size="9.5" fill="#a50e0e">replay attempt</text>
+
+  <!-- ===================== RIGHT: legitimate agent ===================== -->
+  <rect x="550" y="108" width="280" height="60" rx="10" fill="#e6f4ea" stroke="#137333" stroke-width="1.5"/>
+  <text x="690" y="132" text-anchor="middle" font-size="12" font-weight="700" fill="#0d652d">the agent</text>
+  <text x="690" y="150" text-anchor="middle" font-size="9.5" fill="#1f2937">holds the passport and its private key</text>
+  <text x="690" y="162" text-anchor="middle" font-size="9.5" font-style="italic" fill="#0d652d">signs a fresh proof per request</text>
+
+  <!-- passport + proof token -->
+  <rect x="560" y="190" width="260" height="92" rx="8" fill="#fff7e6" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="690" y="210" text-anchor="middle" font-size="11" font-weight="700" fill="#b45309">passport + presentation proof</text>
+  <line x1="572" y1="218" x2="808" y2="218" stroke="#f3d8a8" stroke-width="1"/>
+  <g font-size="9" fill="#1f2937">
+    <text x="572" y="234">iss = passport id &#183; request: method + URI</text>
+    <text x="572" y="248">iat &#183; exp (&#8804; 5 min) &#183; jti (unique)</text>
+    <text x="572" y="262" font-weight="700" fill="#0d652d">signature by the agent's private key</text>
+    <text x="572" y="276" font-style="italic" fill="#475569">binds this passport to this one request</text>
+  </g>
+
+  <line x1="690" y1="168" x2="690" y2="188" stroke="#334155" stroke-width="1.4" marker-end="url(#pp-ar)"/>
+  <line x1="690" y1="282" x2="690" y2="318" stroke="#137333" stroke-width="1.5" marker-end="url(#pp-ar-green)"/>
+  <rect x="648" y="291" width="84" height="15" fill="#ffffff"/>
+  <text x="690" y="303" text-anchor="middle" font-size="9.5" fill="#0d652d">bound request</text>
+
+  <!-- ===================== VERIFIER (center bottom) ===================== -->
+  <rect x="300" y="320" width="300" height="118" rx="10" fill="#f8fafc" stroke="#1a73e8" stroke-width="1.75"/>
+  <text x="450" y="344" text-anchor="middle" font-size="13" font-weight="700" fill="#0b57d0">verifier &#183; &#167;1.2.6 checks</text>
+  <g font-size="9.5" fill="#1f2937">
+    <text x="318" y="366">issuer match (iss = id) &#183; temporal (&#8804; 5 min)</text>
+    <text x="318" y="382">request binding (method + URI) &#183; signature (passport key)</text>
+    <text x="318" y="398">replay prevention &#8212; jti seen before? reject</text>
+  </g>
+  <line x1="318" y1="408" x2="582" y2="408" stroke="#cbd5e1" stroke-width="1"/>
+  <text x="450" y="426" text-anchor="middle" font-size="9.5" font-style="italic" fill="#475569">no valid proof &#8658; no authenticated request</text>
+
+  <!-- left path into verifier -->
+  <line x1="210" y1="318" x2="210" y2="360" stroke="#c5221f" stroke-width="1.5"/>
+  <line x1="210" y1="360" x2="298" y2="360" stroke="#c5221f" stroke-width="1.5" marker-end="url(#pp-ar-red)"/>
+  <!-- right path into verifier -->
+  <line x1="690" y1="318" x2="690" y2="380" stroke="#137333" stroke-width="1.5"/>
+  <line x1="690" y1="380" x2="602" y2="380" stroke="#137333" stroke-width="1.5" marker-end="url(#pp-ar-green)"/>
+
+  <!-- outcomes -->
+  <rect x="120" y="470" width="180" height="44" rx="10" fill="#fce8e6" stroke="#c5221f" stroke-width="1.75"/>
+  <text x="210" y="490" text-anchor="middle" font-size="12" font-weight="700" fill="#a50e0e">REJECTED</text>
+  <text x="210" y="505" text-anchor="middle" font-size="9" fill="#1f2937">replay defeated</text>
+  <line x1="320" y1="438" x2="248" y2="468" stroke="#c5221f" stroke-width="1.5" marker-end="url(#pp-ar-red)"/>
+
+  <rect x="600" y="470" width="180" height="44" rx="10" fill="#e6f4ea" stroke="#137333" stroke-width="1.75"/>
+  <text x="690" y="490" text-anchor="middle" font-size="12" font-weight="700" fill="#0d652d">ACCEPTED</text>
+  <text x="690" y="505" text-anchor="middle" font-size="9" fill="#1f2937">request authenticated</text>
+  <line x1="580" y1="438" x2="652" y2="468" stroke="#137333" stroke-width="1.5" marker-end="url(#pp-ar-green)"/>
+
+  <!-- footnote -->
+  <text x="450" y="544" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">The proof binds passport &#8594; request URI + method + timestamp + jti, signed by the key the attacker lacks. Illustrative; &#167;1.2 is authoritative.</text>
+</svg>

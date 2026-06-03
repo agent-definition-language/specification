@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" role="img" aria-labelledby="as-title as-desc" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <title id="as-title">Anti-swap and version pinning: declared limits are fixed at admission and cannot be silently swapped mid-session</title>
+  <desc id="as-desc">A state machine for the governor's binding to the passport. At session start the admitted passport is pinned to its exact canonical bytes — the version whose signature the counterparty verified — moving the governor into a governing state, where it enforces against those pinned bytes on every step. While governing, each step is checked against the pin: if the canonical bytes are unchanged, the governor stays in the governing state and continues. If the declared limits change mid-session — a different passport, a re-signed passport, or any mutation of the members governed by sections 2 to 7 — the governor MUST NOT silently adopt the new limits; it transitions to a session-integrity fault state. From the fault state it applies the configured degradation response, defaulting to fail-closed (halt), and the new limits are never adopted. A note states the declared limits are the governor's enforcement contract for the session, not advisory inputs.</desc>
+
+  <defs>
+    <marker id="as-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="as-ar-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c5221f"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="900" height="520" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="450" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Anti-Swap &amp; Version Pinning</text>
+  <text x="450" y="56" text-anchor="middle" font-size="13" font-style="italic" fill="#475569">Declared limits are fixed at admission &#8212; they cannot be silently swapped mid-session (&#167;1.3)</text>
+
+  <!-- initial dot -->
+  <circle cx="90" cy="190" r="7" fill="#334155"/>
+  <text x="90" y="170" text-anchor="middle" font-size="9.5" fill="#475569">session start</text>
+
+  <!-- ADMITTED / pinned state -->
+  <rect x="150" y="158" width="200" height="64" rx="12" fill="#e8f0fe" stroke="#1a73e8" stroke-width="1.75"/>
+  <text x="250" y="184" text-anchor="middle" font-size="13" font-weight="700" fill="#0b57d0">admitted &#183; pinned</text>
+  <text x="250" y="201" text-anchor="middle" font-size="9.5" fill="#1f2937">canonical bytes fixed</text>
+  <text x="250" y="214" text-anchor="middle" font-size="9.5" fill="#1f2937">(the &#167;1.1.5 verified version)</text>
+
+  <line x1="97" y1="190" x2="148" y2="190" stroke="#334155" stroke-width="1.4" marker-end="url(#as-ar)"/>
+
+  <!-- GOVERNING state -->
+  <rect x="450" y="158" width="200" height="64" rx="12" fill="#e6f4ea" stroke="#137333" stroke-width="1.75"/>
+  <text x="550" y="184" text-anchor="middle" font-size="13" font-weight="700" fill="#0d652d">governing</text>
+  <text x="550" y="201" text-anchor="middle" font-size="9.5" fill="#1f2937">enforce against the pin</text>
+  <text x="550" y="214" text-anchor="middle" font-size="9.5" fill="#1f2937">on every step</text>
+
+  <line x1="350" y1="190" x2="448" y2="190" stroke="#334155" stroke-width="1.4" marker-end="url(#as-ar)"/>
+  <rect x="364" y="179" width="72" height="16" fill="#ffffff"/>
+  <text x="400" y="191" text-anchor="middle" font-size="9.5" fill="#475569">admit</text>
+
+  <!-- self-loop: bytes unchanged -> continue -->
+  <path d="M520,158 C 505,120 595,120 580,158" fill="none" stroke="#137333" stroke-width="1.4" marker-end="url(#as-ar)"/>
+  <text x="550" y="120" text-anchor="middle" font-size="9.5" fill="#0d652d">bytes unchanged &#8594; continue</text>
+
+  <!-- check step (decision) below governing -->
+  <text x="550" y="250" text-anchor="middle" font-size="10" font-style="italic" fill="#475569">each step: do the canonical bytes still match the pin?</text>
+
+  <!-- transition to FAULT (down) on mutation -->
+  <line x1="550" y1="222" x2="550" y2="300" stroke="#c5221f" stroke-width="1.6" marker-end="url(#as-ar-red)"/>
+  <rect x="372" y="262" width="356" height="32" fill="#ffffff"/>
+  <text x="550" y="276" text-anchor="middle" font-size="10" font-weight="700" fill="#a50e0e">limits change mid-session</text>
+  <text x="550" y="289" text-anchor="middle" font-size="9" fill="#a50e0e">different / re-signed passport &#183; any &#167;2&#8211;&#167;7 mutation</text>
+
+  <!-- FAULT state -->
+  <rect x="430" y="300" width="240" height="60" rx="12" fill="#fce8e6" stroke="#c5221f" stroke-width="1.75"/>
+  <text x="550" y="325" text-anchor="middle" font-size="13" font-weight="700" fill="#a50e0e">session-integrity fault</text>
+  <text x="550" y="343" text-anchor="middle" font-size="9.5" fill="#1f2937">new limits MUST NOT be silently adopted</text>
+
+  <!-- transition to degradation / fail-closed (down) -->
+  <line x1="550" y1="360" x2="550" y2="404" stroke="#c5221f" stroke-width="1.6" marker-end="url(#as-ar-red)"/>
+  <rect x="556" y="372" width="120" height="16" fill="#ffffff"/>
+  <text x="560" y="384" text-anchor="start" font-size="9.5" fill="#a50e0e">apply degradation (&#167;6)</text>
+
+  <!-- FAIL-CLOSED terminal -->
+  <rect x="430" y="404" width="240" height="60" rx="12" fill="#fde8e8" stroke="#c5221f" stroke-width="2"/>
+  <text x="550" y="429" text-anchor="middle" font-size="13" font-weight="700" fill="#a50e0e">fail-closed (halt) by default</text>
+  <text x="550" y="447" text-anchor="middle" font-size="9.5" fill="#1f2937">the swapped limits are never adopted</text>
+
+  <!-- note (left, under admitted) -->
+  <rect x="80" y="320" width="300" height="96" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="96" y="344" font-size="11" font-weight="700" fill="#334155">The pin is the enforcement contract</text>
+  <text x="96" y="364" font-size="10" fill="#1f2937">Declared limits are fixed at admission,</text>
+  <text x="96" y="379" font-size="10" fill="#1f2937">not advisory inputs the runtime can revise.</text>
+  <text x="96" y="399" font-size="10" fill="#1f2937">A mid-session swap is a fault, not an</text>
+  <text x="96" y="414" font-size="10" fill="#1f2937">update &#8212; the session halts rather than drift.</text>
+
+  <!-- footnote -->
+  <text x="450" y="498" text-anchor="middle" font-size="11" font-style="italic" fill="#475569">Session-integrity logic is deterministic: a swapped or mutated passport always faults to the same fail-closed default. Illustrative; &#167;1.3 is authoritative.</text>
+</svg>
