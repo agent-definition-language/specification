@@ -10,8 +10,8 @@ hide_table_of_contents: false
 
 # Trust Protocol
 
-**Version:** 0.4.0-draft
-**Status:** Draft
+**Version:** 0.3.0
+**Status:** Posted
 
 The **Trust Protocol** defines the normative procedures a counterparty performs to establish trust in an ADL agent: verifying a passport, binding a request to a presentation proof, and authorizing agent-to-agent calls. It is the *protocol* layer that sits on top of the *description* layer defined by the [ADL Core specification](/spec). ADL Core declares what an agent is and which credential schemes and scopes it advertises; ADL Trust defines what a verifier **MUST** do with those declarations.
 

@@ -1,0 +1,99 @@
+{
+  "id": "041-signature-missing-when-required",
+  "description": "Passport has no signature; requireSignature=true MUST block at §10.3.5.",
+  "spec_sections": [
+    "1.1.5"
+  ],
+  "input": {
+    "passport": {
+      "adl_spec": "0.2.0",
+      "name": "Personal Assistant",
+      "description": "Consumer agent for verification test vectors",
+      "version": "1.0.0",
+      "id": "https://test.example/agents/personal-assistant",
+      "data_classification": {
+        "sensitivity": "internal"
+      },
+      "lifecycle": {
+        "status": "active",
+        "effective_date": "2026-04-01T00:00:00.000Z"
+      },
+      "provider": {
+        "name": "Test Org",
+        "url": "https://test.example",
+        "contact": "test@test.example"
+      },
+      "cryptographic_identity": {
+        "did": "did:web:test.example:agents:personal-assistant",
+        "public_key": {
+          "algorithm": "Ed25519",
+          "value": "OxP9noTzMJyWX72NdF4f7VCp/pTjmLggVuNJ1YSGj3g="
+        }
+      },
+      "permissions": {
+        "network": {
+          "allowed_hosts": [
+            "api.test.example"
+          ],
+          "allowed_protocols": [
+            "https"
+          ],
+          "deny_private": false
+        },
+        "resource_limits": {
+          "max_memory_mb": 1024,
+          "max_duration_sec": 120
+        }
+      },
+      "security": {
+        "authentication": {
+          "type": "api_key",
+          "required": true
+        },
+        "encryption": {
+          "in_transit": {
+            "required": true,
+            "min_version": "1.2"
+          }
+        },
+        "attestation": {
+          "type": "self",
+          "issued_at": "2026-04-01T00:00:00.000Z",
+          "expires_at": "2027-04-01T00:00:00.000Z"
+        }
+      },
+      "metadata": {
+        "license": "MIT",
+        "tags": [
+          "consumer",
+          "test"
+        ]
+      }
+    },
+    "retrieval": {
+      "channel": "header",
+      "authority": "localhost:3000"
+    }
+  },
+  "config": {
+    "mode": "enforce",
+    "requireSignature": true,
+    "requireDidResolution": false,
+    "requireProviderCoherence": false,
+    "trustOnFirstUse": true,
+    "didLocalOverrides": {},
+    "providerAllowlist": []
+  },
+  "expected": {
+    "verified": false,
+    "public_key_source": "inline_only",
+    "blocked_at_section": "1.1.5",
+    "step_outcomes": [
+      {
+        "section": "1.1.5",
+        "passed": false,
+        "severity": "block"
+      }
+    ]
+  }
+}

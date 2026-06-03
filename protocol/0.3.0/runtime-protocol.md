@@ -10,8 +10,8 @@ hide_table_of_contents: false
 
 # Runtime Protocol
 
-**Version:** 0.4.0-draft
-**Status:** Draft — the runtime governor (§1), the enforcement procedures (§2–§7), and the enforcement-evidence format (§8) are drafted; the completeness/witness tier (§8.8) is reserved.
+**Version:** 0.3.0
+**Status:** Posted — the runtime governor (§1), the enforcement procedures (§2–§7), and the enforcement-evidence format (§8) are drafted; the completeness/witness tier (§8.8) is reserved.
 
 The **Runtime Protocol** defines the normative procedures a *runtime governor* performs to enforce an ADL agent's declared operational limits while the agent executes: budgets, iteration limits, sub-agent admission, human-oversight triggers, degradation, and anomaly detection. It sits in the ADL document family alongside the [ADL Core specification](/spec), which declares what an agent **is** and the limits it advertises, and the [Trust Protocol](/protocol/trust), which defines what a *counterparty* does to verify and authorize it; it is one document in ADL's open protocol layer. Where the Trust Protocol acts **once, at admission**, the Runtime Protocol acts **continuously, after admission**: it is the layer that gives an agent's declared operational limits force at runtime.
 

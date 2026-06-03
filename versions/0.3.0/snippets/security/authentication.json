@@ -1,0 +1,10 @@
+{
+  "authentication": {
+    "type": "oauth2",
+    "required": true,
+    "scopes": [
+      "read:papers",
+      "write:notes"
+    ]
+  }
+}
