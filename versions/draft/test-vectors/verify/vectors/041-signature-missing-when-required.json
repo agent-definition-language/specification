@@ -6,7 +6,7 @@
   ],
   "input": {
     "passport": {
-      "adl_spec": "0.2.0",
+      "adl_spec": "0.3.0",
       "name": "Personal Assistant",
       "description": "Consumer agent for verification test vectors",
       "version": "1.0.0",

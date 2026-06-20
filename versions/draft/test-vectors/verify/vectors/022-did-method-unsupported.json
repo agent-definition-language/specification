@@ -6,7 +6,7 @@
   ],
   "input": {
     "passport": {
-      "adl_spec": "0.2.0",
+      "adl_spec": "0.3.0",
       "name": "Personal Assistant",
       "description": "Consumer agent for verification test vectors",
       "version": "1.0.0",
@@ -62,7 +62,7 @@
           "expires_at": "2027-04-01T00:00:00.000Z",
           "signature": {
             "algorithm": "Ed25519",
-            "value": "GXCEqnw8VFP5ekRs_Dzxro-j3rowERWXkA4S7LdWgSWgmzOVuGkhpWdBVhJOepQwlldFgEWNzo9_XWkMo8eRCg",
+            "value": "0QRd6SILRe5idInGniR6q1M0rfwJe_2NxvXjfsPV_piXpOujFhNp7W0_aERQWj2XnDU3PuXNI-TnLGc56B6fCg",
             "signed_content": "canonical"
           }
         }

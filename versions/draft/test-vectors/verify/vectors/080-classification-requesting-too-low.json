@@ -6,7 +6,7 @@
   ],
   "input": {
     "passport": {
-      "adl_spec": "0.2.0",
+      "adl_spec": "0.3.0",
       "name": "Enterprise Agent",
       "description": "Enterprise agent for verification test vectors",
       "version": "1.0.0",
@@ -62,7 +62,7 @@
           "expires_at": "2027-04-01T00:00:00.000Z",
           "signature": {
             "algorithm": "Ed25519",
-            "value": "QSALjMpiSsWStCB3phND9MqCA7HNxpilAECE8X7-CeE3Cn2zzFWkiBO46d29baHhnYzQaacJjA1elacU5qrWDw",
+            "value": "U_YPA_CBUtZcpAGs_lOUmk9-92KvIdXx4YKGVlb4p2QkXroBA7ypN1SXCevOros55eicWEByT32vcYjluPtMDQ",
             "signed_content": "canonical"
           }
         }
@@ -80,7 +80,7 @@
       "authority": "localhost:3000"
     },
     "requesting_agent": {
-      "adl_spec": "0.2.0",
+      "adl_spec": "0.3.0",
       "name": "Personal Assistant",
       "description": "Consumer agent for verification test vectors",
       "version": "1.0.0",
@@ -136,7 +136,7 @@
           "expires_at": "2027-04-01T00:00:00.000Z",
           "signature": {
             "algorithm": "Ed25519",
-            "value": "oWJj-NjRHoVQ2Jcss0zTSnr9SH0nBbGCv_03yaA8ZMVJK24v-SPEo8tdM_7OYODzyPsBZyt9jYd24EyaOyV9BQ",
+            "value": "LW1RWRI2UhtPxU9mEMPh9Woqh4_lCh4ln6ChEgkbry7zcxVnuuTn0H5Uw7D52cL5tj1R5JjM7uCgAeSDYMJwCw",
             "signed_content": "canonical"
           }
         }
