@@ -6,7 +6,7 @@ slug: ../specification
 description: "Full specification for the ADL Financial Profile including PCI-DSS, SOX, GLBA, MiFID II, and AML/KYC compliance."
 keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
 adl_profile_meta:
-  example_filename: "trade-compliance-agent.json"
+  example_filename: "financial-compliance-agent.json"
 ---
 
 # Financial Profile Specification
@@ -283,8 +283,8 @@ Example:
 {
   "$schema": "https://adl-spec.org/0.3/schema.json",
   "adl_spec": "0.3.0",
-  "name": "Trade Compliance Monitor",
-  "description": "Monitors trading activity for regulatory compliance and suspicious patterns.",
+  "name": "Financial Compliance Monitor",
+  "description": "Monitors both banking activity (wires, deposits) and brokerage activity (securities trading) across a universal financial institution for AML, fraud, and regulatory compliance.",
   "version": "1.0.0",
   "profiles": [
     "urn:adl:profile:financial:1.0"
@@ -294,9 +294,9 @@ Example:
     "effective_date": "2026-01-01T00:00:00Z"
   },
   "provider": {
-    "name": "FinSecure Inc",
-    "url": "https://finsecure.example",
-    "contact": "compliance@finsecure.example"
+    "name": "Meridian Financial Group",
+    "url": "https://meridian.example",
+    "contact": "compliance@meridian.example"
   },
   "model": {
     "capabilities": [
@@ -305,8 +305,8 @@ Example:
   },
   "tools": [
     {
-      "name": "scan_transactions",
-      "description": "Scan recent transactions for compliance violations and suspicious patterns",
+      "name": "screen_wire_transfers",
+      "description": "Screen banking wire and ACH transfers for BSA/AML and sanctions risk",
       "parameters": {
         "type": "object",
         "properties": {
@@ -325,30 +325,49 @@ Example:
       "read_only": true
     },
     {
-      "name": "file_sar",
-      "description": "File a Suspicious Activity Report with FinCEN",
+      "name": "surveil_trades",
+      "description": "Surveil securities trading activity for market manipulation and insider trading",
       "parameters": {
         "type": "object",
         "properties": {
-          "transaction_ids": {
+          "account_id": {
+            "type": "string"
+          },
+          "instrument": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id"
+        ]
+      },
+      "read_only": true
+    },
+    {
+      "name": "file_sar",
+      "description": "File a Suspicious Activity Report with FinCEN (covers both banking and brokerage activity)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "subject_ids": {
             "type": "array",
             "items": {
               "type": "string"
             }
           },
-          "narrative": {
-            "type": "string"
-          },
-          "priority": {
+          "activity_type": {
             "type": "string",
             "enum": [
-              "routine",
-              "expedited"
+              "banking",
+              "securities"
             ]
+          },
+          "narrative": {
+            "type": "string"
           }
         },
         "required": [
-          "transaction_ids",
+          "subject_ids",
           "narrative"
         ]
       },
@@ -358,7 +377,8 @@ Example:
   "permissions": {
     "network": {
       "allowed_hosts": [
-        "api.finsecure.example",
+        "core-banking.meridian.example",
+        "market-surveillance.meridian.example",
         "fincen.gov"
       ],
       "allowed_protocols": [
@@ -369,7 +389,11 @@ Example:
     "filesystem": {
       "allowed_paths": [
         {
-          "path": "/data/transactions/**",
+          "path": "/data/banking/**",
+          "access": "read"
+        },
+        {
+          "path": "/data/trading/**",
           "access": "read"
         },
         {
@@ -411,7 +435,9 @@ Example:
     "financial": {
       "data_types": [
         "transaction_data",
-        "nonpublic_personal_info"
+        "nonpublic_personal_info",
+        "market_data",
+        "material_nonpublic_info"
       ],
       "pci_applicable": false
     }
@@ -424,10 +450,23 @@ Example:
       {
         "jurisdiction": "US",
         "regulation": "GLBA"
+      },
+      {
+        "jurisdiction": "EU",
+        "regulation": "MIFID_II"
       }
     ]
   },
   "transaction_controls": {
+    "transaction_limits": {
+      "max_single_amount": 10000000,
+      "currency": "USD"
+    },
+    "pre_execution_controls": {
+      "enabled": true,
+      "price_tolerance_pct": 2,
+      "requires_approval_above": 1000000
+    },
     "kill_switch": {
       "enabled": true,
       "trigger_conditions": [
@@ -435,7 +474,7 @@ Example:
         "anomaly_detection"
       ],
       "notification_targets": [
-        "compliance-team@finsecure.example"
+        "compliance-team@meridian.example"
       ]
     },
     "segregation_of_duties": {
@@ -450,8 +489,20 @@ Example:
     "applicable_regulations": [
       "GLBA",
       "BSA_AML",
+      "BASEL_III",
       "FINRA",
-      "SEC_REG"
+      "SEC_REG",
+      "MIFID_II"
+    ],
+    "jurisdictions": [
+      {
+        "jurisdiction": "US",
+        "regulation": "BSA_AML"
+      },
+      {
+        "jurisdiction": "EU",
+        "regulation": "MIFID_II"
+      }
     ],
     "record_retention": {
       "min_retention_days": 1825,
@@ -469,21 +520,28 @@ Example:
       "screening_required": true,
       "monitoring_level": "real_time",
       "kyc_refresh_days": 365
+    },
+    "operational_risk": {
+      "category": "high",
+      "assessed_by": "Operational Risk Committee",
+      "assessed_at": "2025-12-15T00:00:00Z",
+      "capital_reserve": true
     }
   },
   "metadata": {
     "authors": [
       {
-        "name": "FinSecure Compliance Team",
-        "email": "compliance@finsecure.example"
+        "name": "Meridian Compliance Team",
+        "email": "compliance@meridian.example"
       }
     ],
     "license": "Proprietary",
     "tags": [
       "financial",
-      "compliance",
+      "banking",
+      "brokerage",
       "aml",
-      "trading"
+      "compliance"
     ]
   }
 }

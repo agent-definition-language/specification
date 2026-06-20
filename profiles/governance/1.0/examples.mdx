@@ -9,6 +9,7 @@ keywords: [adl, governance, example, compliance, soc2, audit, tier 2, tier 3]
 import CodeTabs from '@site/src/components/CodeTabs';
 import complianceAgent from './examples/compliance-agent.json';
 import tier3Agent from './examples/compliance-agent-tier3.json';
+import governanceRegistryAgent from './examples/composite/governance-registry-agent.json';
 
 # Governance Profile Examples
 
@@ -46,3 +47,12 @@ A fully autonomous agent that continuously scans portfolios, classifies risks, a
 | `evaluation_attestation.result` | `passed` | Required at Tier 3 with `passed` result |
 | `evaluation_attestation.evaluator` | External auditor | Third-party evaluation |
 | `human_oversight.level` | `periodic` | Post-hoc review model |
+
+## Composed with the Registry Profile
+
+Governance composes with other profiles via `allOf`. This composite example
+declares both `urn:adl:profile:governance:1.0` and `urn:adl:profile:registry:1.0`,
+combining governance members with the registry catalog members in a single
+document.
+
+<CodeTabs json={governanceRegistryAgent} title="composite/governance-registry-agent.adl" />

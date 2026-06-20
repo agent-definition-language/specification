@@ -8,6 +8,7 @@ keywords: [adl, healthcare, example, hipaa, phi, fhir, clinical safety, ehr]
 
 import CodeTabs from '@site/src/components/CodeTabs';
 import clinicalAgent from './examples/clinical-research-agent.json';
+import governanceHealthcareAgent from './examples/composite/governance-healthcare-agent.json';
 
 # Healthcare Profile Examples
 
@@ -34,3 +35,12 @@ A clinical research agent that assists with patient record analysis and clinical
 - **Breach Notification**: 60-hour notification window, 500-record threshold
 - **Consent**: Purpose-specific, revocation supported
 - **Bias Monitoring**: Quarterly assessment across race, ethnicity, sex, and age
+
+## Composed with the Governance Profile
+
+The Healthcare Profile is designed to compose with the [Governance Profile](../../governance/overview).
+This composite example declares both `urn:adl:profile:governance:1.0` and
+`urn:adl:profile:healthcare:1.0`, adding the governance-required `autonomy` and
+`compliance_framework` members on top of the healthcare members above.
+
+<CodeTabs json={governanceHealthcareAgent} title="composite/governance-healthcare-agent.adl" />

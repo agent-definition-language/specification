@@ -2,36 +2,63 @@
 id: examples
 title: Examples
 sidebar_position: 3
-description: Example ADL document using the Financial Profile for trading compliance and AML controls.
-keywords: [adl, financial, example, aml, kyc, pci-dss, glba, trading, compliance]
+description: Example ADL documents using the Financial Profile across banking and brokerage compliance and AML controls.
+keywords: [adl, financial, example, aml, kyc, banking, brokerage, glba, finra, mifid, compliance]
 ---
 
 import CodeTabs from '@site/src/components/CodeTabs';
-import tradeAgent from './examples/trade-compliance-agent.json';
+import financialAgent from './examples/financial-compliance-agent.json';
+import governanceFinancialAgent from './examples/composite/governance-financial-agent.json';
 
 # Financial Profile Examples
 
-## Trade Compliance Monitor
+## Financial Compliance Monitor
 
-A trading surveillance agent that monitors activity for regulatory compliance and suspicious patterns, with AML controls and segregation of duties.
+A compliance agent for a universal financial institution that monitors **both
+banking activity** (wire and ACH transfers, deposits) **and brokerage activity**
+(securities trading) for AML, fraud, and regulatory compliance. It spans the
+deposit-taking and broker-dealer sides of the house: BSA/AML and GLBA on the
+banking side, FINRA, SEC, and MiFID II on the brokerage side.
 
-<CodeTabs json={tradeAgent} title="trade-compliance-agent.adl" />
+<CodeTabs json={financialAgent} title="financial-compliance-agent.adl" />
+
+### Both Sides of the House
+
+| Banking | Brokerage |
+|---------|-----------|
+| `screen_wire_transfers` tool (wire/ACH AML) | `surveil_trades` tool (market surveillance) |
+| `GLBA`, `BSA_AML`, `BASEL_III` regulations | `FINRA`, `SEC_REG`, `MIFID_II` regulations |
+| `nonpublic_personal_info`, `transaction_data` | `market_data`, `material_nonpublic_info` |
+| `transaction_limits` (wire ceilings) | `pre_execution_controls` (pre-trade checks) |
+
+`file_sar` and the AML controls in `financial_risk_management` apply across
+both — a single FinCEN SAR pipeline and shared KYC/monitoring cadence.
 
 ### Key Financial Fields
 
 | Field | Purpose |
 |-------|---------|
-| `financial_data_handling` | PCI scope assessment and data residency requirements |
-| `transaction_controls` | Kill switch, segregation of duties, approval roles |
-| `regulatory_scope` | Applicable regulations (GLBA, BSA/AML, FINRA, SEC) |
-| `financial_risk_management` | Model risk tier, AML controls, KYC refresh cadence |
-| `data_classification.financial` | Financial data types and PCI applicability |
+| `financial_data_handling` | PCI scope assessment and multi-jurisdiction data residency |
+| `transaction_controls` | Transaction limits, pre-trade checks, kill switch, segregation of duties |
+| `regulatory_scope` | Banking + brokerage regulations and record retention |
+| `financial_risk_management` | Model risk tier, AML controls, operational risk capital |
+| `data_classification.financial` | Banking and brokerage data types |
 
 ### Compliance Highlights
 
 - **Authentication**: Mutual TLS (mTLS) for all connections
 - **Encryption**: TLS 1.3 in transit, AES-256-GCM at rest
-- **Kill Switch**: Triggered on error rate threshold or anomaly detection
+- **Kill Switch**: Triggered on error rate threshold or anomaly detection (required under MiFID II)
 - **Segregation of Duties**: SAR filing requires Compliance Officer approval
 - **Record Retention**: 5-year minimum, tamper-proof storage
-- **AML**: Real-time transaction monitoring, annual KYC refresh
+- **AML**: Real-time monitoring across banking and brokerage, annual KYC refresh
+
+## Composed with the Governance Profile
+
+The Financial Profile is designed to compose with the
+[Governance Profile](../../governance/overview). The composite example below declares both
+`urn:adl:profile:governance:1.0` and `urn:adl:profile:financial:1.0`, adding the
+governance-required `autonomy` and `compliance_framework` members on top of the
+financial members above.
+
+<CodeTabs json={governanceFinancialAgent} title="composite/governance-financial-agent.adl" />

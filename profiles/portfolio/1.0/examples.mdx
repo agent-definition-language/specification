@@ -8,6 +8,7 @@ keywords: [adl, portfolio, example, agent relationships, orchestration, domain, 
 
 import CodeTabs from '@site/src/components/CodeTabs';
 import customerServiceAgent from './examples/customer-service-agent.json';
+import registryPortfolioAgent from './examples/composite/registry-portfolio-agent.json';
 
 # Portfolio Profile Examples
 
@@ -39,3 +40,12 @@ support-orchestrator (orchestrator)
 ```
 
 Dependencies: `knowledge-base-agent`, `ticket-api-agent`, `customer-data-agent`
+
+## Composed with the Registry Profile
+
+The Portfolio Profile composes with other profiles via `allOf`. This composite
+example declares both `urn:adl:profile:registry:1.0` and
+`urn:adl:profile:portfolio:1.0`, pairing catalog identity with the relationship
+and domain members above.
+
+<CodeTabs json={registryPortfolioAgent} title="composite/registry-portfolio-agent.adl" />

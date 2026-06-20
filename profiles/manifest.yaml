@@ -206,7 +206,7 @@ profiles:
     dependencies: []
     overview: "The Financial Profile extends ADL for financial services with PCI-DSS, SOX, GLBA, and MiFID II compliance."
     keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
-    example_filename: "trade-compliance-agent.json"
+    example_filename: "financial-compliance-agent.json"
     sections:
       - id: introduction
         number: "1"
