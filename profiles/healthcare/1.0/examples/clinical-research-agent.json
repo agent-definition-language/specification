@@ -139,6 +139,12 @@
       "compliant": true
     }
   },
+  "autonomy": {
+    "tier": 1,
+    "basis": "Supervised clinical research support; cohort outputs reviewed by the Principal Investigator.",
+    "classified_by": "HealthTech Compliance Team",
+    "classified_at": "2026-01-15T00:00:00Z"
+  },
   "compliance_framework": {
     "primary_framework": "HIPAA",
     "control_mappings": [

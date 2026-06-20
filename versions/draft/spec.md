@@ -1219,9 +1219,24 @@ Profiles extend the base ADL schema using the JSON Schema 2020-12 `allOf` compos
 
 1. References the base ADL schema via `allOf` with `$ref`.
 2. Declares the profile's additional top-level members in its own `properties`.
-3. Adds `unevaluatedProperties: false` to close the composed schema, ensuring only base ADL members, profile-defined members, and `extensions` members are accepted.
+3. Is an **open additive mixin**: it **MUST NOT** set `unevaluatedProperties` or `additionalProperties` at its root. A profile schema **MAY** still close its own sub-objects with `additionalProperties: false` (each providing an `extensions` escape), because those constraints are scoped to a single member and do not interfere with other profiles.
 
-The base ADL schema (Appendix A) does not restrict unknown top-level properties — it declares `properties` and `patternProperties` but omits `additionalProperties` and `unevaluatedProperties`. This allows profile schemas to add members via composition without conflict. For documents that do not declare any profiles, validators **SHOULD** use the strict schema (`schema-strict.json`), which adds `unevaluatedProperties: false` to reject unknown top-level members.
+A profile schema **MUST NOT** close its own root because `unevaluatedProperties` is annotation-scoped: a `$ref`'d schema only "sees" the properties it evaluated itself, so a self-closed profile would reject members contributed by any other profile — breaking composition (§13.2) and even a profile's own dependencies (§13.3). Instead, closure is applied **once, at the composition root**, over the full set of declared profiles. A validator constructs the effective schema for a document as:
+
+```json
+{
+  "allOf": [
+    { "$ref": "https://adl-spec.org/0.3/schema.json" },
+    { "$ref": "https://adl-spec.org/profiles/example-a/1.0/schema.json" },
+    { "$ref": "https://adl-spec.org/profiles/example-b/1.0/schema.json" }
+  ],
+  "unevaluatedProperties": false
+}
+```
+
+This accepts exactly the union of base ADL members, every declared profile's members, and `extensions` members (reserved at every object level, §4.3), and rejects anything else.
+
+The base ADL schema (Appendix A) follows the same principle: it declares `properties` and `patternProperties` but omits `additionalProperties` and `unevaluatedProperties`, so it is itself an open building block onto which closure is layered. For documents that declare no profiles, validators **SHOULD** use the strict schema (`schema-strict.json`), which applies `unevaluatedProperties: false` over the base alone.
 
 Profile schemas **MUST NOT** redefine core ADL members with incompatible types. Profiles **MAY**:
 
@@ -1233,15 +1248,15 @@ Profile schemas **MUST NOT** redefine core ADL members with incompatible types. 
 
 ### 13.2 Multi-Profile Composition
 
-When a document declares multiple profiles, the document **MUST** satisfy all declared profile requirements. Validators compose profile schemas using `allOf` — each profile's schema is included as an element. JSON Schema `allOf` uses "strictest wins" semantics: if any profile requires a member, the composed result requires it.
+When a document declares multiple profiles, the document **MUST** satisfy all declared profile requirements. Validators compose profile schemas using `allOf` as shown in §13.1 — the base schema and each declared profile's schema are included as elements, and `unevaluatedProperties: false` is applied once at the composition root. JSON Schema `allOf` uses "strictest wins" semantics: if any profile requires a member, the composed result requires it.
 
-Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles. For standard profiles, the IANA profile registry designated expert review (see Section 13.5) prevents cross-profile field naming conflicts. Vendor profiles avoid conflicts through their reverse-domain namespace isolation.
+Profiles **MUST** be designed for independent composition. A profile's validation rules **MUST NOT** assume the absence of members defined by other profiles, and a profile schema **MUST NOT** close its own root (§13.1). For standard profiles, the IANA profile registry designated expert review (see Section 13.5) prevents cross-profile field naming conflicts. Vendor profiles avoid conflicts through their reverse-domain namespace isolation.
 
 ### 13.3 Profile Dependencies
 
 A profile **MAY** declare dependencies on other profiles. When a profile declares a dependency, documents using that profile **MUST** also satisfy the dependency profile's requirements. The `profiles` array **MUST** include all transitive dependencies.
 
-At the schema level, a dependent profile composes its parent via `allOf`:
+At the schema level, a dependent profile composes its parent via `allOf`. Like every profile schema it is an open mixin (§13.1) and **MUST NOT** close its own root — closure is applied by the validator over the full set of declared profiles:
 
 ```json
 {
@@ -1251,8 +1266,7 @@ At the schema level, a dependent profile composes its parent via `allOf`:
   ],
   "properties": {
     "hipaa_data_handling": { "type": "object" }
-  },
-  "unevaluatedProperties": false
+  }
 }
 ```
 

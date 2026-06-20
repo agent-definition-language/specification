@@ -63,5 +63,5 @@
       "additionalProperties": false
     }
   },
-  "unevaluatedProperties": false
+  "$comment": "Open additive mixin: intentionally has no root unevaluatedProperties so this profile composes with others via allOf (spec 13.2). Validators apply unevaluatedProperties:false once over the composed schema (base + all declared profiles), per spec 13.1."
 }

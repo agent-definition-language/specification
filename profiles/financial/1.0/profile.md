@@ -411,6 +411,12 @@ Example:
       "kyc_refresh_days": 365
     }
   },
+  "autonomy": {
+    "tier": 1,
+    "basis": "Supervised compliance monitoring; all reportable actions require human confirmation.",
+    "classified_by": "FinSecure Compliance Team",
+    "classified_at": "2026-01-01T00:00:00Z"
+  },
   "compliance_framework": {
     "primary_framework": "NIST_800_53",
     "control_mappings": [

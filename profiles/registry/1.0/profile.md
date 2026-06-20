@@ -163,7 +163,7 @@ The registry profile provides a JSON Schema ([`schema.json`](schema.json)) that 
 
 1. References the base ADL schema via `allOf` with `$ref`.
 2. Declares all registry-specific members in its own `properties`.
-3. Adds `unevaluatedProperties: false` to reject members not defined by either the base schema or this profile.
+3. Is an open additive mixin: it does **not** set a root `unevaluatedProperties`, so it composes with other profiles via `allOf`. Closure (`unevaluatedProperties: false`) is applied once over the composed schema per Section 13.1 of the core specification.
 
 Validators **SHOULD** use this schema for structural validation of documents declaring the registry profile.
 

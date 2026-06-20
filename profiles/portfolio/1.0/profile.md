@@ -157,7 +157,7 @@ The portfolio profile provides a JSON Schema ([`schema.json`](schema.json)) that
 1. References the base ADL schema via `allOf` with `$ref`.
 2. Declares all portfolio-specific members in its own `properties`.
 3. Uses `anyOf` to enforce that at least one of `relationships` or `domain` is present.
-4. Adds `unevaluatedProperties: false` to reject members not defined by either the base schema or this profile.
+4. Is an open additive mixin: it does **not** set a root `unevaluatedProperties`, so it composes with other profiles via `allOf`. Closure (`unevaluatedProperties: false`) is applied once over the composed schema per Section 13.1 of the core specification.
 
 Validators **SHOULD** use this schema for structural validation of documents declaring the portfolio profile.
 

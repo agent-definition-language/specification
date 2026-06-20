@@ -699,7 +699,7 @@ The governance profile provides a JSON Schema ([`schema.json`](schema.json)) tha
 1. References the base ADL schema via `allOf` with `$ref`.
 2. Declares all governance-specific members in its own `properties`.
 3. Enforces tier-conditional requirements using `if`/`then` on `autonomy.tier`.
-4. Adds `unevaluatedProperties: false` to reject members not defined by either the base schema or this profile.
+4. Is an open additive mixin: it does **not** set a root `unevaluatedProperties`, so it composes with other profiles via `allOf`. Closure (`unevaluatedProperties: false`) is applied once over the composed schema per Section 13.1 of the core specification.
 
 Validators **SHOULD** use this schema for structural validation of documents declaring the governance profile. Semantic validation rules (GOV-01 through GOV-24) that cannot be expressed in JSON Schema **MUST** be enforced programmatically.
 
