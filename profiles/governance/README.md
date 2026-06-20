@@ -11,7 +11,7 @@ keywords: [adl, governance specification, ai compliance, ai audit, soc2, nist 80
 
 **Identifier:** `urn:adl:profile:governance:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.2.x
+**ADL Compatibility:** 0.3.x
 
 > **Note:** This profile is in **draft** status. The specification is stable for early adoption, but minor changes may occur before 1.0.
 
@@ -34,7 +34,7 @@ Add the Governance Profile to your ADL document:
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance.",
   "version": "1.0.0",

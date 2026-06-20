@@ -1,6 +1,6 @@
 {
   "$schema": "https://adl-spec.org/profiles/governance/1.0/schema.json",
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Autonomous Risk Assessment Agent",
   "description": "Performs continuous risk assessment across the enterprise portfolio. Independently identifies, classifies, and prioritizes risks. Escalates critical findings and generates regulatory reports without human initiation.",
   "version": "1.0.0",

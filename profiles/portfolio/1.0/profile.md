@@ -13,7 +13,7 @@ adl_profile_meta:
 
 **Identifier:** `urn:adl:profile:portfolio:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.2.x
+**ADL Compatibility:** 0.3.x
 **Schema:** [`schema.json`](schema.json)
 **Dependencies:** None
 
@@ -107,7 +107,7 @@ When present, describes the agent's role within the domain (e.g., "primary-handl
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Customer Service Agent",
   "description": "Handles tier-1 customer inquiries and support requests.",
   "version": "1.2.0",

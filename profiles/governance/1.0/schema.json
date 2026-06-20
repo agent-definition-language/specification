@@ -17,7 +17,7 @@
     }
   },
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.1/schema.json" }
+    { "$ref": "https://adl-spec.org/0.3/schema.json" }
   ],
   "type": "object",
   "required": ["compliance_framework", "autonomy"],

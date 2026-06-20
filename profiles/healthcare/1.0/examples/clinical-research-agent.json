@@ -1,6 +1,6 @@
 {
-  "$schema": "https://adl-spec.org/0.1/schema.json",
-  "adl_spec": "0.1.0",
+  "$schema": "https://adl-spec.org/0.3/schema.json",
+  "adl_spec": "0.3.0",
   "name": "Clinical Research Assistant",
   "description": "Assists researchers with patient record analysis and clinical trial matching.",
   "version": "1.0.0",

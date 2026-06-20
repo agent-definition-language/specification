@@ -14,7 +14,7 @@ This document tracks compatibility between Healthcare Profile versions and ADL s
 
 | Profile Version | ADL Versions | Status | Notes |
 |-----------------|--------------|--------|-------|
-| 1.0             | 0.2.x        | Draft  | Initial release |
+| 1.0             | 0.3.x        | Draft  | Initial release |
 
 ## Compatibility Policy
 

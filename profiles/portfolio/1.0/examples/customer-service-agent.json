@@ -1,6 +1,6 @@
 {
   "$schema": "https://adl-spec.org/profiles/portfolio/1.0/schema.json",
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Customer Service Agent",
   "description": "Handles tier-1 customer inquiries and support requests via chat and email channels.",
   "version": "1.2.0",

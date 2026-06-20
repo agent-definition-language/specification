@@ -13,7 +13,7 @@ adl_profile_meta:
 
 **Identifier:** `urn:adl:profile:governance:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.2.x
+**ADL Compatibility:** 0.3.x
 **Schema:** [`schema.json`](schema.json)
 **Dependencies:** None
 
@@ -541,7 +541,7 @@ A Tier 2 agent with conformance tier, oversight triggers, disclosure, and incide
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance. Flags potential violations and recommends remediation actions.",
   "version": "2.0.0",

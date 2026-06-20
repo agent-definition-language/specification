@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://adl-spec.org/profiles/financial/1.0/schema.json",
+  "title": "ADL Financial Profile",
+  "description": "JSON Schema for ADL documents declaring the financial profile (urn:adl:profile:financial:1.0). Extends the base ADL schema via allOf composition.",
+  "$defs": {
+    "extensions": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z0-9-]*(\\.[a-z][a-z0-9-]*)+$": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "description": "Vendor-namespaced extensions. Keys are reverse-domain identifiers."
+    }
+  },
+  "allOf": [
+    { "$ref": "https://adl-spec.org/0.3/schema.json" },
+    {
+      "comment": "FIN-03: when the agent operates in the cardholder data environment, financial data types MUST include cardholder_data.",
+      "if": {
+        "required": ["financial_data_handling"],
+        "properties": {
+          "financial_data_handling": {
+            "required": ["pci_scope"],
+            "properties": {
+              "pci_scope": {
+                "required": ["in_scope"],
+                "properties": { "in_scope": { "const": true } }
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "data_classification": {
+            "properties": {
+              "financial": {
+                "properties": {
+                  "data_types": { "contains": { "const": "cardholder_data" } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "comment": "FIN-11: MiFID II record-keeping requires at least five years (1825 days) of retention.",
+      "if": {
+        "required": ["regulatory_scope"],
+        "properties": {
+          "regulatory_scope": {
+            "required": ["applicable_regulations"],
+            "properties": {
+              "applicable_regulations": { "contains": { "const": "MIFID_II" } }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "regulatory_scope": {
+            "required": ["record_retention"],
+            "properties": {
+              "record_retention": {
+                "required": ["min_retention_days"],
+                "properties": {
+                  "min_retention_days": { "type": "number", "minimum": 1825 }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "comment": "FIN-12: when MiFID II applies and transaction controls are present, the kill switch MUST be enabled.",
+      "if": {
+        "required": ["regulatory_scope", "transaction_controls"],
+        "properties": {
+          "regulatory_scope": {
+            "required": ["applicable_regulations"],
+            "properties": {
+              "applicable_regulations": { "contains": { "const": "MIFID_II" } }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "transaction_controls": {
+            "required": ["kill_switch"],
+            "properties": {
+              "kill_switch": {
+                "required": ["enabled"],
+                "properties": { "enabled": { "const": true } }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "type": "object",
+  "required": ["financial_data_handling"],
+  "properties": {
+    "profiles": {
+      "type": "array",
+      "contains": { "const": "urn:adl:profile:financial:1.0" }
+    },
+    "data_classification": {
+      "type": "object",
+      "required": ["financial"],
+      "properties": {
+        "categories": { "contains": { "const": "financial" } },
+        "financial": {
+          "type": "object",
+          "required": ["data_types"],
+          "properties": {
+            "data_types": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "cardholder_data",
+                  "sensitive_auth_data",
+                  "nonpublic_personal_info",
+                  "transaction_data",
+                  "market_data",
+                  "financial_reports",
+                  "material_nonpublic_info"
+                ]
+              }
+            },
+            "pci_applicable": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "financial_data_handling": {
+      "type": "object",
+      "properties": {
+        "pci_scope": {
+          "type": "object",
+          "required": ["in_scope"],
+          "properties": {
+            "in_scope": { "type": "boolean" },
+            "saq_type": { "type": "string" },
+            "tokenization_required": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "data_residency": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["jurisdiction"],
+            "properties": {
+              "jurisdiction": { "type": "string", "minLength": 1 },
+              "regulation": { "type": "string" },
+              "extensions": { "$ref": "#/$defs/extensions" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
+    },
+    "transaction_controls": {
+      "type": "object",
+      "properties": {
+        "transaction_limits": {
+          "type": "object",
+          "properties": {
+            "max_single_amount": { "type": "number" },
+            "max_daily_volume": { "type": "number" },
+            "currency": { "type": "string" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "pre_execution_controls": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "price_tolerance_pct": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 100
+            },
+            "throttle_per_second": { "type": "number", "minimum": 0 },
+            "requires_approval_above": { "type": "number" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "kill_switch": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "trigger_conditions": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "notification_targets": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "segregation_of_duties": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "restricted_actions": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "approval_role": { "type": "string" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
+    },
+    "regulatory_scope": {
+      "type": "object",
+      "required": ["applicable_regulations"],
+      "properties": {
+        "applicable_regulations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "enum": [
+              "PCI_DSS_V4",
+              "SOX",
+              "GLBA",
+              "BASEL_III",
+              "FINRA",
+              "SEC_REG",
+              "DORA",
+              "MIFID_II",
+              "BSA_AML",
+              "EU_AMLD"
+            ]
+          }
+        },
+        "jurisdictions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["jurisdiction"],
+            "properties": {
+              "jurisdiction": { "type": "string", "minLength": 1 },
+              "regulation": { "type": "string" },
+              "extensions": { "$ref": "#/$defs/extensions" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "reporting_obligations": {
+          "type": "object",
+          "properties": {
+            "authorities": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "frequency": {
+              "type": "string",
+              "enum": ["real_time", "daily", "monthly", "quarterly", "annual"]
+            },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "record_retention": {
+          "type": "object",
+          "properties": {
+            "min_retention_days": { "type": "number", "minimum": 0 },
+            "tamper_proof": { "type": "boolean" },
+            "format": { "type": "string" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
+    },
+    "financial_risk_management": {
+      "type": "object",
+      "properties": {
+        "model_risk": {
+          "type": "object",
+          "properties": {
+            "tier": {
+              "type": "string",
+              "enum": ["tier_1", "tier_2", "tier_3"]
+            },
+            "validated_by": { "type": "string" },
+            "validated_at": { "type": "string", "format": "date-time" },
+            "methodology": { "type": "string" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "aml_controls": {
+          "type": "object",
+          "properties": {
+            "screening_required": { "type": "boolean" },
+            "monitoring_level": {
+              "type": "string",
+              "enum": ["real_time", "daily", "periodic"]
+            },
+            "kyc_refresh_days": { "type": "number", "minimum": 0 },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "operational_risk": {
+          "type": "object",
+          "properties": {
+            "category": {
+              "type": "string",
+              "enum": ["low", "medium", "high", "critical"]
+            },
+            "assessed_by": { "type": "string" },
+            "assessed_at": { "type": "string", "format": "date-time" },
+            "capital_reserve": { "type": "boolean" },
+            "extensions": { "$ref": "#/$defs/extensions" }
+          },
+          "additionalProperties": false
+        },
+        "extensions": { "$ref": "#/$defs/extensions" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "unevaluatedProperties": false
+}

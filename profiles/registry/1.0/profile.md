@@ -13,7 +13,7 @@ adl_profile_meta:
 
 **Identifier:** `urn:adl:profile:registry:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.2.x
+**ADL Compatibility:** 0.3.x
 **Schema:** [`schema.json`](schema.json)
 **Dependencies:** None
 
@@ -107,7 +107,7 @@ A registered agent with multi-path classification and federation:
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
   "version": "2.0.0",

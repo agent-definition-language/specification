@@ -11,7 +11,7 @@ keywords: [adl, registry specification, agent catalog, agent registry, agentic a
 
 **Identifier:** `urn:adl:profile:registry:1.0`
 **Status:** Draft
-**ADL Compatibility:** 0.2.x
+**ADL Compatibility:** 0.3.x
 
 > **Note:** This profile is in **draft** status. The specification is stable for early adoption, but minor changes may occur before 1.0.
 
@@ -35,7 +35,7 @@ Add the Registry Profile to your ADL document:
 
 ```json
 {
-  "adl_spec": "0.1.0",
+  "adl_spec": "0.3.0",
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance.",
   "version": "2.0.0",
