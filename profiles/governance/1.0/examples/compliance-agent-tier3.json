@@ -4,14 +4,19 @@
   "name": "Autonomous Risk Assessment Agent",
   "description": "Performs continuous risk assessment across the enterprise portfolio. Independently identifies, classifies, and prioritizes risks. Escalates critical findings and generates regulatory reports without human initiation.",
   "version": "1.0.0",
-  "profiles": ["urn:adl:profile:governance:1.0", "urn:adl:profile:registry:1.0"],
+  "profiles": [
+    "urn:adl:profile:governance:1.0"
+  ],
   "lifecycle": {
     "status": "active",
     "effective_date": "2026-02-01T00:00:00Z"
   },
   "data_classification": {
     "sensitivity": "restricted",
-    "categories": ["regulatory", "financial"]
+    "categories": [
+      "regulatory",
+      "financial"
+    ]
   },
   "provider": {
     "name": "Acme Risk Management",
@@ -19,7 +24,9 @@
     "contact": "risk-platform@acme.example"
   },
   "model": {
-    "capabilities": ["function_calling"]
+    "capabilities": [
+      "function_calling"
+    ]
   },
   "tools": [
     {
@@ -28,10 +35,21 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "scope": { "type": "string", "enum": ["full", "incremental"] },
-          "since": { "type": "string", "format": "date-time" }
+          "scope": {
+            "type": "string",
+            "enum": [
+              "full",
+              "incremental"
+            ]
+          },
+          "since": {
+            "type": "string",
+            "format": "date-time"
+          }
         },
-        "required": ["scope"]
+        "required": [
+          "scope"
+        ]
       },
       "read_only": true
     },
@@ -41,10 +59,19 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "finding_id": { "type": "string" },
-          "evidence": { "type": "array", "items": { "type": "string" } }
+          "finding_id": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
         },
-        "required": ["finding_id"]
+        "required": [
+          "finding_id"
+        ]
       }
     },
     {
@@ -53,28 +80,60 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "report_type": { "type": "string", "enum": ["quarterly", "annual", "incident"] },
-          "period_start": { "type": "string", "format": "date" },
-          "period_end": { "type": "string", "format": "date" }
+          "report_type": {
+            "type": "string",
+            "enum": [
+              "quarterly",
+              "annual",
+              "incident"
+            ]
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date"
+          }
         },
-        "required": ["report_type"]
+        "required": [
+          "report_type"
+        ]
       },
       "requires_confirmation": true
     }
   ],
   "permissions": {
     "network": {
-      "allowed_hosts": ["risk-api.acme.example", "data.acme.example", "notifications.acme.example"],
-      "allowed_protocols": ["https"],
+      "allowed_hosts": [
+        "risk-api.acme.example",
+        "data.acme.example",
+        "notifications.acme.example"
+      ],
+      "allowed_protocols": [
+        "https"
+      ],
       "deny_private": true
     },
     "filesystem": {
       "allowed_paths": [
-        { "path": "/data/risk-assessments/**", "access": "read_write" },
-        { "path": "/data/portfolio/**", "access": "read" },
-        { "path": "/data/regulatory/**", "access": "read" }
+        {
+          "path": "/data/risk-assessments/**",
+          "access": "read_write"
+        },
+        {
+          "path": "/data/portfolio/**",
+          "access": "read"
+        },
+        {
+          "path": "/data/regulatory/**",
+          "access": "read"
+        }
       ],
-      "denied_paths": ["/data/risk-assessments/**/drafts"]
+      "denied_paths": [
+        "/data/risk-assessments/**/drafts"
+      ]
     },
     "resource_limits": {
       "max_memory_mb": 2048,
@@ -131,7 +190,12 @@
       "Finding implicates a regulatory filing deadline within 30 days",
       "Agent detects potential fraud indicators",
       "Cumulative risk score for any business unit exceeds threshold",
-      { "description": "Large remediation spend", "when": { "cost_usd_over": 5000 } }
+      {
+        "description": "Large remediation spend",
+        "when": {
+          "cost_usd_over": 5000
+        }
+      }
     ],
     "response_time_minutes": 30,
     "intervention_model": "approve_reject"
@@ -169,7 +233,11 @@
     "lifecycle_governance": {
       "transition_policy": {
         "requires_approval": true,
-        "approvers": ["cro", "ciso", "ai-safety-board"],
+        "approvers": [
+          "cro",
+          "ciso",
+          "ai-safety-board"
+        ],
         "approval_type": "all",
         "notice_period_days": 30
       }
@@ -211,30 +279,42 @@
   "governance_record_ref": "https://gorvnd.acme.example/agents/risk-assessment/governance-record",
   "anomaly_baseline": {
     "expected_tools": [
-      { "name": "assess_risk", "share": 0.5 },
-      { "name": "lookup_regulation", "share": 0.3 },
-      { "name": "generate_report", "share": 0.2 }
-    ],
-    "cost_per_session_usd": { "min": 0.05, "max": 8.0 },
-    "data_classes": ["financial", "regulatory"]
-  },
-  "registry": {
-    "catalog_id": "urn:acme:agents:risk-assessment:1.0.0",
-    "catalog_classification": [
       {
-        "domain": "risk-management",
-        "subdomain": "portfolio-assessment",
-        "capability": "continuous-monitoring"
+        "name": "assess_risk",
+        "share": 0.5
+      },
+      {
+        "name": "lookup_regulation",
+        "share": 0.3
+      },
+      {
+        "name": "generate_report",
+        "share": 0.2
       }
     ],
-    "visibility": "internal"
+    "cost_per_session_usd": {
+      "min": 0.05,
+      "max": 8
+    },
+    "data_classes": [
+      "financial",
+      "regulatory"
+    ]
   },
   "metadata": {
     "authors": [
-      { "name": "Risk Management Team", "email": "risk-platform@acme.example" }
+      {
+        "name": "Risk Management Team",
+        "email": "risk-platform@acme.example"
+      }
     ],
     "license": "Proprietary",
     "documentation": "https://docs.acme.example/agents/risk-assessment",
-    "tags": ["risk", "autonomous", "enterprise", "restricted"]
+    "tags": [
+      "risk",
+      "autonomous",
+      "enterprise",
+      "restricted"
+    ]
   }
 }

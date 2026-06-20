@@ -6,7 +6,7 @@ slug: ../specification
 description: "Full specification for the ADL Financial Profile including PCI-DSS, SOX, GLBA, MiFID II, and AML/KYC compliance."
 keywords: [adl, financial specification, pci-dss, sox, glba, mifid, aml, agentic ai, financial ai compliance, fintech ai, ai risk management]
 adl_profile_meta:
-  example_filename: "trade-compliance-agent.adl.json"
+  example_filename: "trade-compliance-agent.json"
 ---
 
 # Financial Profile Specification
@@ -281,12 +281,12 @@ Example:
 
 ```json
 {
+  "$schema": "https://adl-spec.org/0.3/schema.json",
   "adl_spec": "0.3.0",
   "name": "Trade Compliance Monitor",
   "description": "Monitors trading activity for regulatory compliance and suspicious patterns.",
   "version": "1.0.0",
   "profiles": [
-    "urn:adl:profile:governance:1.0",
     "urn:adl:profile:financial:1.0"
   ],
   "lifecycle": {
@@ -299,7 +299,9 @@ Example:
     "contact": "compliance@finsecure.example"
   },
   "model": {
-    "capabilities": ["function_calling"]
+    "capabilities": [
+      "function_calling"
+    ]
   },
   "tools": [
     {
@@ -308,10 +310,17 @@ Example:
       "parameters": {
         "type": "object",
         "properties": {
-          "account_id": { "type": "string" },
-          "lookback_days": { "type": "integer", "default": 30 }
+          "account_id": {
+            "type": "string"
+          },
+          "lookback_days": {
+            "type": "integer",
+            "default": 30
+          }
         },
-        "required": ["account_id"]
+        "required": [
+          "account_id"
+        ]
       },
       "read_only": true
     },
@@ -321,25 +330,52 @@ Example:
       "parameters": {
         "type": "object",
         "properties": {
-          "transaction_ids": { "type": "array", "items": { "type": "string" } },
-          "narrative": { "type": "string" },
-          "priority": { "type": "string", "enum": ["routine", "expedited"] }
+          "transaction_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "narrative": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "routine",
+              "expedited"
+            ]
+          }
         },
-        "required": ["transaction_ids", "narrative"]
+        "required": [
+          "transaction_ids",
+          "narrative"
+        ]
       },
       "requires_confirmation": true
     }
   ],
   "permissions": {
     "network": {
-      "allowed_hosts": ["api.finsecure.example", "fincen.gov"],
-      "allowed_protocols": ["https"],
+      "allowed_hosts": [
+        "api.finsecure.example",
+        "fincen.gov"
+      ],
+      "allowed_protocols": [
+        "https"
+      ],
       "deny_private": true
     },
     "filesystem": {
       "allowed_paths": [
-        { "path": "/data/transactions/**", "access": "read" },
-        { "path": "/data/reports/**", "access": "read_write" }
+        {
+          "path": "/data/transactions/**",
+          "access": "read"
+        },
+        {
+          "path": "/data/reports/**",
+          "access": "read_write"
+        }
       ]
     }
   },
@@ -349,13 +385,22 @@ Example:
       "required": true
     },
     "encryption": {
-      "in_transit": { "required": true, "min_version": "1.3" },
-      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
+      "in_transit": {
+        "required": true,
+        "min_version": "1.3"
+      },
+      "at_rest": {
+        "required": true,
+        "algorithm": "AES-256-GCM"
+      }
     }
   },
   "data_classification": {
     "sensitivity": "confidential",
-    "categories": ["pii", "financial"],
+    "categories": [
+      "pii",
+      "financial"
+    ],
     "retention": {
       "min_days": 1825
     },
@@ -364,7 +409,10 @@ Example:
       "logging_required": true
     },
     "financial": {
-      "data_types": ["transaction_data", "nonpublic_personal_info"],
+      "data_types": [
+        "transaction_data",
+        "nonpublic_personal_info"
+      ],
       "pci_applicable": false
     }
   },
@@ -373,25 +421,37 @@ Example:
       "in_scope": false
     },
     "data_residency": [
-      { "jurisdiction": "US", "regulation": "GLBA" }
+      {
+        "jurisdiction": "US",
+        "regulation": "GLBA"
+      }
     ]
   },
   "transaction_controls": {
     "kill_switch": {
       "enabled": true,
-      "trigger_conditions": ["error_rate_threshold", "anomaly_detection"],
-      "notification_targets": ["compliance-team@finsecure.example"]
+      "trigger_conditions": [
+        "error_rate_threshold",
+        "anomaly_detection"
+      ],
+      "notification_targets": [
+        "compliance-team@finsecure.example"
+      ]
     },
     "segregation_of_duties": {
       "enabled": true,
-      "restricted_actions": ["file_sar"],
+      "restricted_actions": [
+        "file_sar"
+      ],
       "approval_role": "Compliance Officer"
     }
   },
   "regulatory_scope": {
-    "applicable_regulations": ["GLBA", "BSA_AML", "FINRA", "SEC_REG"],
-    "jurisdictions": [
-      { "jurisdiction": "US", "regulation": "BSA_AML" }
+    "applicable_regulations": [
+      "GLBA",
+      "BSA_AML",
+      "FINRA",
+      "SEC_REG"
     ],
     "record_retention": {
       "min_retention_days": 1825,
@@ -411,26 +471,20 @@ Example:
       "kyc_refresh_days": 365
     }
   },
-  "autonomy": {
-    "tier": 1,
-    "basis": "Supervised compliance monitoring; all reportable actions require human confirmation.",
-    "classified_by": "FinSecure Compliance Team",
-    "classified_at": "2026-01-01T00:00:00Z"
-  },
-  "compliance_framework": {
-    "primary_framework": "NIST_800_53",
-    "control_mappings": [
-      { "framework": "NIST", "control_id": "AU-2", "status": "implemented" },
-      { "framework": "NIST", "control_id": "AC-5", "status": "implemented" },
-      { "framework": "NIST", "control_id": "SC-13", "status": "implemented" }
-    ]
-  },
   "metadata": {
     "authors": [
-      { "name": "FinSecure Compliance Team", "email": "compliance@finsecure.example" }
+      {
+        "name": "FinSecure Compliance Team",
+        "email": "compliance@finsecure.example"
+      }
     ],
     "license": "Proprietary",
-    "tags": ["financial", "compliance", "aml", "trading"]
+    "tags": [
+      "financial",
+      "compliance",
+      "aml",
+      "trading"
+    ]
   }
 }
 ```

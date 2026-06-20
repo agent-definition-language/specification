@@ -6,7 +6,7 @@ slug: ../specification
 description: "Full specification for the ADL Healthcare Profile including HIPAA compliance, PHI handling, clinical safety, and FHIR interoperability."
 keywords: [adl, healthcare specification, hipaa, phi, fhir, clinical ai, agentic ai, healthcare ai compliance, medical ai, ai safety]
 adl_profile_meta:
-  example_filename: "clinical-research-agent.adl.json"
+  example_filename: "clinical-research-agent.json"
 ---
 
 # Healthcare Profile Specification
@@ -308,12 +308,12 @@ Example:
 
 ```json
 {
+  "$schema": "https://adl-spec.org/0.3/schema.json",
   "adl_spec": "0.3.0",
   "name": "Clinical Research Assistant",
   "description": "Assists researchers with patient record analysis and clinical trial matching.",
   "version": "1.0.0",
   "profiles": [
-    "urn:adl:profile:governance:1.0",
     "urn:adl:profile:healthcare:1.0"
   ],
   "lifecycle": {
@@ -326,7 +326,9 @@ Example:
     "contact": "compliance@healthtech.example"
   },
   "model": {
-    "capabilities": ["function_calling"]
+    "capabilities": [
+      "function_calling"
+    ]
   },
   "tools": [
     {
@@ -335,10 +337,17 @@ Example:
       "parameters": {
         "type": "object",
         "properties": {
-          "criteria": { "type": "string" },
-          "limit": { "type": "integer", "default": 20 }
+          "criteria": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20
+          }
         },
-        "required": ["criteria"]
+        "required": [
+          "criteria"
+        ]
       },
       "read_only": true
     },
@@ -348,23 +357,44 @@ Example:
       "parameters": {
         "type": "object",
         "properties": {
-          "cohort_id": { "type": "string" },
-          "format": { "type": "string", "enum": ["pdf", "json"] }
+          "cohort_id": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "pdf",
+              "json"
+            ]
+          }
         },
-        "required": ["cohort_id"]
+        "required": [
+          "cohort_id"
+        ]
       }
     }
   ],
   "permissions": {
     "network": {
-      "allowed_hosts": ["ehr.healthtech.example", "fhir.healthtech.example"],
-      "allowed_protocols": ["https"],
+      "allowed_hosts": [
+        "ehr.healthtech.example",
+        "fhir.healthtech.example"
+      ],
+      "allowed_protocols": [
+        "https"
+      ],
       "deny_private": true
     },
     "filesystem": {
       "allowed_paths": [
-        { "path": "/data/deidentified/**", "access": "read" },
-        { "path": "/data/reports/**", "access": "read_write" }
+        {
+          "path": "/data/deidentified/**",
+          "access": "read"
+        },
+        {
+          "path": "/data/reports/**",
+          "access": "read_write"
+        }
       ]
     }
   },
@@ -372,16 +402,28 @@ Example:
     "authentication": {
       "type": "oauth2",
       "required": true,
-      "scopes": ["patient:read", "report:write"]
+      "scopes": [
+        "patient:read",
+        "report:write"
+      ]
     },
     "encryption": {
-      "in_transit": { "required": true, "min_version": "1.2" },
-      "at_rest": { "required": true, "algorithm": "AES-256-GCM" }
+      "in_transit": {
+        "required": true,
+        "min_version": "1.2"
+      },
+      "at_rest": {
+        "required": true,
+        "algorithm": "AES-256-GCM"
+      }
     }
   },
   "data_classification": {
     "sensitivity": "restricted",
-    "categories": ["pii", "phi"],
+    "categories": [
+      "pii",
+      "phi"
+    ],
     "retention": {
       "min_days": 2190
     },
@@ -390,7 +432,10 @@ Example:
       "logging_required": true
     },
     "healthcare": {
-      "phi_types": ["demographics", "medical_records"],
+      "phi_types": [
+        "demographics",
+        "medical_records"
+      ],
       "hipaa_applicability": true
     }
   },
@@ -422,7 +467,9 @@ Example:
     },
     "consent_management": {
       "required": true,
-      "consent_types": ["research"],
+      "consent_types": [
+        "research"
+      ],
       "granularity": "purpose_specific",
       "revocation_supported": true
     }
@@ -430,7 +477,12 @@ Example:
   "clinical_safety": {
     "bias_monitoring": {
       "enabled": true,
-      "protected_classes": ["race", "ethnicity", "sex", "age"],
+      "protected_classes": [
+        "race",
+        "ethnicity",
+        "sex",
+        "age"
+      ],
       "assessment_frequency": "quarterly",
       "last_assessment": "2026-01-01T00:00:00Z"
     },
@@ -442,31 +494,29 @@ Example:
   },
   "interoperability": {
     "fhir_version": "R4",
-    "terminology_bindings": ["ICD-10", "SNOMED-CT", "LOINC"],
+    "terminology_bindings": [
+      "ICD-10",
+      "SNOMED-CT",
+      "LOINC"
+    ],
     "information_blocking": {
       "compliant": true
     }
   },
-  "autonomy": {
-    "tier": 1,
-    "basis": "Supervised clinical research support; cohort outputs reviewed by the Principal Investigator.",
-    "classified_by": "HealthTech Compliance Team",
-    "classified_at": "2026-01-15T00:00:00Z"
-  },
-  "compliance_framework": {
-    "primary_framework": "HIPAA",
-    "control_mappings": [
-      { "framework": "HIPAA", "control_id": "§164.312(a)(1)", "status": "implemented" },
-      { "framework": "HIPAA", "control_id": "§164.312(e)(1)", "status": "implemented" },
-      { "framework": "NIST", "control_id": "AC-6", "status": "implemented" }
-    ]
-  },
   "metadata": {
     "authors": [
-      { "name": "HealthTech Compliance Team", "email": "compliance@healthtech.example" }
+      {
+        "name": "HealthTech Compliance Team",
+        "email": "compliance@healthtech.example"
+      }
     ],
     "license": "Proprietary",
-    "tags": ["healthcare", "hipaa", "clinical-research", "fhir"]
+    "tags": [
+      "healthcare",
+      "hipaa",
+      "clinical-research",
+      "fhir"
+    ]
   }
 }
 ```

@@ -4,18 +4,14 @@
   "name": "Compliance Review Agent",
   "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls. Flags potential violations and recommends remediation actions.",
   "version": "2.0.0",
-  "profiles": [
-    "urn:adl:profile:governance:1.0"
-  ],
+  "profiles": ["urn:adl:profile:governance:1.0", "urn:adl:profile:registry:1.0"],
   "lifecycle": {
     "status": "active",
     "effective_date": "2026-01-15T00:00:00Z"
   },
   "data_classification": {
     "sensitivity": "confidential",
-    "categories": [
-      "regulatory"
-    ]
+    "categories": ["regulatory"]
   },
   "provider": {
     "name": "Acme Compliance",
@@ -23,9 +19,7 @@
     "contact": "compliance@acme.example"
   },
   "model": {
-    "capabilities": [
-      "function_calling"
-    ]
+    "capabilities": ["function_calling"]
   },
   "tools": [
     {
@@ -34,17 +28,10 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "document_id": {
-            "type": "string"
-          },
-          "framework": {
-            "type": "string"
-          }
+          "document_id": { "type": "string" },
+          "framework": { "type": "string" }
         },
-        "required": [
-          "document_id",
-          "framework"
-        ]
+        "required": ["document_id", "framework"]
       },
       "read_only": true
     },
@@ -54,45 +41,23 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "review_id": {
-            "type": "string"
-          },
-          "format": {
-            "type": "string",
-            "enum": [
-              "pdf",
-              "json",
-              "html"
-            ]
-          }
+          "review_id": { "type": "string" },
+          "format": { "type": "string", "enum": ["pdf", "json", "html"] }
         },
-        "required": [
-          "review_id"
-        ]
+        "required": ["review_id"]
       }
     }
   ],
   "permissions": {
     "network": {
-      "allowed_hosts": [
-        "docs.acme.example",
-        "api.acme.example"
-      ],
-      "allowed_protocols": [
-        "https"
-      ],
+      "allowed_hosts": ["docs.acme.example", "api.acme.example"],
+      "allowed_protocols": ["https"],
       "deny_private": true
     },
     "filesystem": {
       "allowed_paths": [
-        {
-          "path": "/data/documents/**",
-          "access": "read"
-        },
-        {
-          "path": "/data/reports/**",
-          "access": "read_write"
-        }
+        { "path": "/data/documents/**", "access": "read" },
+        { "path": "/data/reports/**", "access": "read_write" }
       ]
     }
   },
@@ -100,10 +65,7 @@
     "authentication": {
       "type": "oauth2",
       "required": true,
-      "scopes": [
-        "compliance:read",
-        "compliance:write"
-      ]
+      "scopes": ["compliance:read", "compliance:write"]
     },
     "encryption": {
       "in_transit": {
@@ -169,10 +131,7 @@
     "lifecycle_governance": {
       "transition_policy": {
         "requires_approval": true,
-        "approvers": [
-          "security-team",
-          "compliance-lead"
-        ],
+        "approvers": ["security-team", "compliance-lead"],
         "approval_type": "all"
       },
       "last_transition": {
@@ -208,10 +167,7 @@
     },
     "approval_workflow": {
       "required": true,
-      "approvers": [
-        "compliance-lead",
-        "security-lead"
-      ],
+      "approvers": ["compliance-lead", "security-lead"],
       "approval_type": "all"
     },
     "audit_trail": {
@@ -221,19 +177,30 @@
     }
   },
   "governance_record_ref": "https://gorvnd.acme.example/agents/compliance-review/governance-record",
+  "registry": {
+    "catalog_id": "urn:acme:agents:compliance-review:2.0.0",
+    "catalog_classification": [
+      {
+        "domain": "compliance",
+        "subdomain": "document-review",
+        "capability": "soc2-review"
+      }
+    ],
+    "visibility": "internal",
+    "federation": {
+      "registries": [
+        "https://registry.acme.example",
+        "https://enterprise-agents.example"
+      ],
+      "primary": "https://registry.acme.example"
+    }
+  },
   "metadata": {
     "authors": [
-      {
-        "name": "Compliance Team",
-        "email": "compliance@acme.example"
-      }
+      { "name": "Compliance Team", "email": "compliance@acme.example" }
     ],
     "license": "Proprietary",
     "documentation": "https://docs.acme.example/agents/compliance-review",
-    "tags": [
-      "compliance",
-      "soc2",
-      "enterprise"
-    ]
+    "tags": ["compliance", "soc2", "enterprise"]
   }
 }

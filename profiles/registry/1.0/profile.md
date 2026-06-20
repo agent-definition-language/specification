@@ -6,7 +6,7 @@ slug: ../specification
 description: "Full specification for the ADL Registry Profile including agent catalog identity, classification, and federation."
 keywords: [adl, registry specification, agent catalog, agent registry, agentic ai, agent discovery, agent classification, agent federation]
 adl_profile_meta:
-  example_filename: "registered-agent.adl.json"
+  example_filename: "registered-agent.json"
 ---
 
 # Registry Profile Specification
@@ -107,9 +107,10 @@ A registered agent with multi-path classification and federation:
 
 ```json
 {
+  "$schema": "https://adl-spec.org/profiles/registry/1.0/schema.json",
   "adl_spec": "0.3.0",
   "name": "Compliance Review Agent",
-  "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls.",
+  "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls. Flags potential violations and recommends remediation actions.",
   "version": "2.0.0",
   "data_classification": {
     "sensitivity": "confidential",
@@ -135,6 +136,11 @@ A registered agent with multi-path classification and federation:
     }
   },
   "metadata": {
+    "authors": [
+      { "name": "Compliance Team", "email": "compliance@acme.example" }
+    ],
+    "license": "Proprietary",
+    "documentation": "https://docs.acme.example/agents/compliance-review",
     "tags": ["compliance", "soc2", "audit", "document-review"]
   }
 }

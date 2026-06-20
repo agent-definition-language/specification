@@ -6,7 +6,7 @@ slug: ../specification
 description: "Full specification for the ADL Portfolio Profile including agent relationships and domain membership."
 keywords: [adl, portfolio specification, multi-agent, agentic ai, agent orchestration, agent relationships, ai fleet management]
 adl_profile_meta:
-  example_filename: "customer-service-agent.adl.json"
+  example_filename: "customer-service-agent.json"
 ---
 
 # Portfolio Profile Specification
@@ -107,24 +107,143 @@ When present, describes the agent's role within the domain (e.g., "primary-handl
 
 ```json
 {
+  "$schema": "https://adl-spec.org/profiles/portfolio/1.0/schema.json",
   "adl_spec": "0.3.0",
   "name": "Customer Service Agent",
-  "description": "Handles tier-1 customer inquiries and support requests.",
+  "description": "Handles tier-1 customer inquiries and support requests via chat and email channels.",
   "version": "1.2.0",
+  "profiles": [
+    "urn:adl:profile:portfolio:1.0"
+  ],
   "data_classification": {
     "sensitivity": "internal",
-    "categories": ["pii"]
+    "categories": [
+      "pii"
+    ]
   },
-  "profiles": ["urn:adl:profile:portfolio:1.0"],
+  "provider": {
+    "name": "Acme Support",
+    "url": "https://support.acme.example",
+    "contact": "support-engineering@acme.example"
+  },
+  "model": {
+    "capabilities": [
+      "function_calling",
+      "streaming"
+    ]
+  },
+  "tools": [
+    {
+      "name": "search_knowledge_base",
+      "description": "Search the knowledge base for relevant articles",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 5
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "read_only": true
+    },
+    {
+      "name": "create_ticket",
+      "description": "Create a support ticket for escalation",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "urgent"
+            ]
+          },
+          "customer_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subject",
+          "description",
+          "customer_id"
+        ]
+      },
+      "requires_confirmation": true
+    },
+    {
+      "name": "get_customer_info",
+      "description": "Retrieve customer information",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "customer_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "customer_id"
+        ]
+      },
+      "read_only": true
+    }
+  ],
+  "permissions": {
+    "network": {
+      "allowed_hosts": [
+        "api.acme.example",
+        "kb.acme.example",
+        "tickets.acme.example"
+      ],
+      "allowed_protocols": [
+        "https"
+      ],
+      "deny_private": true
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "scopes": [
+        "customers:read",
+        "tickets:write",
+        "kb:read"
+      ]
+    },
+    "encryption": {
+      "in_transit": {
+        "required": true,
+        "min_version": "1.2"
+      }
+    }
+  },
   "relationships": {
     "depends_on": [
       "urn:adl:agent:acme:knowledge-base-agent:1.0",
-      "urn:adl:agent:acme:ticket-api-agent:2.0"
+      "urn:adl:agent:acme:ticket-api-agent:2.0",
+      "urn:adl:agent:acme:customer-data-agent:1.5"
     ],
     "orchestrated_by": "urn:adl:agent:acme:support-orchestrator:1.0",
     "peers": [
       "urn:adl:agent:acme:billing-support-agent:1.0",
-      "urn:adl:agent:acme:technical-support-agent:1.0"
+      "urn:adl:agent:acme:technical-support-agent:1.0",
+      "urn:adl:agent:acme:returns-agent:1.0"
     ]
   },
   "domain": {
@@ -132,6 +251,21 @@ When present, describes the agent's role within the domain (e.g., "primary-handl
     "subdomain": "inquiries",
     "bounded_context": "support-portal",
     "role": "primary-handler"
+  },
+  "metadata": {
+    "authors": [
+      {
+        "name": "Support Engineering",
+        "email": "support-engineering@acme.example"
+      }
+    ],
+    "license": "Proprietary",
+    "documentation": "https://docs.acme.example/agents/customer-service",
+    "tags": [
+      "customer-service",
+      "support",
+      "production"
+    ]
   }
 }
 ```

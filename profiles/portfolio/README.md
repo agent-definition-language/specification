@@ -90,6 +90,7 @@ Organizations that need catalog identity alongside portfolio relationships decla
 - [Profile Specification (1.0)](./1.0/profile.md)
 - [Compatibility](./COMPATIBILITY.md)
 - [Examples](./1.0/examples/)
+- [Composite example](./1.0/examples/composite/registry-portfolio-agent.json) — this profile declared together with the Registry Profile
 
 ## Maintainers
 

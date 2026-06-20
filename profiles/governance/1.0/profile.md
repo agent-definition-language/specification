@@ -6,7 +6,7 @@ slug: ../specification
 description: "Full specification for the ADL Governance Profile including compliance frameworks, AI governance, and audit trails."
 keywords: [adl, governance specification, ai compliance, ai audit, soc2, nist 800-53, iso 27001, eu ai act, agentic ai, ai governance, responsible ai]
 adl_profile_meta:
-  example_filename: "compliance-review-agent.adl.json"
+  example_filename: "compliance-agent.json"
 ---
 
 # Governance Profile Specification
@@ -541,18 +541,118 @@ A Tier 2 agent with conformance tier, oversight triggers, disclosure, and incide
 
 ```json
 {
+  "$schema": "https://adl-spec.org/profiles/governance/1.0/schema.json",
   "adl_spec": "0.3.0",
   "name": "Compliance Review Agent",
-  "description": "Reviews documents for regulatory compliance. Flags potential violations and recommends remediation actions.",
+  "description": "Reviews documents for regulatory compliance against SOC 2 Type II controls. Flags potential violations and recommends remediation actions.",
   "version": "2.0.0",
-  "data_classification": {
-    "sensitivity": "confidential",
-    "categories": ["regulatory"]
-  },
-  "profiles": ["urn:adl:profile:governance:1.0"],
+  "profiles": [
+    "urn:adl:profile:governance:1.0"
+  ],
   "lifecycle": {
     "status": "active",
     "effective_date": "2026-01-15T00:00:00Z"
+  },
+  "data_classification": {
+    "sensitivity": "confidential",
+    "categories": [
+      "regulatory"
+    ]
+  },
+  "provider": {
+    "name": "Acme Compliance",
+    "url": "https://compliance.acme.example",
+    "contact": "compliance@acme.example"
+  },
+  "model": {
+    "capabilities": [
+      "function_calling"
+    ]
+  },
+  "tools": [
+    {
+      "name": "review_document",
+      "description": "Review a document against compliance controls",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "document_id": {
+            "type": "string"
+          },
+          "framework": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "framework"
+        ]
+      },
+      "read_only": true
+    },
+    {
+      "name": "generate_report",
+      "description": "Generate a compliance report",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "review_id": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "pdf",
+              "json",
+              "html"
+            ]
+          }
+        },
+        "required": [
+          "review_id"
+        ]
+      }
+    }
+  ],
+  "permissions": {
+    "network": {
+      "allowed_hosts": [
+        "docs.acme.example",
+        "api.acme.example"
+      ],
+      "allowed_protocols": [
+        "https"
+      ],
+      "deny_private": true
+    },
+    "filesystem": {
+      "allowed_paths": [
+        {
+          "path": "/data/documents/**",
+          "access": "read"
+        },
+        {
+          "path": "/data/reports/**",
+          "access": "read_write"
+        }
+      ]
+    }
+  },
+  "security": {
+    "authentication": {
+      "type": "oauth2",
+      "required": true,
+      "scopes": [
+        "compliance:read",
+        "compliance:write"
+      ]
+    },
+    "encryption": {
+      "in_transit": {
+        "required": true,
+        "min_version": "1.2"
+      }
+    }
   },
   "autonomy": {
     "tier": 2,
@@ -571,7 +671,14 @@ A Tier 2 agent with conformance tier, oversight triggers, disclosure, and incide
     "level": "medium",
     "autonomy_level": "L3",
     "assessed_by": "AI Ethics Committee",
-    "assessed_at": "2026-01-10T00:00:00Z"
+    "assessed_at": "2026-01-10T00:00:00Z",
+    "rationale": "Agent processes sensitive compliance data with conditional autonomy within defined review boundaries"
+  },
+  "safety_reviews": {
+    "required": true,
+    "frequency": "quarterly",
+    "last_review": "2026-01-15T00:00:00Z",
+    "review_board": "AI Safety Board"
   },
   "human_oversight": {
     "level": "on_exception",
@@ -598,13 +705,31 @@ A Tier 2 agent with conformance tier, oversight triggers, disclosure, and incide
       "Final regulatory determination without human review",
       "Legal advice to external parties"
     ],
-    "reporting_contact": "mailto:ai-issues@example.com"
+    "reporting_contact": "mailto:ai-issues@acme.example"
   },
   "governance": {
+    "lifecycle_governance": {
+      "transition_policy": {
+        "requires_approval": true,
+        "approvers": [
+          "security-team",
+          "compliance-lead"
+        ],
+        "approval_type": "all"
+      },
+      "last_transition": {
+        "from_status": "draft",
+        "to_status": "active",
+        "approved_by": "compliance-lead",
+        "approved_at": "2026-01-15T00:00:00Z",
+        "reason": "Passed SOC2 audit, security review, and Tier 2 governance validation"
+      }
+    },
     "ownership": {
       "owner": "Compliance Team",
-      "contact": "compliance@example.com",
-      "user_escalation_contact": "mailto:ai-support@example.com",
+      "delegate": "Security Team",
+      "contact": "compliance@acme.example",
+      "user_escalation_contact": "mailto:ai-support@acme.example",
       "decision_boundaries": [
         {
           "decision_type": "regulatory_filing",
@@ -623,19 +748,36 @@ A Tier 2 agent with conformance tier, oversight triggers, disclosure, and incide
         }
       ]
     },
-    "lifecycle_governance": {
-      "transition_policy": {
-        "requires_approval": true,
-        "approvers": ["security-team", "compliance-lead"],
-        "approval_type": "all"
-      }
+    "approval_workflow": {
+      "required": true,
+      "approvers": [
+        "compliance-lead",
+        "security-lead"
+      ],
+      "approval_type": "all"
     },
     "audit_trail": {
       "enabled": true,
-      "retention_days": 730
+      "retention_days": 730,
+      "destination": "s3://acme-audit-logs/compliance-agent/"
     }
   },
-  "governance_record_ref": "https://gorvnd.example.com/agents/compliance-review/governance-record"
+  "governance_record_ref": "https://gorvnd.acme.example/agents/compliance-review/governance-record",
+  "metadata": {
+    "authors": [
+      {
+        "name": "Compliance Team",
+        "email": "compliance@acme.example"
+      }
+    ],
+    "license": "Proprietary",
+    "documentation": "https://docs.acme.example/agents/compliance-review",
+    "tags": [
+      "compliance",
+      "soc2",
+      "enterprise"
+    ]
+  }
 }
 ```
 

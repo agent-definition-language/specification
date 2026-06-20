@@ -101,6 +101,7 @@ This profile maps requirements from:
 - [Profile Specification (1.0)](./1.0/profile.md)
 - [Compatibility](./COMPATIBILITY.md)
 - [Examples](./1.0/examples/)
+- [Composite example](./1.0/examples/composite/governance-healthcare-agent.json) — this profile declared together with the Governance Profile
 
 ## Maintainers
 
