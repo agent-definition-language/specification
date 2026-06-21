@@ -6,7 +6,10 @@
   "scripts": {
     "build:schema": "bun run scripts/build-schema.ts",
     "verify:schema": "bun run scripts/build-schema.ts --check",
-    "build": "bun run build:schema"
+    "build:profiles": "bun run scripts/build-profiles.ts",
+    "verify:profiles": "bun run scripts/build-profiles.ts --check",
+    "build": "bun run build:schema && bun run build:profiles",
+    "verify": "bun run verify:schema && bun run verify:profiles"
   },
   "devDependencies": {
     "@sinclair/typebox": "^0.34.0"

@@ -17,18 +17,28 @@
     }
   },
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.3/schema.json" }
+    {
+      "$ref": "https://adl-spec.org/0.3/schema.json"
+    }
   ],
   "type": "object",
-  "required": ["compliance_framework", "autonomy"],
+  "required": [
+    "compliance_framework",
+    "autonomy"
+  ],
   "properties": {
     "profiles": {
       "type": "array",
-      "contains": { "const": "urn:adl:profile:governance:1.0" }
+      "contains": {
+        "const": "urn:adl:profile:governance:1.0"
+      }
     },
     "compliance_framework": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["primary_framework"],
+      "required": [
+        "primary_framework"
+      ],
       "properties": {
         "primary_framework": {
           "type": "string",
@@ -48,105 +58,187 @@
         "control_mappings": {
           "type": "array",
           "items": {
+            "additionalProperties": false,
             "type": "object",
-            "required": ["framework", "control_id", "status"],
+            "required": [
+              "framework",
+              "control_id",
+              "status"
+            ],
             "properties": {
-              "framework": { "type": "string" },
-              "control_id": { "type": "string" },
+              "framework": {
+                "type": "string"
+              },
+              "control_id": {
+                "type": "string"
+              },
               "status": {
                 "type": "string",
-                "enum": ["implemented", "partial", "planned", "not_applicable"]
+                "enum": [
+                  "implemented",
+                  "partial",
+                  "planned",
+                  "not_applicable"
+                ]
               },
-              "extensions": { "$ref": "#/$defs/extensions" }
-            },
-            "additionalProperties": false
+              "extensions": {
+                "$ref": "#/$defs/extensions"
+              }
+            }
           }
         },
         "audit_dates": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "last_audit": { "type": "string", "format": "date-time" },
-            "next_audit": { "type": "string", "format": "date-time" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "last_audit": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "next_audit": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "autonomy": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["tier", "basis", "classified_by", "classified_at"],
+      "required": [
+        "tier",
+        "basis",
+        "classified_by",
+        "classified_at"
+      ],
       "properties": {
         "tier": {
           "type": "integer",
-          "enum": [1, 2, 3]
+          "enum": [
+            1,
+            2,
+            3
+          ]
         },
         "basis": {
-          "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "type": "string"
         },
         "classified_by": {
-          "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "type": "string"
         },
         "classified_at": {
-          "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "type": "string"
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "risk_classification": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "level": {
           "type": "string",
-          "enum": ["low", "medium", "high", "critical"]
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ]
         },
         "autonomy_level": {
           "type": "string",
-          "enum": ["L0", "L1", "L2", "L3", "L4", "L5"]
+          "enum": [
+            "L0",
+            "L1",
+            "L2",
+            "L3",
+            "L4",
+            "L5"
+          ]
         },
-        "assessed_by": { "type": "string" },
-        "assessed_at": { "type": "string", "format": "date-time" },
-        "rationale": { "type": "string" },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "assessed_by": {
+          "type": "string"
+        },
+        "assessed_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "human_oversight": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "level": {
           "type": "string",
-          "enum": ["none", "on_exception", "periodic", "continuous"]
+          "enum": [
+            "none",
+            "on_exception",
+            "periodic",
+            "continuous"
+          ]
         },
-        "role": { "type": "string" },
+        "role": {
+          "type": "string"
+        },
         "triggers": {
           "type": "array",
           "minItems": 1,
           "items": {
             "anyOf": [
-              { "type": "string" },
+              {
+                "type": "string"
+              },
               {
                 "type": "object",
-                "required": ["when"],
+                "required": [
+                  "when"
+                ],
                 "properties": {
-                  "description": { "type": "string" },
+                  "description": {
+                    "type": "string"
+                  },
                   "when": {
                     "type": "object",
                     "minProperties": 1,
                     "properties": {
-                      "cost_usd_over": { "type": "number", "exclusiveMinimum": 0 },
+                      "cost_usd_over": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
                       "data_classification_at_least": {
                         "type": "string",
-                        "enum": ["public", "internal", "confidential", "restricted"]
+                        "enum": [
+                          "public",
+                          "internal",
+                          "confidential",
+                          "restricted"
+                        ]
                       },
-                      "tool": { "type": "string" },
-                      "path_matches": { "type": "string" }
+                      "tool": {
+                        "type": "string"
+                      },
+                      "path_matches": {
+                        "type": "string"
+                      }
                     },
                     "additionalProperties": false
                   }
@@ -157,259 +249,452 @@
           }
         },
         "response_time_minutes": {
-          "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "type": "integer"
         },
         "intervention_model": {
           "type": "string",
-          "enum": ["approve_reject", "plan_editing", "monitor_only"]
+          "enum": [
+            "approve_reject",
+            "plan_editing",
+            "monitor_only"
+          ]
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "incident_response": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["policy_documented"],
+      "required": [
+        "policy_documented"
+      ],
       "properties": {
-        "policy_documented": { "type": "boolean" },
-        "last_tested": { "type": "string", "format": "date-time" },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "policy_documented": {
+          "type": "boolean"
+        },
+        "last_tested": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "evaluation_attestation": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["result", "evaluator", "evaluation_date"],
+      "required": [
+        "result",
+        "evaluator",
+        "evaluation_date"
+      ],
       "properties": {
         "result": {
           "type": "string",
-          "enum": ["passed", "conditional", "failed"]
+          "enum": [
+            "passed",
+            "conditional",
+            "failed"
+          ]
         },
-        "evaluator": { "type": "string", "minLength": 1 },
-        "evaluation_date": { "type": "string", "format": "date-time" },
+        "evaluator": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "evaluation_date": {
+          "format": "date-time",
+          "type": "string"
+        },
         "methodology": {
           "type": "string",
-          "enum": ["automated_benchmark", "red_team", "third_party_audit", "sandbox", "internal_review"]
+          "enum": [
+            "automated_benchmark",
+            "red_team",
+            "third_party_audit",
+            "sandbox",
+            "internal_review"
+          ]
         },
-        "expires_at": { "type": "string", "format": "date-time" },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "expires_at": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "disclosure": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["required"],
+      "required": [
+        "required"
+      ],
       "properties": {
-        "required": { "type": "boolean" },
+        "required": {
+          "type": "boolean"
+        },
         "known_limitations": {
-          "type": "array",
           "minItems": 1,
-          "items": { "type": "string" }
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "prohibited_uses": {
-          "type": "array",
           "minItems": 1,
-          "items": { "type": "string" }
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "user_responsibilities": {
-          "type": "array",
           "minItems": 1,
-          "items": { "type": "string" }
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "reporting_contact": {
-          "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "type": "string"
         },
-        "disclosure_version": { "type": "string" },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "disclosure_version": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "safety_reviews": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "required": { "type": "boolean" },
-        "frequency": { "type": "string" },
-        "last_review": { "type": "string", "format": "date-time" },
-        "next_review": { "type": "string", "format": "date-time" },
-        "review_board": { "type": "string" },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "required": {
+          "type": "boolean"
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "last_review": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "next_review": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "review_board": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "governance": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "ownership": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "owner": { "type": "string" },
-            "delegate": { "type": "string" },
-            "contact": { "type": "string", "format": "email" },
-            "user_escalation_contact": { "type": "string", "format": "uri" },
+            "owner": {
+              "type": "string"
+            },
+            "delegate": {
+              "type": "string"
+            },
+            "contact": {
+              "format": "email",
+              "type": "string"
+            },
+            "user_escalation_contact": {
+              "format": "uri",
+              "type": "string"
+            },
             "decision_boundaries": {
-              "type": "array",
               "minItems": 1,
+              "type": "array",
               "items": {
+                "additionalProperties": false,
                 "type": "object",
-                "required": ["decision_type", "owner"],
+                "required": [
+                  "decision_type",
+                  "owner"
+                ],
                 "properties": {
-                  "decision_type": { "type": "string" },
+                  "decision_type": {
+                    "type": "string"
+                  },
                   "owner": {
                     "type": "string",
-                    "enum": ["human_only", "agent", "human_in_loop"]
+                    "enum": [
+                      "human_only",
+                      "agent",
+                      "human_in_loop"
+                    ]
                   },
-                  "rationale": { "type": "string" },
-                  "extensions": { "$ref": "#/$defs/extensions" }
-                },
-                "additionalProperties": false
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "extensions": {
+                    "$ref": "#/$defs/extensions"
+                  }
+                }
               }
             },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "approval_workflow": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "required": { "type": "boolean" },
+            "required": {
+              "type": "boolean"
+            },
             "approvers": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
             "approval_type": {
               "type": "string",
-              "enum": ["any", "all", "quorum"]
+              "enum": [
+                "any",
+                "all",
+                "quorum"
+              ]
             },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "audit_trail": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "enabled": { "type": "boolean" },
-            "retention_days": { "type": "integer", "minimum": 0 },
-            "destination": { "type": "string", "format": "uri" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "enabled": {
+              "type": "boolean"
+            },
+            "retention_days": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "destination": {
+              "format": "uri",
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "lifecycle_governance": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
             "transition_policy": {
+              "additionalProperties": false,
               "type": "object",
               "properties": {
-                "requires_approval": { "type": "boolean" },
+                "requires_approval": {
+                  "type": "boolean"
+                },
                 "approvers": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "string"
+                  }
                 },
                 "approval_type": {
                   "type": "string",
-                  "enum": ["any", "all", "quorum"]
+                  "enum": [
+                    "any",
+                    "all",
+                    "quorum"
+                  ]
                 },
-                "notice_period_days": { "type": "integer", "minimum": 0 },
+                "notice_period_days": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
                 "allowed_transitions": {
                   "type": "array",
-                  "items": { "type": "string" }
+                  "items": {
+                    "type": "string"
+                  }
                 },
-                "extensions": { "$ref": "#/$defs/extensions" }
-              },
-              "additionalProperties": false
+                "extensions": {
+                  "$ref": "#/$defs/extensions"
+                }
+              }
             },
             "last_transition": {
+              "additionalProperties": false,
               "type": "object",
               "properties": {
                 "from_status": {
                   "type": "string",
-                  "enum": ["draft", "active", "deprecated", "retired"]
+                  "enum": [
+                    "draft",
+                    "active",
+                    "deprecated",
+                    "retired"
+                  ]
                 },
                 "to_status": {
                   "type": "string",
-                  "enum": ["draft", "active", "deprecated", "retired"]
+                  "enum": [
+                    "draft",
+                    "active",
+                    "deprecated",
+                    "retired"
+                  ]
                 },
-                "approved_by": { "type": "string" },
-                "approved_at": { "type": "string", "format": "date-time" },
-                "reason": { "type": "string" },
-                "extensions": { "$ref": "#/$defs/extensions" }
-              },
-              "additionalProperties": false
+                "approved_by": {
+                  "type": "string"
+                },
+                "approved_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "extensions": {
+                  "$ref": "#/$defs/extensions"
+                }
+              }
             },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "governance_record_ref": {
-      "type": "string",
-      "format": "uri"
+      "format": "uri",
+      "type": "string"
     },
     "anomaly_baseline": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "expected_tools": {
           "type": "array",
           "items": {
+            "additionalProperties": false,
             "type": "object",
-            "required": ["name"],
+            "required": [
+              "name"
+            ],
             "properties": {
-              "name": { "type": "string" },
-              "share": { "type": "number", "minimum": 0, "maximum": 1 }
-            },
-            "additionalProperties": false
+              "name": {
+                "type": "string"
+              },
+              "share": {
+                "minimum": 0,
+                "maximum": 1,
+                "type": "number"
+              }
+            }
           }
         },
         "cost_per_session_usd": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "min": { "type": "number", "minimum": 0 },
-            "max": { "type": "number", "minimum": 0 }
-          },
-          "additionalProperties": false
+            "min": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "max": {
+              "minimum": 0,
+              "type": "number"
+            }
+          }
         },
         "data_classes": {
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["pii", "phi", "financial", "credentials", "intellectual_property", "regulatory"]
+            "enum": [
+              "pii",
+              "phi",
+              "financial",
+              "credentials",
+              "intellectual_property",
+              "regulatory"
+            ]
           }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     }
   },
   "if": {
     "properties": {
       "autonomy": {
         "properties": {
-          "tier": { "enum": [2, 3] }
+          "tier": {
+            "enum": [
+              2,
+              3
+            ]
+          }
         },
-        "required": ["tier"]
+        "required": [
+          "tier"
+        ]
       }
     },
-    "required": ["autonomy"]
+    "required": [
+      "autonomy"
+    ]
   },
   "then": {
-    "required": ["human_oversight", "incident_response", "disclosure"],
+    "required": [
+      "human_oversight",
+      "incident_response",
+      "disclosure"
+    ],
     "properties": {
       "human_oversight": {
-        "required": ["triggers", "response_time_minutes"]
+        "required": [
+          "triggers",
+          "response_time_minutes"
+        ]
       },
       "incident_response": {
         "properties": {
-          "policy_documented": { "const": true }
+          "policy_documented": {
+            "const": true
+          }
         }
       },
       "disclosure": {
         "properties": {
-          "required": { "const": true }
+          "required": {
+            "const": true
+          }
         }
       }
     },
@@ -417,17 +702,27 @@
       "properties": {
         "autonomy": {
           "properties": {
-            "tier": { "const": 3 }
+            "tier": {
+              "const": 3
+            }
           }
         }
       }
     },
     "then": {
-      "required": ["human_oversight", "incident_response", "disclosure", "evaluation_attestation", "anomaly_baseline"],
+      "required": [
+        "human_oversight",
+        "incident_response",
+        "disclosure",
+        "evaluation_attestation",
+        "anomaly_baseline"
+      ],
       "properties": {
         "evaluation_attestation": {
           "properties": {
-            "result": { "const": "passed" }
+            "result": {
+              "const": "passed"
+            }
           }
         }
       }

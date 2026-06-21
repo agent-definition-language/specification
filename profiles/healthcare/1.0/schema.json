@@ -17,7 +17,9 @@
     }
   },
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.3/schema.json" },
+    {
+      "$ref": "https://adl-spec.org/0.3/schema.json"
+    },
     {
       "comment": "HC-11: substance use disorder records (42 CFR Part 2) require consent management.",
       "if": {
@@ -26,36 +28,62 @@
             "properties": {
               "healthcare": {
                 "properties": {
-                  "phi_types": { "contains": { "const": "substance_use" } }
+                  "phi_types": {
+                    "contains": {
+                      "const": "substance_use"
+                    }
+                  }
                 },
-                "required": ["phi_types"]
+                "required": [
+                  "phi_types"
+                ]
               }
             },
-            "required": ["healthcare"]
+            "required": [
+              "healthcare"
+            ]
           }
         },
-        "required": ["data_classification"]
+        "required": [
+          "data_classification"
+        ]
       },
       "then": {
         "properties": {
-          "phi_handling": { "required": ["consent_management"] }
+          "phi_handling": {
+            "required": [
+              "consent_management"
+            ]
+          }
         },
-        "required": ["phi_handling"]
+        "required": [
+          "phi_handling"
+        ]
       }
     },
     {
       "comment": "HC-14: an FDA device class beyond exempt/non_device requires a documented change control plan.",
       "if": {
-        "required": ["clinical_safety"],
+        "required": [
+          "clinical_safety"
+        ],
         "properties": {
           "clinical_safety": {
-            "required": ["fda_classification"],
+            "required": [
+              "fda_classification"
+            ],
             "properties": {
               "fda_classification": {
-                "required": ["device_class"],
+                "required": [
+                  "device_class"
+                ],
                 "properties": {
                   "device_class": {
-                    "enum": ["class_I", "class_II", "class_III"]
+                    "enum": [
+                      "class_I",
+                      "class_II",
+                      "class_III"
+                    ]
                   }
                 }
               }
@@ -65,21 +93,35 @@
       },
       "then": {
         "properties": {
-          "clinical_safety": { "required": ["change_control"] }
+          "clinical_safety": {
+            "required": [
+              "change_control"
+            ]
+          }
         }
       }
     },
     {
       "comment": "HC-15: a predictive DSI must publish source attributes and document IRM practices (ONC HTI-1).",
       "if": {
-        "required": ["interoperability"],
+        "required": [
+          "interoperability"
+        ],
         "properties": {
           "interoperability": {
-            "required": ["dsi_transparency"],
+            "required": [
+              "dsi_transparency"
+            ],
             "properties": {
               "dsi_transparency": {
-                "required": ["predictive_dsi"],
-                "properties": { "predictive_dsi": { "const": true } }
+                "required": [
+                  "predictive_dsi"
+                ],
+                "properties": {
+                  "predictive_dsi": {
+                    "const": true
+                  }
+                }
               }
             }
           }
@@ -90,10 +132,17 @@
           "interoperability": {
             "properties": {
               "dsi_transparency": {
-                "required": ["source_attributes_published", "irm_practices"],
+                "required": [
+                  "source_attributes_published",
+                  "irm_practices"
+                ],
                 "properties": {
-                  "source_attributes_published": { "const": true },
-                  "irm_practices": { "const": true }
+                  "source_attributes_published": {
+                    "const": true
+                  },
+                  "irm_practices": {
+                    "const": true
+                  }
                 }
               }
             }
@@ -103,24 +152,38 @@
     }
   ],
   "type": "object",
-  "required": ["hipaa_compliance", "phi_handling"],
+  "required": [
+    "hipaa_compliance",
+    "phi_handling"
+  ],
   "properties": {
     "profiles": {
       "type": "array",
-      "contains": { "const": "urn:adl:profile:healthcare:1.0" }
+      "contains": {
+        "const": "urn:adl:profile:healthcare:1.0"
+      }
     },
     "data_classification": {
       "type": "object",
-      "required": ["healthcare"],
+      "required": [
+        "healthcare"
+      ],
       "properties": {
-        "categories": { "contains": { "const": "phi" } },
+        "categories": {
+          "contains": {
+            "const": "phi"
+          }
+        },
         "healthcare": {
+          "additionalProperties": false,
           "type": "object",
-          "required": ["phi_types"],
+          "required": [
+            "phi_types"
+          ],
           "properties": {
             "phi_types": {
-              "type": "array",
               "minItems": 1,
+              "type": "array",
               "items": {
                 "type": "string",
                 "enum": [
@@ -135,93 +198,167 @@
                 ]
               }
             },
-            "hipaa_applicability": { "type": "boolean" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "hipaa_applicability": {
+              "type": "boolean"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         }
       }
     },
     "hipaa_compliance": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["covered_entity_type", "baa_required", "minimum_necessary"],
+      "required": [
+        "covered_entity_type",
+        "baa_required",
+        "minimum_necessary"
+      ],
       "properties": {
         "covered_entity_type": {
           "type": "string",
-          "enum": ["covered_entity", "business_associate", "subcontractor"]
+          "enum": [
+            "covered_entity",
+            "business_associate",
+            "subcontractor"
+          ]
         },
-        "baa_required": { "type": "boolean" },
+        "baa_required": {
+          "type": "boolean"
+        },
         "minimum_necessary": {
+          "additionalProperties": false,
           "type": "object",
-          "required": ["scope"],
+          "required": [
+            "scope"
+          ],
           "properties": {
             "scope": {
               "type": "string",
-              "enum": ["task_specific", "role_based", "full_record"]
+              "enum": [
+                "task_specific",
+                "role_based",
+                "full_record"
+              ]
             },
-            "justification": { "type": "string" },
-            "review_frequency": { "type": "string" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "justification": {
+              "type": "string"
+            },
+            "review_frequency": {
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "security_rule": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
             "encryption_at_rest": {
               "type": "string",
-              "enum": ["AES_256", "AES_128"]
+              "enum": [
+                "AES_256",
+                "AES_128"
+              ]
             },
             "encryption_in_transit": {
               "type": "string",
-              "enum": ["TLS_1_2", "TLS_1_3"]
+              "enum": [
+                "TLS_1_2",
+                "TLS_1_3"
+              ]
             },
-            "mfa_required": { "type": "boolean" },
+            "mfa_required": {
+              "type": "boolean"
+            },
             "data_retention": {
               "type": "string",
-              "enum": ["none", "minimum", "standard"]
+              "enum": [
+                "none",
+                "minimum",
+                "standard"
+              ]
             },
-            "restoration_hours": { "type": "number", "minimum": 0 },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "restoration_hours": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "phi_handling": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["de_identification", "breach_notification"],
+      "required": [
+        "de_identification",
+        "breach_notification"
+      ],
       "properties": {
         "de_identification": {
+          "additionalProperties": false,
           "type": "object",
-          "required": ["method"],
+          "required": [
+            "method"
+          ],
           "properties": {
             "method": {
               "type": "string",
-              "enum": ["safe_harbor", "expert_determination", "none"]
+              "enum": [
+                "safe_harbor",
+                "expert_determination",
+                "none"
+              ]
             },
-            "re_identification_controls": { "type": "boolean" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "re_identification_controls": {
+              "type": "boolean"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "breach_notification": {
+          "additionalProperties": false,
           "type": "object",
-          "required": ["notification_hours", "contact"],
+          "required": [
+            "notification_hours",
+            "contact"
+          ],
           "properties": {
-            "notification_hours": { "type": "number", "minimum": 0 },
-            "contact": { "type": "string" },
-            "threshold": { "type": "number", "minimum": 0 },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "notification_hours": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "contact": {
+              "type": "string"
+            },
+            "threshold": {
+              "minimum": 0,
+              "type": "number"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "consent_management": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "required": { "type": "boolean" },
+            "required": {
+              "type": "boolean"
+            },
             "consent_types": {
               "type": "array",
               "items": {
@@ -237,33 +374,49 @@
             },
             "granularity": {
               "type": "string",
-              "enum": ["broad", "purpose_specific", "data_specific"]
+              "enum": [
+                "broad",
+                "purpose_specific",
+                "data_specific"
+              ]
             },
-            "revocation_supported": { "type": "boolean" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "revocation_supported": {
+              "type": "boolean"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "data_provenance": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "tracking": { "type": "boolean" },
+            "tracking": {
+              "type": "boolean"
+            },
             "source_systems": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "clinical_safety": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "fda_classification": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
             "device_class": {
@@ -278,9 +431,16 @@
             },
             "clearance_type": {
               "type": "string",
-              "enum": ["510k", "de_novo", "pma", "not_applicable"]
+              "enum": [
+                "510k",
+                "de_novo",
+                "pma",
+                "not_applicable"
+              ]
             },
-            "clearance_number": { "type": "string" },
+            "clearance_number": {
+              "type": "string"
+            },
             "software_level": {
               "type": "string",
               "enum": [
@@ -289,93 +449,155 @@
                 "life_supporting"
               ]
             },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "change_control": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "pccp_authorized": { "type": "boolean" },
+            "pccp_authorized": {
+              "type": "boolean"
+            },
             "modification_scope": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
-            "validation_protocol": { "type": "string", "format": "uri" },
-            "rollback_plan": { "type": "boolean" },
-            "monitoring_frequency": { "type": "string" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "validation_protocol": {
+              "format": "uri",
+              "type": "string"
+            },
+            "rollback_plan": {
+              "type": "boolean"
+            },
+            "monitoring_frequency": {
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "bias_monitoring": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "enabled": { "type": "boolean" },
+            "enabled": {
+              "type": "boolean"
+            },
             "protected_classes": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
-            "assessment_frequency": { "type": "string" },
-            "last_assessment": { "type": "string", "format": "date-time" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "assessment_frequency": {
+              "type": "string"
+            },
+            "last_assessment": {
+              "format": "date-time",
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "human_in_the_loop": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
             "level": {
               "type": "string",
-              "enum": ["advisory", "approval_required", "continuous_oversight"]
+              "enum": [
+                "advisory",
+                "approval_required",
+                "continuous_oversight"
+              ]
             },
-            "role": { "type": "string" },
-            "escalation_path": { "type": "string" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "role": {
+              "type": "string"
+            },
+            "escalation_path": {
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "interoperability": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "fhir_version": {
           "type": "string",
-          "enum": ["DSTU2", "STU3", "R4", "R4B", "R5"]
+          "enum": [
+            "DSTU2",
+            "STU3",
+            "R4",
+            "R4B",
+            "R5"
+          ]
         },
         "terminology_bindings": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "tefca_participant": { "type": "boolean" },
+        "tefca_participant": {
+          "type": "boolean"
+        },
         "information_blocking": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "compliant": { "type": "boolean" },
+            "compliant": {
+              "type": "boolean"
+            },
             "exceptions_claimed": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
         "dsi_transparency": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
-            "predictive_dsi": { "type": "boolean" },
-            "source_attributes_published": { "type": "boolean" },
-            "irm_practices": { "type": "boolean" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "predictive_dsi": {
+              "type": "boolean"
+            },
+            "source_attributes_published": {
+              "type": "boolean"
+            },
+            "irm_practices": {
+              "type": "boolean"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     }
   },
   "$comment": "Open additive mixin: intentionally has no root unevaluatedProperties so this profile composes with others via allOf (spec 13.2). Validators apply unevaluatedProperties:false once over the composed schema (base + all declared profiles), per spec 13.1."

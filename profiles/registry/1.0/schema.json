@@ -17,59 +17,89 @@
     }
   },
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.3/schema.json" }
+    {
+      "$ref": "https://adl-spec.org/0.3/schema.json"
+    }
   ],
   "type": "object",
-  "required": ["registry"],
+  "required": [
+    "registry"
+  ],
   "properties": {
     "profiles": {
       "type": "array",
-      "contains": { "const": "urn:adl:profile:registry:1.0" }
+      "contains": {
+        "const": "urn:adl:profile:registry:1.0"
+      }
     },
     "registry": {
+      "additionalProperties": false,
       "type": "object",
-      "required": ["catalog_id"],
+      "required": [
+        "catalog_id"
+      ],
       "properties": {
         "catalog_id": {
-          "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "type": "string"
         },
         "catalog_classification": {
           "type": "array",
           "items": {
+            "additionalProperties": false,
             "type": "object",
-            "required": ["domain"],
+            "required": [
+              "domain"
+            ],
             "properties": {
               "domain": {
-                "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "type": "string"
               },
-              "subdomain": { "type": "string" },
-              "capability": { "type": "string" },
-              "extensions": { "$ref": "#/$defs/extensions" }
-            },
-            "additionalProperties": false
+              "subdomain": {
+                "type": "string"
+              },
+              "capability": {
+                "type": "string"
+              },
+              "extensions": {
+                "$ref": "#/$defs/extensions"
+              }
+            }
           }
         },
         "visibility": {
           "type": "string",
-          "enum": ["private", "internal", "public"]
+          "enum": [
+            "private",
+            "internal",
+            "public"
+          ]
         },
         "federation": {
+          "additionalProperties": false,
           "type": "object",
           "properties": {
             "registries": {
               "type": "array",
-              "items": { "type": "string", "format": "uri" }
+              "items": {
+                "format": "uri",
+                "type": "string"
+              }
             },
-            "primary": { "type": "string", "format": "uri" },
-            "extensions": { "$ref": "#/$defs/extensions" }
-          },
-          "additionalProperties": false
+            "primary": {
+              "format": "uri",
+              "type": "string"
+            },
+            "extensions": {
+              "$ref": "#/$defs/extensions"
+            }
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     }
   },
   "$comment": "Open additive mixin: intentionally has no root unevaluatedProperties so this profile composes with others via allOf (spec 13.2). Validators apply unevaluatedProperties:false once over the composed schema (base + all declared profiles), per spec 13.1."

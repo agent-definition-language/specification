@@ -17,51 +17,81 @@
     }
   },
   "allOf": [
-    { "$ref": "https://adl-spec.org/0.3/schema.json" }
+    {
+      "$ref": "https://adl-spec.org/0.3/schema.json"
+    }
   ],
   "type": "object",
-  "anyOf": [
-    { "required": ["relationships"] },
-    { "required": ["domain"] }
-  ],
   "properties": {
     "profiles": {
       "type": "array",
-      "contains": { "const": "urn:adl:profile:portfolio:1.0" }
+      "contains": {
+        "const": "urn:adl:profile:portfolio:1.0"
+      }
     },
     "relationships": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
         "depends_on": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "composed_of": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
         "orchestrated_by": {
           "type": "string"
         },
         "peers": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string"
+          }
         },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     },
     "domain": {
+      "additionalProperties": false,
       "type": "object",
       "properties": {
-        "domain_id": { "type": "string" },
-        "subdomain": { "type": "string" },
-        "bounded_context": { "type": "string" },
-        "role": { "type": "string" },
-        "extensions": { "$ref": "#/$defs/extensions" }
-      },
-      "additionalProperties": false
+        "domain_id": {
+          "type": "string"
+        },
+        "subdomain": {
+          "type": "string"
+        },
+        "bounded_context": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "extensions": {
+          "$ref": "#/$defs/extensions"
+        }
+      }
     }
   },
+  "anyOf": [
+    {
+      "required": [
+        "relationships"
+      ]
+    },
+    {
+      "required": [
+        "domain"
+      ]
+    }
+  ],
   "$comment": "Open additive mixin: intentionally has no root unevaluatedProperties so this profile composes with others via allOf (spec 13.2). Validators apply unevaluatedProperties:false once over the composed schema (base + all declared profiles), per spec 13.1."
 }
