@@ -1,0 +1,13 @@
+{
+  "name": "@adl-spec/model",
+  "private": true,
+  "type": "module",
+  "description": "TypeBox model for the ADL document schema — single source that emits versions/<id>/schema*.json and TypeScript types.",
+  "scripts": {
+    "build:schema": "bun run scripts/build-schema.ts",
+    "verify:schema": "bun run scripts/build-schema.ts --check"
+  },
+  "devDependencies": {
+    "@sinclair/typebox": "^0.34.0"
+  }
+}
