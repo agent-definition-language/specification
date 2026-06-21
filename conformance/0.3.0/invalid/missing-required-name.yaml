@@ -1,0 +1,8 @@
+# INVALID: omits the required top-level member `name` (schema required:
+# adl_spec, name, description, version, data_classification).
+adl_spec: "0.3.0"
+description: A simple greeting agent.
+version: "1.0.0"
+
+data_classification:
+  sensitivity: public

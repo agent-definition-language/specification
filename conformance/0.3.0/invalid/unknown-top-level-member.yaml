@@ -1,0 +1,11 @@
+# INVALID: introduces an unknown top-level member `notarealfield`. The 0.3.0 schema
+# sets additionalProperties:false, so unknown members are rejected.
+adl_spec: "0.3.0"
+name: Hello Agent
+description: A simple greeting agent.
+version: "1.0.0"
+
+data_classification:
+  sensitivity: public
+
+notarealfield: oops

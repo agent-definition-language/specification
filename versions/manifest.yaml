@@ -1,5 +1,8 @@
 # ADL Specification Version Manifest
 # Metadata for version tracking — the Docusaurus spec plugin handles site versioning.
+#
+# NOTE: standards-submission metadata (the version -> IETF draft mapping) is kept in
+# the private `standardization` repo (ietf-mapping.yaml), not here.
 
 # The current official release shown by default at /spec/
 latest: "0.3.0"
@@ -12,22 +15,18 @@ versions:
   - id: "draft"
     status: draft
     label: "0.4.0 (Draft)"
-    ietf_draft: "draft-nederveld-adl-04"
 
   - id: "0.3.0"
     status: released
     label: "0.3.0"
     released_at: "2026-06-03"
-    ietf_draft: "draft-nederveld-adl-03"
 
   - id: "0.2.0"
     status: released
     label: "0.2.0"
     released_at: "2026-03-18"
-    ietf_draft: "draft-nederveld-adl-02"
 
   - id: "0.1.0"
     status: released
     label: "0.1.0"
     released_at: "2026-02-18"
-    ietf_draft: "draft-nederveld-adl-01"

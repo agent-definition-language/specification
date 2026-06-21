@@ -1,40 +1,46 @@
-# Agent Definition Language (ADL)
+# Agent Definition Language (ADL) — Specification
 
 The **Agent Definition Language (ADL)** is a vendor-neutral, machine-readable specification for describing AI agents — their identity, permissions, lifecycle, and compliance — in one auditable document. Think of it as [OpenAPI](https://www.openapis.org/) for AI agents.
 
-**Documentation:** [adl-spec.org](https://adl-spec.org)
+This repository is the **source of truth for the standard**: the core specification, companion protocols, domain profiles, deployment patterns, the change-proposal process, and conformance vectors.
+
+**Documentation:** [adl-spec.org](https://adl-spec.org) · **Reference implementations:** [agent-definition-language/implementations](https://github.com/agent-definition-language/implementations) · **Governance:** [agent-definition-language/governance](https://github.com/agent-definition-language/governance)
 
 ## Specification
 
-| Version | Spec | Schema | IETF Draft |
-|---------|------|--------|------------|
-| **0.2.0** (latest) | [spec.md](versions/0.2.0/spec.md) | [schema.json](versions/0.2.0/schema.json) | `draft-nederveld-adl-02` |
-| 0.1.0 | [spec.md](versions/0.1.0/spec.md) | [schema.json](versions/0.1.0/schema.json) | `draft-nederveld-adl-01` |
+| Version | Spec | Schema |
+|---------|------|--------|
+| **0.3.0** (latest) | [spec.md](versions/0.3.0/spec.md) | [schema.json](versions/0.3.0/schema.json) |
+| 0.2.0 | [spec.md](versions/0.2.0/spec.md) | [schema.json](versions/0.2.0/schema.json) |
+| 0.1.0 | [spec.md](versions/0.1.0/spec.md) | [schema.json](versions/0.1.0/schema.json) |
+| draft (next) | [spec.md](versions/draft/spec.md) | [schema.json](versions/draft/schema.json) |
 
-The Markdown in `versions/` is the source of truth for the draft specification until a standards body publishes an official standard. For the full standards strategy, see the [roadmap](standardization/roadmap.md).
+The Markdown in `versions/` is the source of truth for the specification until a standards body publishes an official standard. Released versions are immutable; active work happens in `versions/draft/`.
 
 ## Quick start
 
-Validate an ADL document with the CLI ([Bun](https://bun.sh/) required):
+Validate an ADL document with the CLI (from the reference implementations):
 
 ```bash
 bunx @adl-spec/cli validate my-agent.yaml
 ```
 
-## Packages
+## Repository structure
 
-All packages are published under the `@adl-spec` scope on npm.
+| Path | Purpose |
+|------|---------|
+| [versions/](versions/) | Versioned core specifications and JSON schemas (the data model) |
+| [protocol/](protocol/) | Companion protocol specs (runtime, trust) — versioned independently |
+| [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial, portfolio, registry) |
+| [patterns/](patterns/) | Non-normative, version-pinned deployment patterns |
+| [proposals/](proposals/) | The RFC / change-proposal process |
+| [conformance/](conformance/) | Conformance test vectors, scoped by version |
 
-| Package | Description |
-|---------|-------------|
-| [`@adl-spec/core`](packages/adl-core/) | SDK — parsing, validation, and schema utilities |
-| [`@adl-spec/generator`](packages/adl-generator/) | Code generation from ADL passports (vanilla TS, Claude SDK) |
-| [`@adl-spec/cli`](packages/adl-cli/) | CLI tooling — validate, generate, inspect |
-| [`@adl-spec/agent`](packages/adl-agent/) | ADL Explainer AI agent |
+Reference SDKs/CLI/tooling live in the separate [implementations](https://github.com/agent-definition-language/implementations) repo; the documentation site is built and deployed separately and consumes released versions of this repo.
 
 ## Profiles
 
-Domain-specific profiles extend the core spec for regulated industries. See [adl-spec.org](https://adl-spec.org/profiles/) for full documentation.
+Domain-specific profiles extend the core spec for regulated industries. See [adl-spec.org/profiles](https://adl-spec.org/profiles/) for full documentation.
 
 | Profile | Path |
 |---------|------|
@@ -44,26 +50,13 @@ Domain-specific profiles extend the core spec for regulated industries. See [adl
 | Financial | [profiles/financial/](profiles/financial/) |
 | Portfolio | [profiles/portfolio/](profiles/portfolio/) |
 
-## Repository structure
-
-| Path | Purpose |
-|------|---------|
-| [versions/](versions/) | Versioned specifications and schemas |
-| [packages/](packages/) | SDK, CLI, code generator, and agent tooling |
-| [profiles/](profiles/) | Domain-specific profiles |
-| [site/](site/) | Documentation site ([adl-spec.org](https://adl-spec.org)) |
-| [standardization/](standardization/) | IETF drafts and standards-body roadmap |
-| [proposals/](proposals/) | Spec and process proposals |
-| [.github/](.github/) | CI workflows, issue and PR templates |
-
 ## Participation
 
-- **Contributing:** See [CONTRIBUTING.md](CONTRIBUTING.md).
-- **Governance:** See [GOVERNANCE.md](GOVERNANCE.md).
-- **Code of conduct:** See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
-- **Implementations:** See [IMPLEMENTATIONS.md](IMPLEMENTATIONS.md).
+- **Contributing:** [CONTRIBUTING.md](CONTRIBUTING.md) (canonical process in the [governance](https://github.com/agent-definition-language/governance) repo)
+- **Governance & Code of Conduct:** [governance](https://github.com/agent-definition-language/governance) repo
+- **Implementations:** [IMPLEMENTATIONS.md](https://github.com/agent-definition-language/implementations/blob/main/IMPLEMENTATIONS.md)
 
-Use [issues](https://github.com/Ironstead-Group/agent-definition-language/issues) and [pull requests](https://github.com/Ironstead-Group/agent-definition-language/pulls) for spec changes, standardization work, and examples.
+Use [issues](https://github.com/agent-definition-language/specification/issues) and [pull requests](https://github.com/agent-definition-language/specification/pulls) for spec changes and examples. Substantive (normative) changes start as an RFC under [proposals/](proposals/).
 
 ## Intellectual Property
 

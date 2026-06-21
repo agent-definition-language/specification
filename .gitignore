@@ -1,0 +1,12 @@
+# OS / editor
+.DS_Store
+*.swp
+
+# Node (examples/tooling that may run locally)
+node_modules/
+dist/
+
+# Build / release artifacts
+/build/
+/dist-artifact/
+*.tgz
