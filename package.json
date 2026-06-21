@@ -2,16 +2,13 @@
   "name": "@adl-spec/model",
   "private": true,
   "type": "module",
-  "description": "TypeBox model for the ADL document schema — single source that emits versions/<id>/schema*.json and TypeScript types.",
+  "description": "TypeBox model for the ADL document schema — the single source that emits the canonical, language-neutral JSON Schemas under versions/<id>/. Language SDK bindings (TypeScript, Python, …) are generated in the implementations repo from these schemas.",
   "scripts": {
     "build:schema": "bun run scripts/build-schema.ts",
     "verify:schema": "bun run scripts/build-schema.ts --check",
-    "build:types": "bun run scripts/build-types.ts",
-    "verify:types": "bun run scripts/build-types.ts --check",
-    "build": "bun run build:schema && bun run build:types"
+    "build": "bun run build:schema"
   },
   "devDependencies": {
-    "@sinclair/typebox": "^0.34.0",
-    "json-schema-to-typescript": "^15.0.4"
+    "@sinclair/typebox": "^0.34.0"
   }
 }
