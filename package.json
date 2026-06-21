@@ -5,9 +5,13 @@
   "description": "TypeBox model for the ADL document schema — single source that emits versions/<id>/schema*.json and TypeScript types.",
   "scripts": {
     "build:schema": "bun run scripts/build-schema.ts",
-    "verify:schema": "bun run scripts/build-schema.ts --check"
+    "verify:schema": "bun run scripts/build-schema.ts --check",
+    "build:types": "bun run scripts/build-types.ts",
+    "verify:types": "bun run scripts/build-types.ts --check",
+    "build": "bun run build:schema && bun run build:types"
   },
   "devDependencies": {
-    "@sinclair/typebox": "^0.34.0"
+    "@sinclair/typebox": "^0.34.0",
+    "json-schema-to-typescript": "^15.0.4"
   }
 }
