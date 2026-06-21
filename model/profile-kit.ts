@@ -34,6 +34,19 @@ export interface ProfileOpts {
   baseId?: string;
   /** The profile's root object (TypeBox Type.Object) contributing type/properties/required. */
   root: object;
+  /**
+   * Profile dependencies — other profiles this one requires. Each entry is a
+   * "<slug>/<version>" pair (e.g. "governance/1.0") that becomes an allOf `$ref` to
+   * that profile's published schema URL. The dependency is expressed as a URL, not a
+   * code import, so dependent profiles stay independently extractable.
+   *
+   * Effects (enforced by composition): a document using this profile must also satisfy
+   * the dependency's constraints AND declare the dependency's profile URN (because each
+   * profile's `profiles.contains` is combined under allOf). Pin the version; a dependent
+   * may tighten but never loosen its dependency; record the dependency in
+   * profiles/manifest.yaml `dependencies`.
+   */
+  dependsOn?: string[];
   /** Extra allOf entries appended after the base $ref (e.g. conditional subschemas). */
   allOfExtra?: unknown[];
   /** Extra root keywords merged verbatim (e.g. root-level `if`/`then`, `anyOf`). */
@@ -43,13 +56,21 @@ export interface ProfileOpts {
 /** Assemble a complete profile JSON Schema object (ready to serialize). */
 export function assembleProfile(opts: ProfileOpts): Record<string, unknown> {
   const baseId = opts.baseId ?? '0.3';
+  const dependencyRefs = (opts.dependsOn ?? []).map((d) => ({
+    $ref: `https://adl-spec.org/profiles/${d}/schema.json`,
+  }));
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
     $id: `https://adl-spec.org/profiles/${opts.slug}/${opts.version}/schema.json`,
     title: opts.title,
     description: opts.description,
     $defs: { extensions: EXTENSIONS },
-    allOf: [{ $ref: `https://adl-spec.org/${baseId}/schema.json` }, ...(opts.allOfExtra ?? [])],
+    // base, then profile dependencies, then this profile's own conditional subschemas.
+    allOf: [
+      { $ref: `https://adl-spec.org/${baseId}/schema.json` },
+      ...dependencyRefs,
+      ...(opts.allOfExtra ?? []),
+    ],
     ...(opts.root as Record<string, unknown>),
     ...(opts.extra ?? {}),
     $comment: PROFILE_COMMENT,
