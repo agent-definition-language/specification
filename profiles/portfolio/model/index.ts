@@ -1,5 +1,5 @@
 import { Type } from '@sinclair/typebox';
-import { Ref, Raw, assembleProfile } from '../../../model/profile-kit.ts';
+import { Ref, Raw, assembleProfile } from '../../_kit/profile-kit.ts';
 
 const root = Type.Object({
   profiles: Type.Optional(Raw({ type: 'array', contains: { const: 'urn:adl:profile:portfolio:1.0' } })),
