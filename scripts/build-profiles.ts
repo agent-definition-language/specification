@@ -11,11 +11,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { schema as registry } from '../profiles/registry/1.0/model.ts';
-import { schema as portfolio } from '../profiles/portfolio/1.0/model.ts';
-import { schema as governance } from '../profiles/governance/1.0/model.ts';
-import { schema as healthcare } from '../profiles/healthcare/1.0/model.ts';
-import { schema as financial } from '../profiles/financial/1.0/model.ts';
+import { schema as registry } from '../profiles/registry/model/index.ts';
+import { schema as portfolio } from '../profiles/portfolio/model/index.ts';
+import { schema as governance } from '../profiles/governance/model/index.ts';
+import { schema as healthcare } from '../profiles/healthcare/model/index.ts';
+import { schema as financial } from '../profiles/financial/model/index.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const check = process.argv.includes('--check');

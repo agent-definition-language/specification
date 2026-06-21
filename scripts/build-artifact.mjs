@@ -36,7 +36,12 @@ function main() {
       console.warn(`skip (missing): ${dir}`);
       continue;
     }
-    fs.cpSync(src, path.join(OUT, dir), {recursive: true});
+    // Exclude authoring sources (TypeBox model dirs) — the artifact is consumable
+    // content (schemas, markdown, examples), not the source that generates it.
+    fs.cpSync(src, path.join(OUT, dir), {
+      recursive: true,
+      filter: (s) => path.basename(s) !== 'model',
+    });
     console.log(`bundled: ${dir}/`);
   }
 
