@@ -21,13 +21,29 @@ const check = process.argv.includes('--check');
 
 const schema = JSON.parse(fs.readFileSync(path.join(DRAFT, 'schema.json'), 'utf-8'));
 
-const ts = await compile(schema, 'ADLDocument', {
+let ts = await compile(schema, 'ADLDocument', {
   bannerComment:
     '/* eslint-disable */\n/**\n * GENERATED — do not edit by hand.\n * Source: ADL spec model (model/adl.ts) -> versions/draft/schema.json\n * Regenerate with: bun run build:types\n */',
-  additionalProperties: false,
+  // Leave additionalProperties at the default (true) so open JSON-Schema-valued fields
+  // (tool parameters/returns, resource schema, prompt arguments, annotations) become
+  // index-signature objects rather than `{}` — usable by consumers that introspect them.
   declareExternallyReferenced: true,
   style: { singleQuote: true },
 });
+
+// Fix the one construct JSON Schema can express but TS cannot as-is: `runtime.degradation`
+// has a fixed `extensions` property AND patternProperties (on_*), which json2ts emits as a
+// named property plus a `[k: string]: DegradationResponse` index — an invalid combination.
+// Fold the named property into the index union so the type is valid and usable.
+const degradationFix = ts.replace(
+  /\n\s*extensions\?: Extensions;\n(\s*)\[k: string\]: DegradationResponse;/,
+  '\n$1[k: string]: DegradationResponse | Extensions | undefined;',
+);
+if (degradationFix === ts && ts.includes('[k: string]: DegradationResponse;')) {
+  console.error('build-types: degradation index/property conflict not resolved — check the post-processor.');
+  process.exit(1);
+}
+ts = degradationFix;
 
 if (check) {
   const current = fs.existsSync(OUT) ? fs.readFileSync(OUT, 'utf-8') : '';

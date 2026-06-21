@@ -93,7 +93,9 @@ export interface ADLDocument {
     | string
     | {
         template: string;
-        variables?: {};
+        variables?: {
+          [k: string]: unknown;
+        };
         extensions?: Extensions;
       };
   /**
@@ -108,17 +110,23 @@ export interface ADLDocument {
     /**
      * JSON Schema for tool input parameters
      */
-    parameters?: {};
+    parameters?: {
+      [k: string]: unknown;
+    };
     /**
      * JSON Schema for tool return value
      */
-    returns?: {};
+    returns?: {
+      [k: string]: unknown;
+    };
     /**
      * Example invocations
      */
     examples?: {
       name?: string;
-      input?: {};
+      input?: {
+        [k: string]: unknown;
+      };
       output?: unknown;
       extensions?: Extensions;
     }[];
@@ -148,7 +156,9 @@ export interface ADLDocument {
     /**
      * JSON Schema describing the resource's data structure
      */
-    schema?: {};
+    schema?: {
+      [k: string]: unknown;
+    };
     /**
      * Implementation hints and metadata (open object)
      */
@@ -168,7 +178,9 @@ export interface ADLDocument {
     /**
      * JSON Schema for template arguments
      */
-    arguments?: {};
+    arguments?: {
+      [k: string]: unknown;
+    };
     extensions?: Extensions;
   }[];
   /**
@@ -357,8 +369,7 @@ export interface ADLDocument {
      * Behavior when an operational limit is reached or a fault occurs, keyed by cause (enforced by Runtime Protocol §6)
      */
     degradation?: {
-      extensions?: Extensions;
-      [k: string]: DegradationResponse;
+      [k: string]: DegradationResponse | Extensions | undefined;
     };
     extensions?: Extensions;
   };
@@ -383,6 +394,7 @@ export interface ADLDocument {
    */
   profiles?: string[];
   extensions?: Extensions;
+  [k: string]: unknown;
 }
 /**
  * Vendor-namespaced extensions. Keys are reverse-domain identifiers.
@@ -433,6 +445,7 @@ export interface DataClassification {
     extensions?: Extensions;
   };
   extensions?: Extensions;
+  [k: string]: unknown;
 }
 /**
  * Cumulative token / cost / wall-clock budget, scoped per session and per day (enforced by Runtime Protocol §2)
