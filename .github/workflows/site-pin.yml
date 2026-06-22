@@ -1,0 +1,63 @@
+name: Pin site to spec
+
+# When spec content changes on main, bump a rolling pin in the website repo and keep
+# a single PR open. Vercel builds a PREVIEW for that PR (non-prod); merging it deploys
+# PRODUCTION at the pinned commit. Reproducible: prod renders an exact spec SHA.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'core/**'
+      - 'protocol/**'
+      - 'profiles/**'
+      - 'patterns/**'
+
+concurrency:
+  group: site-pin
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  pin:
+    name: Bump rolling spec pin in website
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint app token (website)
+        id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.ADL_APP_CLIENT_ID }}
+          private-key: ${{ secrets.ADL_APP_PRIVATE_KEY }}
+          owner: agent-definition-language
+          repositories: website
+      - name: Checkout website
+        uses: actions/checkout@v5
+        with:
+          repository: agent-definition-language/website
+          token: ${{ steps.token.outputs.token }}
+      - name: Bump pin + open/refresh rolling PR
+        env:
+          GH_TOKEN: ${{ steps.token.outputs.token }}
+          APP_SLUG: ${{ steps.token.outputs.app-slug }}
+        run: |
+          SHA="$GITHUB_SHA"; SHORT="${SHA:0:7}"
+          printf '{\n  "ref": "%s"\n}\n' "$SHA" > spec-pin.json
+          BOT_ID="$(gh api "/users/${APP_SLUG}[bot]" --jq .id)"
+          git config user.name "${APP_SLUG}[bot]"
+          git config user.email "${BOT_ID}+${APP_SLUG}[bot]@users.noreply.github.com"
+          git checkout -B spec-pin
+          git add spec-pin.json
+          if git diff --cached --quiet; then
+            echo "pin already at ${SHORT}; nothing to do"; exit 0
+          fi
+          git commit -m "chore: pin site to specification ${SHORT}"
+          git push -f origin spec-pin
+          if gh pr view spec-pin --json state >/dev/null 2>&1; then
+            echo "rolling PR already open; branch updated to ${SHORT}"
+          else
+            gh pr create --base main --head spec-pin \
+              --title "chore: promote specification to production" \
+              --body "Rolling pin of the published site to the latest \`specification\` \`main\`. The Vercel PR preview renders the pinned content; merging deploys production at that commit. Latest: \`${SHORT}\`."
+          fi
