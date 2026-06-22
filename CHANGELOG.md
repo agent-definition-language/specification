@@ -26,21 +26,41 @@ groundwork:
 
 ## [0.3.0] — 2026-06-03
 
+The protocol release: ADL grows from a single document into a three-document family —
+the passport plus a **Trust Protocol** and a **Runtime Protocol** — with a security
+model and a full runtime-governance layer.
+
 ### Added
-- **Protocol** — new Trust and Runtime protocol layer with runtime governance, plus
-  the ADL security model.
-- **Core** — VAL-37 URN type rule; sub-agents split into subordinate personas and
-  external delegation; capability-described, self-triaging discovery entries.
+- **Security model** — new Core §10 security model, splitting Core and Trust concerns.
+- **Trust Protocol** — new standalone Trust Protocol document (passport verification,
+  presentation proof, the Passport section), with its own IANA, Security
+  Considerations, and References.
+- **Runtime Protocol** — new Runtime Protocol document: the runtime governor (§1),
+  enforcement (§2), the runtime-governance member set (§3–§7), enforcement evidence
+  (§8), and budget envelopes (§9.6); the enforcement-record schema is served.
+- **Core** — runtime-governance members and budget envelopes; the `VAL-37` URN type
+  rule; sub-agents split into subordinate personas vs external delegation; self-triaging
+  discovery entries carrying a capability description; governed discovery.
 - **Core** — `VAL-35a` assigned error code `ADL-6009`.
+- Named the three-document family and added a section-layer taxonomy.
 
 ### Changed
-- **Protocol** — renamed `X-ADL-*` headers to `ADL-*` (RFC 6648).
-- **Release** — the protocol layer is frozen alongside each spec cut.
+- **Protocol** — renamed `X-ADL-*` headers to `ADL-*` (RFC 6648); renamed `protocol.md`
+  to `trust-protocol.md`; renumbered the Trust Protocol into standalone sections.
+- **Discovery** — reframed for non-deterministic agents; distinguished the ADL document
+  from the passport.
+- **Release** — the protocol layer is now frozen alongside each spec cut.
+
+### Fixed
+- Resolved dangling references and error-code gaps in the draft; repaired the A2A and
+  W3C.VC reference URLs; corrected IMDA/CLTC citations and removed non-existent control
+  IDs.
 
 ### Documentation
-- Spec figures D1–D8 and UML sequence diagrams (incl. multi-hop authorization);
-  protocol IANA, Security Considerations, and References sections; reference and
-  error-code repairs; profile docs aligned to ADL 0.2.x compatibility.
+- Completed cited references (Core §1.4, §19, and the I-D boilerplate) and added IANA,
+  Security Considerations, and References to both protocols; added the D1–D8 figures and
+  UML sequence diagrams (multi-hop authorization, governed discovery §6.4); aligned and
+  reordered the profile docs to ADL 0.2.x.
 
 ## [0.2.0] — 2026-03-18
 
