@@ -2,8 +2,8 @@
 #
 # Signatures are recorded once in a central ledger — the `cla-signatures` branch of the
 # governance repo — and honored across every ADL repository, so contributors sign once.
-# Requires a least-privilege PAT (secret CLA_SIGNATURES_TOKEN) able to write that branch
-# in agent-definition-language/governance.
+# The cross-repo write uses a short-lived token minted from the org-owned `adl-autobot`
+# GitHub App (secrets ADL_APP_ID + ADL_APP_PRIVATE_KEY); no personal PATs.
 name: CLA
 
 on:
@@ -13,7 +13,7 @@ on:
     types: [created]
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
   actions: read
 
@@ -25,11 +25,19 @@ jobs:
       (github.event_name == 'pull_request_target') ||
       (github.event_name == 'issue_comment' && github.event.comment.body == 'recheck')
     steps:
+      - name: Mint app token (write governance ledger)
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.ADL_APP_ID }}
+          private-key: ${{ secrets.ADL_APP_PRIVATE_KEY }}
+          owner: agent-definition-language
+          repositories: governance
       - name: CLA Assistant
         uses: contributor-assistant/github-action@v2.6.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PERSONAL_ACCESS_TOKEN: ${{ secrets.CLA_SIGNATURES_TOKEN }}
+          PERSONAL_ACCESS_TOKEN: ${{ steps.app-token.outputs.token }}
         with:
           path-to-document: 'https://github.com/agent-definition-language/governance/blob/main/CLA.md'
           path-to-signatures: 'signatures/cla.json'
