@@ -3,7 +3,7 @@ name: Release
 # Controlled, tag-driven publish. Cutting a release (freezing core/_next into a
 # version dir + bumping the manifest) is done deliberately; pushing the matching
 # `v<version>` tag triggers this workflow, which verifies, builds the content
-# artifact, and publishes it as a GitHub Release asset.
+# artifact, and publishes it as a GitHub Release asset with the changelog as notes.
 on:
   push:
     tags: ['v*']
@@ -21,20 +21,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Guard — require release tooling at this tag
+        id: guard
+        run: |
+          if [ ! -f scripts/build-artifact.mjs ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::No build-artifact.mjs at $GITHUB_REF_NAME (historical tag) — skipping build/publish. Backfill its Release manually if desired."
+          fi
       - uses: oven-sh/setup-bun@v2
+        if: steps.guard.outputs.skip != 'true'
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
+        if: steps.guard.outputs.skip != 'true'
       - name: Schemas + profiles match the model
+        if: steps.guard.outputs.skip != 'true'
         run: bun run verify
       - name: Build content artifact
+        if: steps.guard.outputs.skip != 'true'
         run: bun scripts/build-artifact.mjs
       - name: Stamp artifact with the version
+        if: steps.guard.outputs.skip != 'true'
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           cp adl-content.tgz "adl-content-${VERSION}.tgz"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
       - name: Extract this version's changelog section
+        if: steps.guard.outputs.skip != 'true'
         run: |
           awk -v v="$VERSION" '
             $0 ~ ("^## \\[" v "\\]") {f=1; next}
@@ -47,6 +60,7 @@ jobs:
             echo "no CHANGELOG.md section for $VERSION; will fall back to generated notes"
           fi
       - name: Publish GitHub Release
+        if: steps.guard.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
