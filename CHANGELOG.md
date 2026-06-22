@@ -64,30 +64,37 @@ model and a full runtime-governance layer.
 
 ## [0.2.0] — 2026-03-18
 
-### Changed
-- Replaced the `x_` extension mechanism with a structured `extensions` object (schema
-  and spec).
-- Elevated the passport model into the core specification.
-
 ### Added
-- Standard vs vendor profile taxonomy (Section 13); conformance tiers, passport
-  fields, and the governance record.
-- Documentation-site version bridge (multi-version rendering).
+- Standard vs vendor **profile taxonomy** (Section 13).
+- **Conformance tiers**, passport fields, and the governance record.
+- Manifest section structure that drives profile badge rendering.
+- Documentation-site **version bridge** (multi-version rendering).
+
+### Changed
+- Replaced the `x_` extension mechanism with a structured **`extensions` object** —
+  across both the spec and the schema (`x_` patternProperties → an `extensions` `$def`).
+- Elevated the **passport model** into the core specification.
+- Corrected RFC 2119 keyword usage in the new sections.
 
 ### Documentation
-- Aligned terminology with ISO/IEC 22989:2022; added ISO-22989 and AI-PROTOCOLS
-  informative references; cited IMDA and CLTC governance studies.
+- Aligned terminology with **ISO/IEC 22989:2022**; added the ISO-22989 and
+  AI-PROTOCOLS informative references; cited the IMDA and CLTC governance studies.
 
 ## [0.1.0] — 2026-02-18
 
-Initial release.
+Initial release — the ADL document model, the first profile, identity, and the
+standards-track scaffolding.
 
 ### Added
-- Core ADL data model and document structure, with composable data classification as a
-  required core member.
-- Profiles directory structure and the governance profile.
-- HTTPS-first identity model, discovery, and IANA registrations.
-- IETF draft generation pipeline; metadata and error-source-pointer examples.
+- Core ADL **data model** and document structure, with composable **data
+  classification** as a required core member.
+- **Profiles** directory structure and the **governance profile**.
+- **HTTPS-first identity model**, discovery, and IANA registrations, including the
+  initial IANA profile-registry contents.
+- **IETF draft pipeline** — draft generation and spec expansion for standards
+  readiness (`draft-nederveld-adl-01`, idnits-clean).
+- Examples — metadata and error-source pointers.
+- Governance-first framing and patent status.
 
 [Unreleased]: https://github.com/agent-definition-language/specification/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/agent-definition-language/specification/releases/tag/v0.3.0
