@@ -33,7 +33,7 @@ conformant when it loads every vector and produces matching outcomes.
 ## Layout
 
 ```
-core/draft/test-vectors/verify/
+core/_next/test-vectors/verify/
 ├── README.md         (this file)
 ├── SCHEMA.md         (vector format reference)
 ├── test-keys.json    (deterministic Ed25519 keypairs the generator uses)

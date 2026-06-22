@@ -8,11 +8,11 @@
 latest: "0.3.0"
 
 # The working draft shown at /spec/next/
-next: "draft"
+next: "_next"
 
 # All versions with their metadata
 versions:
-  - id: "draft"
+  - id: "_next"
     status: draft
     label: "0.4.0 (Draft)"
 
