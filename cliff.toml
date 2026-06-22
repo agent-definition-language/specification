@@ -1,0 +1,44 @@
+# git-cliff — generate the ADL spec changelog from conventional commits.
+# Subject = WHAT; first body paragraph = WHY. Grouped by category, then scope.
+# Used at release-cut time to produce the new CHANGELOG.md section.
+
+[changelog]
+header = """
+# Changelog
+
+All notable changes to the ADL specification are documented here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project follows
+[Semantic Versioning](https://semver.org/).
+"""
+body = """
+{% if version %}\
+## [{{ version | trim_start_matches(pat="v") }}] — {{ timestamp | date(format="%Y-%m-%d") }}
+{% else %}\
+## [Unreleased]
+{% endif %}
+{% for group, commits in commits | group_by(attribute="group") %}\
+### {{ group }}
+{% for commit in commits %}\
+- {% if commit.scope %}**{{ commit.scope }}** — {% endif %}{{ commit.message }}\
+{% if commit.body %} — {{ commit.body | split(pat="\n\n") | first | trim | replace(from="\n", to=" ") }}{% endif %}
+{% endfor %}
+{% endfor %}
+"""
+trim = true
+
+[git]
+conventional_commits = true
+filter_unconventional = true
+filter_commits = true
+tag_pattern = "v[0-9]*"
+sort_commits = "newest"
+
+# feat/fix/refactor/perf carry the changelog; everything mechanical is skipped.
+commit_parsers = [
+  { message = "^feat", group = "Added" },
+  { message = "^fix", group = "Fixed" },
+  { message = "^refactor", group = "Changed" },
+  { message = "^perf", group = "Changed" },
+  { message = "^(docs|style|test|chore|ci|build|revert)", skip = true },
+  { message = ".*", skip = true },
+]
