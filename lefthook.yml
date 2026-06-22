@@ -1,0 +1,7 @@
+# Git hooks (managed by Lefthook; installed via the `postinstall` script).
+# commit-msg: enforce Conventional Commits + require a body (the "why") for
+# changelog-worthy types, so the release changelog always has material.
+commit-msg:
+  commands:
+    conventional:
+      run: bun scripts/check-commit-msg.ts {1}
