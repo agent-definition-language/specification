@@ -2,7 +2,7 @@
 /**
  * Emit and verify the ADL core JSON Schemas from the TypeBox model.
  *
- *   bun run scripts/build-schema.ts            # write versions/draft/schema*.json
+ *   bun run scripts/build-schema.ts            # write core/draft/schema*.json
  *   bun run scripts/build-schema.ts --check    # verify only (no writes); nonzero on drift
  *
  * Verifies the emitted passport schema is structurally identical (deep-equal,
@@ -14,8 +14,8 @@ import { fileURLToPath } from 'node:url';
 import { buildPassportSchema } from '../model/adl.ts';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const DRAFT = path.join(ROOT, 'versions', 'draft');
-const V030 = path.join(ROOT, 'versions', '0.3.0');
+const DRAFT = path.join(ROOT, 'core', 'draft');
+const V030 = path.join(ROOT, 'core', '0.3.0');
 const check = process.argv.includes('--check');
 
 /** Drop TypeBox symbols and normalize empty `required: []` (source omits them). */
@@ -118,4 +118,4 @@ if (failed) {
 // Write generated outputs for the draft (released versions stay frozen).
 fs.writeFileSync(path.join(DRAFT, 'schema.json'), JSON.stringify(emitted, null, 2) + '\n');
 fs.writeFileSync(path.join(DRAFT, 'schema-strict.json'), JSON.stringify(buildStrict('0.3'), null, 2) + '\n');
-console.log('\nwrote versions/draft/schema.json and schema-strict.json (generated from model)');
+console.log('\nwrote core/draft/schema.json and schema-strict.json (generated from model)');

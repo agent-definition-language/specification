@@ -98,5 +98,5 @@ Organizations that need catalog identity alongside portfolio relationships decla
 
 ## See Also
 
-- [ADL Specification — Appendix C](../../versions/0.1.0/spec.md#appendix-c-profiles)
+- [ADL Specification — Appendix C](../../core/0.1.0/spec.md#appendix-c-profiles)
 - [Registry Profile](../registry/) — Agent catalog identity, classification, and federation (sibling profile, no dependency)

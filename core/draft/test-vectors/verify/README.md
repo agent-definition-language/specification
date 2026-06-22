@@ -33,7 +33,7 @@ conformant when it loads every vector and produces matching outcomes.
 ## Layout
 
 ```
-versions/draft/test-vectors/verify/
+core/draft/test-vectors/verify/
 ├── README.md         (this file)
 ├── SCHEMA.md         (vector format reference)
 ├── test-keys.json    (deterministic Ed25519 keypairs the generator uses)
@@ -167,7 +167,7 @@ includes a DID Document, in that document as well).
 ## Status
 
 The vector pack is part of the **draft** version of the spec. It will
-move to a numbered version (e.g., `versions/0.3.0/test-vectors/verify/`)
+move to a numbered version (e.g., `core/0.3.0/test-vectors/verify/`)
 when §10.3 is included in a published release.
 
 ## Related

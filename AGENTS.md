@@ -43,24 +43,24 @@ Behavioral guidelines to reduce common LLM coding mistakes.
 Released, immutable artifacts. Changing them rewrites published history and breaks
 downstream consumers, conformance vectors, and the documentation site's version snapshots.
 
-- `versions/<x.y.z>/` — any numbered release directory. The working draft lives in
-  `versions/draft/`; edit there.
+- `core/<x.y.z>/` — any numbered release directory. The working draft lives in
+  `core/draft/`; edit there.
 - `profiles/<name>/<version>/` — any **released** profile version. Edit the in-development
   draft version; never retroactively change a released one.
 
-A version's status is defined in `versions/manifest.yaml` / `profiles/manifest.yaml`. A fix
+A version's status is defined in `core/manifest.yaml` / `profiles/manifest.yaml`. A fix
 that looks like it belongs in a released version belongs in the draft (and, if warranted, a
 new release), never in the frozen copy.
 
 ## Layout
 
-- `versions/draft/spec.md` — the working-draft spec (edit here for spec changes)
-- `versions/draft/schema.json` — JSON Schema; `schema-strict.json` rejects unknown top-level members
-- `versions/draft/schema-enforcement-record.json` — schema for Runtime Protocol enforcement records
-- `versions/draft/schema-discovery.json` — schema for the `.well-known/adl-agents` discovery document (§6.4)
-- `versions/draft/examples/` — version-scoped example documents (`*.yaml` + `*.mdx` wrappers)
-- `versions/draft/diagrams/` — spec diagrams
-- `versions/manifest.yaml` — version metadata: `latest`, `next`, per-version `status` (no standards-submission metadata)
+- `core/draft/spec.md` — the working-draft spec (edit here for spec changes)
+- `core/draft/schema.json` — JSON Schema; `schema-strict.json` rejects unknown top-level members
+- `core/draft/schema-enforcement-record.json` — schema for Runtime Protocol enforcement records
+- `core/draft/schema-discovery.json` — schema for the `.well-known/adl-agents` discovery document (§6.4)
+- `core/draft/examples/` — version-scoped example documents (`*.yaml` + `*.mdx` wrappers)
+- `core/draft/diagrams/` — spec diagrams
+- `core/manifest.yaml` — version metadata: `latest`, `next`, per-version `status` (no standards-submission metadata)
 - `protocol/draft/` — protocol layer: `trust-protocol.md`, `runtime-protocol.md`, `index.md`
 - `profiles/` — domain profiles, each versioned independently; `profiles/manifest.yaml` holds metadata/status
 - `patterns/` — non-normative, version-pinned deployment patterns
@@ -69,7 +69,7 @@ new release), never in the frozen copy.
 
 ## Spec authoring conventions
 
-When editing `versions/draft/spec.md`:
+When editing `core/draft/spec.md`:
 - Section headings: `## N. Title` (top-level), `### N.M Title` (subsections), `## Appendix A. Title`
 - Requirements language: RFC 2119 keywords in **bold** — **MUST**, **SHOULD**, **MAY**, etc.
 - Tables: Markdown pipe tables for member definitions, error codes, validation rules
@@ -80,14 +80,14 @@ When editing `versions/draft/spec.md`:
 
 - Commits: [Conventional Commits](https://www.conventionalcommits.org/) — e.g. `docs(spec): ...`, `feat(spec): ...`
 - Branches: short-lived `feature/`, `fix/`, `docs/` → merge to `main`
-- Spec versioning: SemVer; `versions/manifest.yaml` controls latest/next and status lifecycle
+- Spec versioning: SemVer; `core/manifest.yaml` controls latest/next and status lifecycle
 
 ## When acting
 
-- **Spec change:** Edit `versions/draft/spec.md`; update examples if needed.
-- **Schema change:** Update `versions/draft/schema.json` alongside the member it defines.
+- **Spec change:** Edit `core/draft/spec.md`; update examples if needed.
+- **Schema change:** Update `core/draft/schema.json` alongside the member it defines.
 - **Protocol change:** Edit `protocol/draft/trust-protocol.md` or `runtime-protocol.md`.
 - **Profile change:** Edit `profiles/<name>/<version>/profile.md`; update profile examples.
 - **New proposal:** Add under `proposals/`; follow `proposals/README.md`.
-- **New example:** Add YAML under `versions/draft/examples/`; update `examples/README.md`.
+- **New example:** Add YAML under `core/draft/examples/`; update `examples/README.md`.
 - **New conformance vector:** Add under `conformance/<version>/{valid,invalid}/`.

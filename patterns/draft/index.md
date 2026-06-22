@@ -21,7 +21,7 @@ This section is **non-normative**. The normative content lives in the [specifica
 ## What does not belong here
 
 - **Standalone ADL document samples** — those go in [Examples](/spec/next/examples) (e.g. `minimal.yaml`, `production.yaml`).
-- **Test vectors** — those go in `versions/draft/test-vectors/`, with their own SCHEMA.md and conformance runners.
+- **Test vectors** — those go in `core/draft/test-vectors/`, with their own SCHEMA.md and conformance runners.
 - **Implementer guides** that prescribe "do these steps to build X" — patterns describe how the spec composes, not how to build something.
 
 ## Index
@@ -39,4 +39,4 @@ This section is **non-normative**. The normative content lives in the [specifica
 - **Section anchors** at the end of every pattern mapping every operation to the exact `§10.x.y.z` it cites.
 - **Failure modes section** documenting what happens when each authentication or authorization gate rejects.
 - **End-to-end audit reconstruction** showing how the chain reconstructs across hops where no single hop sees the full picture.
-- **Version-pinned**: this directory lives under `versions/draft/`. When the draft is released, patterns move with it.
+- **Version-pinned**: this directory lives under `core/draft/`. When the draft is released, patterns move with it.

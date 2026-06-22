@@ -102,6 +102,6 @@ The Registry Profile is independent — it has no dependencies on other profiles
 
 ## See Also
 
-- [ADL Specification — Appendix C](../../versions/0.1.0/spec.md#appendix-c-profiles)
+- [ADL Specification — Appendix C](../../core/0.1.0/spec.md#appendix-c-profiles)
 - [Portfolio Profile](../portfolio/) — Agent relationships and domain alignment (sibling profile, no dependency)
 - [Governance Profile](../governance/) — Compliance and governance controls (sibling profile, no dependency)

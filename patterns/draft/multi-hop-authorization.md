@@ -519,7 +519,7 @@ For implementers building this scenario:
 - [Draft spec §10.3 (Authentication)](/spec/next#103-authentication)
 - [Draft spec §10.4 (Authorization Scopes)](/spec/next#104-authorization-scopes)
 - [Draft spec §6.4 (Discovery)](/spec/next#64-discovery)
-- [Test vector pack](https://github.com/adl-spec/agent-definition-language/tree/main/versions/draft/test-vectors/verify) (GitHub)
+- [Test vector pack](https://github.com/adl-spec/agent-definition-language/tree/main/core/draft/test-vectors/verify) (GitHub)
 - [OpenClaw passport reference example](https://github.com/adl-spec/agent-definition-language/tree/main/packages/adl-agent/examples/openclaw-passport) (GitHub)
 
 

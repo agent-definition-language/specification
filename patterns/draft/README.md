@@ -22,7 +22,7 @@ This directory is **non-normative**. The normative content lives in [`spec.md`](
 - **Section anchors** at the end of every pattern mapping every operation in the scenario to the exact `§10.x.y.z` it cites — so the pattern stays auditable as the spec evolves.
 - **Failure modes section** documenting what happens when each authentication or authorization gate rejects.
 - **End-to-end audit reconstruction** showing how a regulator or auditor reconstructs the chain across hops where no single hop sees the full picture.
-- **Version-pinned**: this directory lives under `versions/draft/`. When the draft is released as `0.3.0`, the patterns move with it (`versions/0.3.0/patterns/`). Subsequent revisions update spec section references in lockstep.
+- **Version-pinned**: this directory lives under `core/draft/`. When the draft is released as `0.3.0`, the patterns move with it (`core/0.3.0/patterns/`). Subsequent revisions update spec section references in lockstep.
 
 ## Index
 

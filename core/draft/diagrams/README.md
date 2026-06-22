@@ -2,7 +2,7 @@
 
 Editable Excalidraw masters and their exported SVGs for the spec docs in this version.
 
-This directory is **version-pinned**: it lives under `versions/draft/` alongside `patterns/`, `examples/`, and `test-vectors/`, so the diagrams travel with the spec when the draft is released (snapshotting into `versions/0.3.0/diagrams/`). Each version's docs reference their own copy.
+This directory is **version-pinned**: it lives under `core/draft/` alongside `patterns/`, `examples/`, and `test-vectors/`, so the diagrams travel with the spec when the draft is released (snapshotting into `core/0.3.0/diagrams/`). Each version's docs reference their own copy.
 
 ## Contents
 
@@ -16,8 +16,8 @@ Commit **both** the `.excalidraw` master and the exported `.svg` together.
 1. **Draw** the diagram at [excalidraw.com](https://excalidraw.com).
    - Keep text large enough to read in docs.
    - Use consistent stroke width; group related shapes.
-2. **Save the master** as `versions/draft/diagrams/<name>.excalidraw` (Menu → Save to… / export the scene).
-3. **Export the SVG** with a **white background baked in**: Menu → Export image → SVG, "Background: on", dark mode off. Save as `versions/draft/diagrams/<name>.svg`.
+2. **Save the master** as `core/draft/diagrams/<name>.excalidraw` (Menu → Save to… / export the scene).
+3. **Export the SVG** with a **white background baked in**: Menu → Export image → SVG, "Background: on", dark mode off. Save as `core/draft/diagrams/<name>.svg`.
    - White background keeps Excalidraw's dark strokes readable in the site's dark theme without any wrapper.
 4. **(Optional) Optimize** — from `site/`, run `npm run optimize:diagrams`. Be conservative; aggressive SVGO settings can strip embedded fonts or scene metadata.
 5. **Embed** in a doc using a **relative** path so the asset version-pins (never a global `/img/...` URL — that would share one asset across all versions and break version-pinning):

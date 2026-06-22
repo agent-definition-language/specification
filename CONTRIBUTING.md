@@ -10,9 +10,9 @@ Quick orientation for this repo:
 - **Normative changes** (anything that changes meaning, requirements, schemas, or
   conformance): open an RFC under [`proposals/`](./proposals) (or a linked issue) first.
 - **Sign the CLA** — required before any merge; the bot will prompt on your first PR.
-- **Change-control tiers:** the core spec (`versions/`) is the highest bar; `protocol/`
+- **Change-control tiers:** the core spec (`core/`) is the highest bar; `protocol/`
   moves on its own cadence; `profiles/` are delegated to domain stewards with the central
   team controlling the profile registry. See `governance/CHARTER.md`.
 
-Draft work happens in the open under `versions/draft/`. Unformed ideas may incubate
+Draft work happens in the open under `core/draft/`. Unformed ideas may incubate
 privately and be promoted to a public proposal when ready.

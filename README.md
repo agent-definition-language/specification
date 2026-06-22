@@ -10,12 +10,12 @@ This repository is the **source of truth for the standard**: the core specificat
 
 | Version | Spec | Schema |
 |---------|------|--------|
-| **0.3.0** (latest) | [spec.md](versions/0.3.0/spec.md) | [schema.json](versions/0.3.0/schema.json) |
-| 0.2.0 | [spec.md](versions/0.2.0/spec.md) | [schema.json](versions/0.2.0/schema.json) |
-| 0.1.0 | [spec.md](versions/0.1.0/spec.md) | [schema.json](versions/0.1.0/schema.json) |
-| draft (next) | [spec.md](versions/draft/spec.md) | [schema.json](versions/draft/schema.json) |
+| **0.3.0** (latest) | [spec.md](core/0.3.0/spec.md) | [schema.json](core/0.3.0/schema.json) |
+| 0.2.0 | [spec.md](core/0.2.0/spec.md) | [schema.json](core/0.2.0/schema.json) |
+| 0.1.0 | [spec.md](core/0.1.0/spec.md) | [schema.json](core/0.1.0/schema.json) |
+| draft (next) | [spec.md](core/draft/spec.md) | [schema.json](core/draft/schema.json) |
 
-The Markdown in `versions/` is the source of truth for the specification until a standards body publishes an official standard. Released versions are immutable; active work happens in `versions/draft/`.
+The Markdown in `core/` is the source of truth for the specification until a standards body publishes an official standard. Released versions are immutable; active work happens in `core/draft/`.
 
 ## Quick start
 
@@ -29,7 +29,7 @@ bunx @adl-spec/cli validate my-agent.yaml
 
 | Path | Purpose |
 |------|---------|
-| [versions/](versions/) | Versioned core specifications and JSON schemas (the data model) |
+| [core/](core/) | Versioned core specifications and JSON schemas (the data model) |
 | [protocol/](protocol/) | Companion protocol specs (runtime, trust) — versioned independently |
 | [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial, portfolio, registry) |
 | [patterns/](patterns/) | Non-normative, version-pinned deployment patterns |

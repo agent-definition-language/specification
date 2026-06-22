@@ -6,7 +6,7 @@ Test vectors for validating ADL implementations against the specification. Vecto
 ```
 conformance/
   <version>/
-    valid/      documents that MUST validate against versions/<version>/schema(-strict).json
+    valid/      documents that MUST validate against core/<version>/schema(-strict).json
     invalid/    documents that MUST be rejected, each with a header comment stating why
 ```
 

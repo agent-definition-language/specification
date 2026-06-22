@@ -2,12 +2,12 @@
 /**
  * Build the ADL spec content artifact.
  *
- * Bundles the consumable spec corpus — versions/, protocol/, profiles/, patterns/ —
+ * Bundles the consumable spec corpus — core/, protocol/, profiles/, patterns/ —
  * into dist-artifact/ and a tarball (adl-content.tgz). Downstream consumers (the
  * website, the standardization tooling) extract this and point ADL_CONTENT_ROOT at it,
  * instead of reading this repo directly.
  *
- * Released versions inside versions/ are immutable; the draft is included too so the
+ * Released versions inside core/ are immutable; the draft is included too so the
  * site can render /spec/next. Standards-submission metadata (spec-manifest.yaml,
  * ietf_draft) is not present in this repo and therefore never ships in the artifact.
  *
@@ -20,7 +20,7 @@ import {fileURLToPath} from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = path.join(ROOT, 'dist-artifact');
-const CONTENT_DIRS = ['versions', 'protocol', 'profiles', 'patterns'];
+const CONTENT_DIRS = ['core', 'protocol', 'profiles', 'patterns'];
 
 function rmrf(p) {
   fs.rmSync(p, {recursive: true, force: true});
