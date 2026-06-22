@@ -1,0 +1,44 @@
+name: Release
+
+# Controlled, tag-driven publish. Cutting a release (freezing core/_next into a
+# version dir + bumping the manifest) is done deliberately; pushing the matching
+# `v<version>` tag triggers this workflow, which verifies, builds the content
+# artifact, and publishes it as a GitHub Release asset.
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false # never cancel a publish mid-flight
+
+permissions:
+  contents: write # create the GitHub Release
+
+jobs:
+  release:
+    name: Build + publish content artifact
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Schemas + profiles match the model
+        run: bun run verify
+      - name: Build content artifact
+        run: bun scripts/build-artifact.mjs
+      - name: Stamp artifact with the version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          cp adl-content.tgz "adl-content-${VERSION}.tgz"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "adl-content-${VERSION}.tgz" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes
