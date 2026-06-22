@@ -14,5 +14,5 @@ Quick orientation for this repo:
   moves on its own cadence; `profiles/` are delegated to domain stewards with the central
   team controlling the profile registry. See `governance/CHARTER.md`.
 
-Draft work happens in the open under `core/draft/`. Unformed ideas may incubate
+Draft work happens in the open under `core/_next/`. Unformed ideas may incubate
 privately and be promoted to a public proposal when ready.
