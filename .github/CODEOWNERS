@@ -1,0 +1,3 @@
+# Default owner for all paths. Add per-area owners (e.g. /profiles/healthcare/ @steward)
+# as maintainers/domain stewards are seated.
+* @terry-nederveld
