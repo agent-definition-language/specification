@@ -34,11 +34,26 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           cp adl-content.tgz "adl-content-${VERSION}.tgz"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - name: Extract this version's changelog section
+        run: |
+          awk -v v="$VERSION" '
+            $0 ~ ("^## \\[" v "\\]") {f=1; next}
+            f && /^## \[/ {exit}
+            f {print}
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ -s RELEASE_NOTES.md ]; then
+            echo "using CHANGELOG.md section for $VERSION"
+          else
+            echo "no CHANGELOG.md section for $VERSION; will fall back to generated notes"
+          fi
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            "adl-content-${VERSION}.tgz" \
-            --title "$GITHUB_REF_NAME" \
-            --generate-notes
+          if [ -s RELEASE_NOTES.md ]; then
+            gh release create "$GITHUB_REF_NAME" "adl-content-${VERSION}.tgz" \
+              --title "$GITHUB_REF_NAME" --notes-file RELEASE_NOTES.md
+          else
+            gh release create "$GITHUB_REF_NAME" "adl-content-${VERSION}.tgz" \
+              --title "$GITHUB_REF_NAME" --generate-notes
+          fi
