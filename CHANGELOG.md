@@ -27,24 +27,33 @@ groundwork:
 ## [0.3.0] — 2026-06-03
 
 The protocol release: ADL grows from a single document into a three-document family —
-the passport plus a **Trust Protocol** and a **Runtime Protocol** — with a security
-model and a full runtime-governance layer.
+the passport plus a **Trust Protocol** and a **Runtime Protocol** — and the core gains
+runtime governance, authorization scopes, budgets, and graceful degradation.
 
 ### Added
-- **Security model** — new Core §10 security model, splitting Core and Trust concerns.
-- **Trust Protocol** — new standalone Trust Protocol document (passport verification,
-  presentation proof, the Passport section), with its own IANA, Security
+- **Trust Protocol** — new standalone document (did not exist in 0.2.0): passport
+  verification, presentation proof, the Passport section; with its own IANA, Security
   Considerations, and References.
-- **Runtime Protocol** — new Runtime Protocol document: the runtime governor (§1),
-  enforcement (§2), the runtime-governance member set (§3–§7), enforcement evidence
-  (§8), and budget envelopes (§9.6); the enforcement-record schema is served.
-- **Core** — runtime-governance members and budget envelopes; the `VAL-37` URN type
-  rule; sub-agents split into subordinate personas vs external delegation; self-triaging
-  discovery entries carrying a capability description; governed discovery.
-- **Core** — `VAL-35a` assigned error code `ADL-6009`.
+- **Runtime Protocol** — new standalone document: the runtime governor (§1),
+  enforcement (§2), the runtime-governance member set (§3–§7), and enforcement evidence
+  (§8).
+- **Core §9.6 budget envelopes** — new `budget` and `budgetDimension` schema
+  definitions.
+- **Core §9.7 Sub-Agents and Delegation** — sub-agents split into subordinate personas
+  vs external delegation.
+- **Core §10.4 Authorization Scopes** — new in the security model.
+- **Core §11.5 Degradation** — graceful-degradation responses, with a new
+  `degradationResponse` schema definition.
+- **New schema documents** — `schema-discovery.json` (self-triaging discovery entries
+  carrying a capability description) and `schema-enforcement-record.json` (enforcement
+  evidence / governed discovery).
+- **Core** — the `VAL-37` URN type rule; `VAL-35a` assigned error code `ADL-6009`.
 - Named the three-document family and added a section-layer taxonomy.
 
 ### Changed
+- **Core/Trust split** — the §10 security model (present since 0.2.0) was reorganized to
+  Data Classification, Attestation, Authentication, Authorization Scopes, Encryption,
+  with trust concerns moved out into the new Trust Protocol.
 - **Protocol** — renamed `X-ADL-*` headers to `ADL-*` (RFC 6648); renamed `protocol.md`
   to `trust-protocol.md`; renumbered the Trust Protocol into standalone sections.
 - **Discovery** — reframed for non-deterministic agents; distinguished the ADL document
