@@ -1,6 +1,6 @@
 # Patterns
 
-Worked, version-pinned deployment patterns that trace real-world agent topologies through the spec end-to-end. Each pattern in this directory cites specific section numbers (`§10.3.1.x`, `§10.4.4` step N, etc.) so an implementer reading along can move from "I want this behavior in production" to "the normative paragraph that says how" in one lookup.
+Worked deployment patterns that trace real-world agent topologies through the spec end-to-end. Each pattern in this directory cites specific section numbers (`§10.3.1.x`, `§10.4.4` step N, etc.) so an implementer reading along can move from "I want this behavior in production" to "the normative paragraph that says how" in one lookup.
 
 This directory is **non-normative**. The normative content lives in [`spec.md`](../spec.md). Patterns illustrate composition, document failure modes, and provide regulators or auditors with reconstructable end-to-end traces — but if a pattern ever conflicts with the spec, the spec wins.
 
@@ -22,7 +22,7 @@ This directory is **non-normative**. The normative content lives in [`spec.md`](
 - **Section anchors** at the end of every pattern mapping every operation in the scenario to the exact `§10.x.y.z` it cites — so the pattern stays auditable as the spec evolves.
 - **Failure modes section** documenting what happens when each authentication or authorization gate rejects.
 - **End-to-end audit reconstruction** showing how a regulator or auditor reconstructs the chain across hops where no single hop sees the full picture.
-- **Version-pinned**: this directory lives under `core/_next/`. When the draft is released as `0.3.0`, the patterns move with it (`core/0.3.0/patterns/`). Subsequent revisions update spec section references in lockstep.
+- **Unversioned living guidance**: patterns are non-normative and track the current spec. Section references point at the latest spec/protocol and are updated as the spec evolves; they are not snapshotted per release.
 
 ## Index
 

@@ -2,13 +2,13 @@
 id: index
 title: Patterns
 sidebar_position: 1
-description: Worked, version-pinned deployment patterns that trace real-world agent topologies through the ADL specification end-to-end.
+description: Worked deployment patterns that trace real-world agent topologies through the ADL specification end-to-end.
 keywords: [adl, patterns, deployment patterns, scenarios, authentication, authorization, oauth, passport, did:web, multi-hop]
 ---
 
 # Patterns
 
-Worked, version-pinned deployment patterns that trace real-world agent topologies through the spec end-to-end. Each pattern cites specific section numbers — [§1.1](/protocol/trust#11-passport-verification-procedure) verification, [§1.2](/protocol/trust#12-presentation-proof) presentation proof, [§10.3.3](/spec/next#1033-credential-schemes) credential schemes, [§10.4](/spec/next#104-authorization-scopes) authorization scopes — so an implementer reading along can move from "I want this behavior in production" to "the normative paragraph that says how" in one lookup.
+Worked deployment patterns that trace real-world agent topologies through the spec end-to-end. Each pattern cites specific section numbers — [§1.1](/protocol/trust#11-passport-verification-procedure) verification, [§1.2](/protocol/trust#12-presentation-proof) presentation proof, [§10.3.3](/spec/next#1033-credential-schemes) credential schemes, [§10.4](/spec/next#104-authorization-scopes) authorization scopes — so an implementer reading along can move from "I want this behavior in production" to "the normative paragraph that says how" in one lookup.
 
 This section is **non-normative**. The normative content lives in the [specification](/spec/next). Patterns illustrate composition, document failure modes, and provide regulators or auditors with reconstructable end-to-end traces — but if a pattern ever conflicts with the spec, the spec wins.
 
@@ -39,4 +39,4 @@ This section is **non-normative**. The normative content lives in the [specifica
 - **Section anchors** at the end of every pattern mapping every operation to the exact `§10.x.y.z` it cites.
 - **Failure modes section** documenting what happens when each authentication or authorization gate rejects.
 - **End-to-end audit reconstruction** showing how the chain reconstructs across hops where no single hop sees the full picture.
-- **Version-pinned**: this directory lives under `core/_next/`. When the draft is released, patterns move with it.
+- **Unversioned living guidance**: patterns are non-normative and track the current spec; they are not snapshotted per release.

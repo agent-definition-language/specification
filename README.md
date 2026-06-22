@@ -32,7 +32,7 @@ bunx @adl-spec/cli validate my-agent.yaml
 | [core/](core/) | Versioned core specifications and JSON schemas (the data model) |
 | [protocol/](protocol/) | Companion protocol specs (runtime, trust) — versioned independently |
 | [profiles/](profiles/) | Domain-specific profiles (governance, healthcare, financial, portfolio, registry) |
-| [patterns/](patterns/) | Non-normative, version-pinned deployment patterns |
+| [patterns/](patterns/) | Non-normative deployment patterns |
 | [proposals/](proposals/) | The RFC / change-proposal process |
 | [conformance/](conformance/) | Conformance test vectors, scoped by version |
 

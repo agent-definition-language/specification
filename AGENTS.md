@@ -63,7 +63,7 @@ new release), never in the frozen copy.
 - `core/manifest.yaml` — version metadata: `latest`, `next`, per-version `status` (no standards-submission metadata)
 - `protocol/_next/` — protocol layer: `trust-protocol.md`, `runtime-protocol.md`, `index.md`
 - `profiles/` — domain profiles, each versioned independently; `profiles/manifest.yaml` holds metadata/status
-- `patterns/` — non-normative, version-pinned deployment patterns
+- `patterns/` — non-normative deployment patterns
 - `proposals/` — one Markdown file per proposal; see `proposals/README.md`
 - `conformance/` — conformance vectors, scoped by version; see `conformance/README.md`
 
