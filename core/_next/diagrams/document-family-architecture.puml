@@ -1,6 +1,6 @@
 @startuml document-family-architecture
 ' Editable UML master for the ADL document-family / layer architecture.
-' Anchors: ADL Core §1.3 (The ADL Document Family); protocol overview (protocol/draft/index.md).
+' Anchors: ADL Core §1.3 (The ADL Document Family); protocol overview (protocol/_next/index.md).
 ' Render to SVG: plantuml -tsvg document-family-architecture.puml
 ' The committed .svg is a hand-authored render; keep both committed (see diagrams/README.md).
 '

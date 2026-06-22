@@ -61,7 +61,7 @@ new release), never in the frozen copy.
 - `core/_next/examples/` — version-scoped example documents (`*.yaml` + `*.mdx` wrappers)
 - `core/_next/diagrams/` — spec diagrams
 - `core/manifest.yaml` — version metadata: `latest`, `next`, per-version `status` (no standards-submission metadata)
-- `protocol/draft/` — protocol layer: `trust-protocol.md`, `runtime-protocol.md`, `index.md`
+- `protocol/_next/` — protocol layer: `trust-protocol.md`, `runtime-protocol.md`, `index.md`
 - `profiles/` — domain profiles, each versioned independently; `profiles/manifest.yaml` holds metadata/status
 - `patterns/` — non-normative, version-pinned deployment patterns
 - `proposals/` — one Markdown file per proposal; see `proposals/README.md`
@@ -86,7 +86,7 @@ When editing `core/_next/spec.md`:
 
 - **Spec change:** Edit `core/_next/spec.md`; update examples if needed.
 - **Schema change:** Update `core/_next/schema.json` alongside the member it defines.
-- **Protocol change:** Edit `protocol/draft/trust-protocol.md` or `runtime-protocol.md`.
+- **Protocol change:** Edit `protocol/_next/trust-protocol.md` or `runtime-protocol.md`.
 - **Profile change:** Edit `profiles/<name>/<version>/profile.md`; update profile examples.
 - **New proposal:** Add under `proposals/`; follow `proposals/README.md`.
 - **New example:** Add YAML under `core/_next/examples/`; update `examples/README.md`.
