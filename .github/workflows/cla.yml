@@ -3,7 +3,7 @@
 # Signatures are recorded once in a central ledger — the `cla-signatures` branch of the
 # governance repo — and honored across every ADL repository, so contributors sign once.
 # The cross-repo write uses a short-lived token minted from the org-owned `adl-autobot`
-# GitHub App (secrets ADL_APP_ID + ADL_APP_PRIVATE_KEY); no personal PATs.
+# GitHub App (secrets ADL_APP_CLIENT_ID + ADL_APP_PRIVATE_KEY); no personal PATs.
 name: CLA
 
 on:
@@ -11,6 +11,10 @@ on:
     types: [opened, synchronize, reopened]
   issue_comment:
     types: [created]
+
+concurrency:
+  group: cla-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
