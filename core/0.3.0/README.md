@@ -9,7 +9,6 @@ This directory contains the specification for the ADL v0.3.0 working draft.
 ```
 draft/
 ├── spec.md              # Canonical specification (source of truth)
-├── spec-manifest.yaml   # Section structure for multi-format generation
 ├── schema.json          # JSON Schema for validation
 ├── examples/            # Complete ADL document examples
 │   ├── minimal.yaml
@@ -29,19 +28,9 @@ draft/
 | File | Purpose |
 |------|---------|
 | `spec.md` | The canonical specification document |
-| `spec-manifest.yaml` | Section IDs and structure for generating body-specific output (IETF, ISO, LF) |
 | `schema.json` | JSON Schema for validating ADL documents |
 | `examples/` | Complete, valid ADL document examples |
 | `snippets/` | Partial code snippets used in documentation |
-
-## Generating Documentation
-
-The sync script reads this directory and generates:
-- Docusaurus documentation site pages
-- JSON versions of YAML examples
-- Versioned documentation snapshots
-
-See [`scripts/sync-spec.ts`](../../site/scripts/sync-spec.ts) for the generation logic.
 
 ## Versioning
 
