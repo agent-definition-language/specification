@@ -1,0 +1,54 @@
+name: Mirror flagged issue to internal
+
+# When a maintainer adds the "private-review" label to a public issue, clone it into the
+# private internal tracker for IP/security/strategy evaluation and note it on the public
+# issue. The decision is always reported back here, in the open.
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  issues: write
+
+concurrency:
+  group: mirror-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    if: github.event.label.name == 'private-review'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint app token (write internal)
+        id: token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.ADL_APP_CLIENT_ID }}
+          private-key: ${{ secrets.ADL_APP_PRIVATE_KEY }}
+          owner: agent-definition-language
+          repositories: internal
+      - name: Clone to internal + link back
+        env:
+          APP_TOKEN: ${{ steps.token.outputs.token }}
+          GH_TOKEN: ${{ github.token }}
+          SRC: ${{ github.repository }}
+          NUM: ${{ github.event.issue.number }}
+          TITLE: ${{ github.event.issue.title }}
+          URL: ${{ github.event.issue.html_url }}
+          BODY: ${{ github.event.issue.body }}
+        run: |
+          if gh issue view "$NUM" --repo "$SRC" --json comments \
+               --jq '.comments[].body' | grep -q '<!-- mirrored-to-internal -->'; then
+            echo "already mirrored; nothing to do"; exit 0
+          fi
+          mirror=$(GH_TOKEN="$APP_TOKEN" gh issue create \
+            --repo agent-definition-language/internal \
+            --title "[review] $TITLE" \
+            --body "Flagged for private review from **$SRC#$NUM** — $URL
+
+---
+
+$BODY")
+          echo "mirrored to: $mirror"
+          gh issue comment "$NUM" --repo "$SRC" --body '<!-- mirrored-to-internal -->
+Flagged for **private review**. Maintainers will evaluate this privately (IP / security / strategy) and report the decision back here. Most issues are handled in the open — this routing is the exception.'

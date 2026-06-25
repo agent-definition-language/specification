@@ -1,0 +1,16 @@
+name: Spec question / clarification
+description: Ask about or request clarification of the specification.
+labels: [question]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What is unclear or ambiguous?
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Spec section / version
+      placeholder: e.g. Core §10.4, ADL 0.3.0

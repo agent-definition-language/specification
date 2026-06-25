@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Propose a normative change (RFC)
+    url: https://github.com/agent-definition-language/specification/tree/main/proposals
+    about: Behavioral or normative changes go through the RFC process, not an issue.
+  - name: Discuss an idea
+    url: https://github.com/orgs/agent-definition-language/discussions
+    about: Float ideas and questions in Discussions before an RFC.
+  - name: Security vulnerability
+    url: https://github.com/agent-definition-language/governance/blob/main/SECURITY.md
+    about: Report security issues privately — do not open a public issue.

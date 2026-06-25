@@ -1,0 +1,21 @@
+name: Errata (error or typo)
+description: Report a typo, broken link, or factual error in the spec text.
+labels: [errata]
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Location
+      placeholder: e.g. Core §11.5, core/0.3.0/spec.md
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is wrong
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested correction
